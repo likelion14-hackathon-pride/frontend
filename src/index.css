@@ -1,14 +1,14 @@
 @import "tailwindcss";
 
 @theme {
-  --color-accent: #F5872B;
-  --color-ink: #17171B;
-  --color-body: #3A3A42;
-  --color-muted: #8A8A93;
-  --color-border: #E7E7EB;
-  --color-canvas: #F7F7F8;
-  --color-field: #FCFCFD;
-  --color-faint: #B4B4BC;
+  --color-accent: #f5872b;
+  --color-ink: #17171b;
+  --color-body: #3a3a42;
+  --color-muted: #8a8a93;
+  --color-border: #e7e7eb;
+  --color-canvas: #f7f7f8;
+  --color-field: #fcfcfd;
+  --color-faint: #b4b4bc;
 
   --radius-card: 20px;
   --radius-input: 11px;

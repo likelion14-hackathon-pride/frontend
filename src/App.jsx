@@ -1,6 +1,6 @@
-import { Routes, Route } from 'react-router-dom'
-import Login from './pages/Login'
-import OnboardingOwner from './pages/OnboardingOwner'
+import { Routes, Route } from "react-router-dom";
+import Login from "./pages/Login";
+import OnboardingOwner from "./pages/OnboardingOwner";
 
 const App = () => {
   return (
@@ -9,7 +9,7 @@ const App = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/onboarding/owner" element={<OnboardingOwner />} />
     </Routes>
-  )
-}
+  );
+};
 
-export default App
+export default App;
