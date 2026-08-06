@@ -1,30 +1,38 @@
-const StepTabs = ({ steps, currentStep, maxUnlockedStep, onStepChange, lang }) => {
+const StepTabs = ({
+  steps,
+  currentStep,
+  maxUnlockedStep,
+  onStepChange,
+  lang,
+}) => {
   const handleKeyDown = (e, index) => {
-    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return
-    e.preventDefault()
+    if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+    e.preventDefault();
 
-    const direction = e.key === 'ArrowRight' ? 1 : -1
-    let nextIndex = index + direction
+    const direction = e.key === "ArrowRight" ? 1 : -1;
+    let nextIndex = index + direction;
 
     while (nextIndex >= 0 && nextIndex < steps.length) {
       if (steps[nextIndex].id <= maxUnlockedStep) {
-        onStepChange(steps[nextIndex].id)
-        document.getElementById(`onboarding-tab-${steps[nextIndex].id}`)?.focus()
-        break
+        onStepChange(steps[nextIndex].id);
+        document
+          .getElementById(`onboarding-tab-${steps[nextIndex].id}`)
+          ?.focus();
+        break;
       }
-      nextIndex += direction
+      nextIndex += direction;
     }
-  }
+  };
 
   return (
     <div
       role="tablist"
-      aria-label={lang === 'ko' ? '온보딩 단계' : 'Onboarding steps'}
+      aria-label={lang === "ko" ? "온보딩 단계" : "Onboarding steps"}
       className="flex gap-1 overflow-x-auto px-4 md:px-0 md:justify-center border-b border-border bg-white"
     >
       {steps.map((step, index) => {
-        const isCurrent = step.id === currentStep
-        const isLocked = step.id > maxUnlockedStep
+        const isCurrent = step.id === currentStep;
+        const isLocked = step.id > maxUnlockedStep;
 
         return (
           <button
@@ -33,7 +41,7 @@ const StepTabs = ({ steps, currentStep, maxUnlockedStep, onStepChange, lang }) =
             type="button"
             role="tab"
             aria-selected={isCurrent}
-            aria-current={isCurrent ? 'step' : undefined}
+            aria-current={isCurrent ? "step" : undefined}
             aria-controls={`onboarding-panel-${step.id}`}
             tabIndex={isCurrent ? 0 : -1}
             disabled={isLocked}
@@ -41,18 +49,18 @@ const StepTabs = ({ steps, currentStep, maxUnlockedStep, onStepChange, lang }) =
             onKeyDown={(e) => handleKeyDown(e, index)}
             className={`flex-none whitespace-nowrap px-4 py-3 text-[12.5px] font-bold border-b-2 transition ${
               isCurrent
-                ? 'border-accent text-ink'
+                ? "border-accent text-ink"
                 : isLocked
-                  ? 'border-transparent text-faint cursor-not-allowed'
-                  : 'border-transparent text-muted hover:text-ink'
+                  ? "border-transparent text-faint cursor-not-allowed"
+                  : "border-transparent text-muted hover:text-ink"
             }`}
           >
-            {step.id}. {lang === 'ko' ? step.labelKo : step.labelEn}
+            {step.id}. {lang === "ko" ? step.labelKo : step.labelEn}
           </button>
-        )
+        );
       })}
     </div>
-  )
-}
+  );
+};
 
-export default StepTabs
+export default StepTabs;
