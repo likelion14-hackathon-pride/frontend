@@ -196,13 +196,13 @@ const Login = () => {
 
             <div className="flex gap-2">
                 <Link
-                    to="/onboarding/owner"    // 임의값, 나중에 보고 수정하기 (밑에 app도!!)
+                    to="/onboarding/owner"   
                     className="flex-1 text-center py-2.5 rounded-input bg-[#F2F2F4] text-[#6B6B73] text-xs font-bold hover:bg-[#EAEAED] transition"
                 >
                     {lang === 'ko' ? '대표 화면' : 'Owner screens'}
                 </Link>
                 <Link
-                    to="/app"    
+                    to="/onboarding/member"    
                     className="flex-1 text-center py-2.5 rounded-input bg-[#F2F2F4] text-[#6B6B73] text-xs font-bold hover:bg-[#EAEAED] transition"
                 >
                     {lang === 'ko' ? '팀원 화면' : 'Member screens'}
