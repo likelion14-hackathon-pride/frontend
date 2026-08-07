@@ -5,6 +5,7 @@ import StepTabs from "../components/onboarding/StepTabs";
 import StepPlaceholder from "../components/onboarding/steps/StepPlaceholder";
 import { useLanguage } from "../context/LanguageContext";
 import StepSources from "../components/onboarding/steps/StepSources";
+import StepDraftReview from "../components/onboarding/steps/StepDraftReview";
 
 const STEPS = [
   { id: 1, labelKo: "소스 연결", labelEn: "Connect sources" },
@@ -68,6 +69,12 @@ const OnboardingOwner = () => {
       >
         {currentStep === 1 ? (
           <StepSources
+            headingRef={headingRef}
+            onNext={handleNext}
+            lang={lang}
+          />
+        ) : currentStep === 2 ? (
+          <StepDraftReview
             headingRef={headingRef}
             onNext={handleNext}
             lang={lang}
