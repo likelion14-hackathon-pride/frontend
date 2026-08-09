@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import Header from "../components/Header";
-import LanguageToggle from "../components/LanguageToggle";
+import OwnerBadge from "../components/OwnerBadge";
 import StepTabs from "../components/onboarding/StepTabs";
 import StepPlaceholder from "../components/onboarding/steps/StepPlaceholder";
 import { useLanguage } from "../context/LanguageContext";
 import StepSources from "../components/onboarding/steps/StepSources";
 import StepDraftReview from "../components/onboarding/steps/StepDraftReview";
+import StepGuardrails from "../components/onboarding/steps/StepGuardrails";
 
 const STEPS = [
   { id: 1, labelKo: "소스 연결", labelEn: "Connect sources" },
@@ -15,7 +16,7 @@ const STEPS = [
 ];
 
 const OnboardingOwner = () => {
-  const { lang, setLang } = useLanguage();
+  const { lang } = useLanguage();
   const [currentStep, setCurrentStep] = useState(1);
   const [maxUnlockedStep, setMaxUnlockedStep] = useState(1);
   const headingRef = useRef(null);
@@ -50,7 +51,7 @@ const OnboardingOwner = () => {
   return (
     <div className="min-h-screen bg-canvas font-display flex flex-col">
       <Header appTitle="SAI">
-        <LanguageToggle lang={lang} setLang={setLang} />
+        <OwnerBadge lang={lang} />
       </Header>
 
       <StepTabs
@@ -79,6 +80,8 @@ const OnboardingOwner = () => {
             onNext={handleNext}
             lang={lang}
           />
+        ) : currentStep === 3 ? (
+            <StepGuardrails headingRef={headingRef} onNext={handleNext} lang={lang} />
         ) : (
           <StepPlaceholder
             title={lang === "ko" ? activeStep.labelKo : activeStep.labelEn}

@@ -7,6 +7,37 @@ import {
 import DraftItem from "./DraftItem";
 import QuestionItem from "./QuestionItem";
 
+const CATEGORIES = [
+  {
+    key: "company",
+    nameKo: "회사 전반",
+    nameEn: "Company",
+    metaKo: "가치·미션·컬처·핸드북 운영",
+    metaEn: "Values · mission · culture · handbook ops",
+  },
+  {
+    key: "people",
+    nameKo: "피플팀",
+    nameEn: "People",
+    metaKo: "인사·채용·다양성·보상·학습",
+    metaEn: "HR · hiring · diversity · comp · learning",
+  },
+  {
+    key: "product",
+    nameKo: "제품 / 엔지니어링",
+    nameEn: "Product / Engineering",
+    metaKo: "제품 우선순위·개발 이슈·고객지원·오픈소스",
+    metaEn: "Priorities · dev issues · support · open source",
+  },
+  {
+    key: "security",
+    nameKo: "보안",
+    nameEn: "Security",
+    metaKo: "보안 표준·접근 보안·사고 대응·위험 관리",
+    metaEn: "Security standards · access · incidents · risk",
+  },
+];
+
 const StepDraftReview = ({ headingRef, onNext, lang }) => {
   const [loading, setLoading] = useState(true);
   const [mode, setMode] = useState("rich");
@@ -110,8 +141,15 @@ const StepDraftReview = ({ headingRef, onNext, lang }) => {
             />
           </div>
 
-          <div className="space-y-2.5">
-            {drafts.map((draft) => (
+          {(() => {
+            const companyDrafts = drafts.filter((d) => d.scope === "company");
+            const projectDrafts = drafts.filter((d) => d.scope === "project");
+            const groups = CATEGORIES.map((cat) => ({
+              ...cat,
+              items: companyDrafts.filter((d) => d.category === cat.key),
+            })).filter((group) => group.items.length > 0);
+
+            const renderDraft = (draft) => (
               <DraftItem
                 key={draft.id}
                 draft={draft}
@@ -136,11 +174,79 @@ const StepDraftReview = ({ headingRef, onNext, lang }) => {
                 onAssignProject={(projectId) =>
                   patchDraft(draft.id, { scope: "project", projectId })
                 }
+                onScopeToCompany={() =>
+                  patchDraft(draft.id, { scope: "company", projectId: null })
+                }
                 onCreateProject={handleCreateProject}
                 lang={lang}
               />
-            ))}
-          </div>
+            );
+
+            return (
+              <div className="space-y-7">
+                {groups.map((group) => {
+                  const pendingCount = group.items.filter(
+                    (d) => d.status === "pending",
+                  ).length;
+                  return (
+                    <div key={group.key} className="space-y-2.5">
+                      <div className="flex items-baseline gap-2.5">
+                        <span className="text-[13px] font-extrabold tracking-tight flex-none">
+                          {lang === "ko" ? group.nameKo : group.nameEn}
+                        </span>
+                        <span className="text-[11px] font-medium text-faint flex-none">
+                          {lang === "ko" ? group.metaKo : group.metaEn}
+                        </span>
+                        <span className="flex-1 h-px bg-border" />
+                        <span className="text-[10.5px] font-bold text-faint font-mono flex-none">
+                          {pendingCount > 0
+                            ? lang === "ko"
+                              ? `${pendingCount}건 확인 필요`
+                              : `${pendingCount} to review`
+                            : lang === "ko"
+                              ? `${group.items.length}건 확인 완료`
+                              : `${group.items.length} confirmed`}
+                        </span>
+                      </div>
+                      <div className="space-y-2.5">
+                        {group.items.map(renderDraft)}
+                      </div>
+                    </div>
+                  );
+                })}
+
+                <div className="space-y-2.5 ml-6 pl-5 border-l-2 border-border">
+                  <div className="flex items-baseline gap-2.5 pt-1">
+                    <span className="text-[10px] font-extrabold tracking-wide text-muted bg-[#EDEDF0] px-2.5 py-1 rounded-md flex-none">
+                      {lang === "ko" ? "프로젝트" : "Project"}
+                    </span>
+                    <span className="text-[11px] font-medium text-faint flex-none">
+                      {lang === "ko"
+                        ? "회사 전반과 다르게 굴러가는 항목만 여기 내려옵니다"
+                        : "Items that differ from the company-wide handbook"}
+                    </span>
+                    <span className="flex-1 h-px bg-border" />
+                    <span className="text-[10.5px] font-bold text-faint font-mono flex-none">
+                      {lang === "ko"
+                        ? `${projectDrafts.length}건`
+                        : `${projectDrafts.length} items`}
+                    </span>
+                  </div>
+                  {projectDrafts.length > 0 ? (
+                    <div className="space-y-2.5">
+                      {projectDrafts.map(renderDraft)}
+                    </div>
+                  ) : (
+                    <div className="bg-white border border-dashed border-[#E0E0E5] rounded-card px-5 py-4.5 text-[12px] text-muted leading-relaxed">
+                      {lang === "ko"
+                        ? "아직 프로젝트로 내려보낸 항목이 없어요. 회사 전반과 다르게 굴러가는 항목이 있다면 문항을 열어 '프로젝트로 내려보내기'를 눌러 주세요."
+                        : "Nothing moved to a project yet. Open an item and use 'Move to project' for anything that differs from the company-wide rules."}
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
         </>
       ) : (
         <div className="space-y-2.5 mt-4">

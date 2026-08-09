@@ -19,6 +19,11 @@ const SOURCE_TAG_STYLE = {
   파일: { bg: "#F2F2F4", text: "#6B6B73" },
 };
 
+const scopeChipClass = (active) =>
+  `flex-none whitespace-nowrap px-3 py-1.5 rounded-full text-[11px] font-bold transition ${
+    active ? "bg-ink text-white" : "bg-[#F2F2F4] text-muted"
+  }`;
+
 const DraftItem = ({
   draft,
   isOpen,
@@ -28,6 +33,7 @@ const DraftItem = ({
   projects,
   onAssignProject,
   onCreateProject,
+  onScopeToCompany,
   lang,
 }) => {
   const [editing, setEditing] = useState(false);
@@ -36,6 +42,10 @@ const DraftItem = ({
   const [showProjectPicker, setShowProjectPicker] = useState(false);
   const tagStyle =
     SOURCE_TAG_STYLE[draft.sourceTag] || SOURCE_TAG_STYLE["파일"];
+  const isProjectScoped = draft.scope === "project";
+  const projectName = isProjectScoped
+    ? projects.find((p) => p.projectId === draft.projectId)?.name
+    : null;
 
   return (
     <div className="bg-white rounded-card border border-[#EFEFF1]">
@@ -51,6 +61,11 @@ const DraftItem = ({
           style={{ backgroundColor: STATUS_DOT[draft.status] }}
           aria-hidden="true"
         />
+        {isProjectScoped && (
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full flex-none bg-[#EDEDF0] text-muted">
+            {projectName || (lang === "ko" ? "이름 미정" : "Untitled")}
+          </span>
+        )}
         <span className="flex-1 text-[13px] font-bold line-clamp-2">
           {draft.title}
         </span>
@@ -141,16 +156,36 @@ const DraftItem = ({
                 >
                   {lang === "ko" ? "수정" : "Edit"}
                 </button>
+              </div>
+
+              <div className="flex items-center gap-2 flex-wrap mt-3">
+                <span className="text-[10px] font-bold text-faint tracking-wide flex-none">
+                  {lang === "ko" ? "적용 범위" : "Scope"}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowProjectPicker(false);
+                    onScopeToCompany();
+                  }}
+                  className={scopeChipClass(!isProjectScoped)}
+                >
+                  {lang === "ko" ? "회사 전체" : "Company-wide"}
+                </button>
                 <button
                   type="button"
                   onClick={() => setShowProjectPicker((v) => !v)}
-                  className="px-3 py-1.5 rounded-input bg-[#F2F2F4] text-[#6B6B73] text-[11.5px] font-bold"
+                  className={scopeChipClass(isProjectScoped)}
                 >
-                  {lang === "ko" ? "프로젝트로 내려보내기" : "Move to project"}
+                  {isProjectScoped
+                    ? projectName || (lang === "ko" ? "프로젝트 선택" : "Choose project")
+                    : lang === "ko"
+                      ? "프로젝트로 내려보내기"
+                      : "Move to project"}
                 </button>
               </div>
 
-              {showProjectPicker && (
+              {(showProjectPicker || isProjectScoped) && (
                 <ProjectPicker
                   projects={projects}
                   selectedProjectId={draft.projectId}
