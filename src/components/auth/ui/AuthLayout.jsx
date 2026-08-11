@@ -153,7 +153,15 @@ const RightBrandText = styled.p`
 `;
 
 
-export default function AuthLayout({ children }) {
+export default function AuthLayout({ 
+  children,
+  brandWelcome,
+  heroTitle,
+  heroDescription,
+  checklist = [],
+  lang = "ko",
+  onLangChange,
+}) {
   return (
     <PageWrapper>
       <Content>
@@ -165,35 +173,35 @@ export default function AuthLayout({ children }) {
 
           <TitleContainer>
             <div>
-              <Title>물어보면, 팀의 규칙이 답합니다</Title>
-              <Description>슬랙과 핸드북을 대신 읽고, 해야 할 일로 정리해 드립니다.</Description>
+              <Title>{heroTitle}</Title>
+              <Description>{heroDescription}</Description>
             </div>
             <ListWrapper>
-              <TextList>
-                <IconBadge><img src={chatBubbleIcon} alt="" width={12} height={12} /></IconBadge>
-                질문에는 근거가 함께 붙습니다
-              </TextList>
-              <TextList>
-                <IconBadge><img src={chatBubbleIcon} alt="" width={12} height={12} /></IconBadge>
-                답할 수 없는 것만 대표님께 갑니다
-              </TextList>
-              <TextList>
-                <IconBadge><img src={chatBubbleIcon} alt="" width={12} height={12} /></IconBadge>
-                읽기는 영어, 확인은 한국어
-              </TextList>
+              {checklist.map((item, i) => (
+                <TextList key={i}>
+                  <IconBadge>
+                    <img src={chatBubbleIcon} alt="" width={12} height={12} />
+                  </IconBadge>
+                  {item}
+                </TextList>
+              ))}
             </ListWrapper>
           </TitleContainer>
 
           <LanguageRow>
-            <LanguageOption $active>한국어</LanguageOption>
-            <LanguageOption>English</LanguageOption>
+            <LanguageOption $active={lang === "ko"} onClick={() => onLangChange?.("ko")}>
+              한국어
+            </LanguageOption>
+            <LanguageOption $active={lang === "en"} onClick={() => onLangChange?.("en")}>
+              English
+            </LanguageOption>
           </LanguageRow>
         </LeftPanel>
 
         <RightPanel>
           <RightBrandRow>
             <img src={logoMascot} alt="SAI" height={24} />
-            <RightBrandText>SAI에 오신 것을 환영합니다</RightBrandText>
+            <RightBrandText>{brandWelcome}</RightBrandText>
           </RightBrandRow>
           {children}
         </RightPanel>

@@ -24,14 +24,14 @@ const Option = styled.button`
 
 
 
-export default function ModeToggle({ value, onChange }) {
+export default function ModeToggle({ value, onChange, signupLabel = "회원가입", loginLabel = "로그인"}) {
   return (
     <Wrapper>
       <Option type="button" $active={value === "signup"} onClick={() => onChange("signup")}>
-        회원가입
+        {signupLabel}
       </Option>
       <Option type="button" $active={value === "login"} onClick={() => onChange("login")}>
-        로그인
+        {loginLabel}
       </Option>
     </Wrapper>
   );

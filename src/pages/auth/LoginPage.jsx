@@ -8,13 +8,16 @@ import { StartButton } from "../../components/auth/ui/Button";
 import OwnerSignupForm from "../../components/auth/OwnerSignupForm";
 import MemberSignupForm from "../../components/auth/MemberSignupForm";
 import GuestSection from "../../components/auth/ui/GuestSection";
+import { translations } from "../../components/auth/translations";
 
 import mailIcon from "../../assets/icons/mail.svg";
 import lockIcon from "../../assets/icons/lock.svg";
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  
+  const [lang, setLang] = useState("ko");
+  const t = translations[lang];
+
   const [mode, setMode] = useState("signup");
   const [role, setRole] = useState("owner");
 
@@ -27,7 +30,7 @@ export default function LoginPage() {
   const handleSubmit = () => {
     if (mode === "login") {
       if (!email || !password) {
-        alert("이메일과 비밀번호를 모두 입력해주세요.");
+        alert(t.errorLoginRequired);
         return;
       }
       // 로그인 API 호출 넣기
@@ -36,13 +39,13 @@ export default function LoginPage() {
 
     if (role === "owner") {
       if (!name || !email || !password || !companyName) {
-        alert("모든 항목을 입력해주세요.");
+        alert(t.errorRequired);
         return;
       }
       // 오너 회원가입 API 호출
     } else {
       if (!name || !email || !password || !inviteCode) {
-        alert("모든 항목을 입력해주세요.");
+        alert(t.errorRequired);
         return;
       }
       // 팀원 회원가입 API 호출
@@ -50,10 +53,19 @@ export default function LoginPage() {
   };
 
   return (
-    <AuthLayout>
-      <ModeToggle value={mode} onChange={setMode} />
+    <AuthLayout
+      brandWelcome={t.brandWelcome}
+      heroTitle={t.heroTitle}
+      heroDescription={t.heroDescription}
+      checklist={t.checklist}
+      lang={lang}
+      onLangChange={setLang}
+    >
+      <ModeToggle value={mode} onChange={setMode} signupLabel={t.signupLabel} loginLabel={t.loginLabel} />
 
-      {mode === "signup" && <RoleSelect value={role} onChange={setRole} />}
+      {mode === "signup" && (
+        <RoleSelect value={role} onChange={setRole} ownerLabel={t.ownerLabel} memberLabel={t.memberLabel} />
+      )}
 
       {mode === "signup" && role === "owner" && (
         <OwnerSignupForm
@@ -61,6 +73,7 @@ export default function LoginPage() {
           email={email} setEmail={setEmail}
           password={password} setPassword={setPassword}
           companyName={companyName} setCompanyName={setCompanyName}
+          t={t}
         />
       )}
 
@@ -70,22 +83,23 @@ export default function LoginPage() {
           email={email} setEmail={setEmail}
           password={password} setPassword={setPassword}
           inviteCode={inviteCode} setInviteCode={setInviteCode}
+          t={t}
         />
       )}
 
       {mode === "login" && (
         <>
           <Input
-            label="업무용 이메일"
+            label={t.emailLabel}
             name="email"
             type="email"
             icon={<img src={mailIcon} alt="" width={14} height={14} />}
-            placeholder="daepyo@company.com"
+            placeholder={t.emailPlaceholder}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
           <Input
-            label="비밀번호"
+            label={t.passwordLabel}
             name="password"
             type="password"
             icon={<img src={lockIcon} alt="" width={14} height={14} />}
@@ -98,14 +112,13 @@ export default function LoginPage() {
 
       <StartButton onClick={handleSubmit}>
         {mode === "signup"
-          ? role === "owner"
-            ? "회사 만들고 설정 시작"
-            : "회사에 참여하기"
-          : "로그인"}
+          ? role === "owner" ? t.submitOwner : t.submitMember
+          : t.submitLogin}
       </StartButton>
       <GuestSection
         onOwnerPreview={() => navigate("/owner")}
         onMemberPreview={() => navigate("/member")}
+        t={t}
       />
     </AuthLayout>
   );

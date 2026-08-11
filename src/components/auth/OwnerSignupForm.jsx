@@ -10,42 +10,43 @@ export default function OwnerSignupForm({
   email, setEmail,
   password, setPassword,
   companyName, setCompanyName,
+  t,    // 번역 객체
 }) {
   return (
     <>
       <Input
-        label="이름"
+        label={t.nameLabel}
         name="name"
         type="text"
         icon={<img src={userIcon} alt="" width={14} height={14} />}
-        placeholder="예: 김민수"
+        placeholder={t.namePlaceholder}
         value={name}
         onChange={(e) => setName(e.target.value)}
       />
       <Input
-        label="업무용 이메일"
+        label={t.emailLabel}
         name="email"
         type="email"
         icon={<img src={mailIcon} alt="" width={14} height={14} />}
-        placeholder="daepyo@company.com"
+        placeholder={t.emailPlaceholder}
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
       <Input
-        label="비밀번호"
+        label={t.passwordLabel}
         name="password"
         type="password"
         icon={<img src={lockIcon} alt="" width={14} height={14} />}
-        placeholder="8자 이상"
+        placeholder={t.passwordPlaceholder}
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
       <Input
-        label="회사 이름"
+        label={t.companyNameLabel}
         name="companyName"
         type="text"
         icon={<img src={buildingIcon} alt="" width={14} height={14} />}
-        placeholder="예: 에코랩"
+        placeholder={t.companyNamePlaceholder}
         value={companyName}
         onChange={(e) => setCompanyName(e.target.value)}
       />
