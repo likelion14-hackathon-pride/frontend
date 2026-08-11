@@ -1,5 +1,8 @@
+import { useState } from "react";
 import styled from "styled-components";
 import { colors } from "./theme";
+import eyeIcon from "../../../assets/icons/eye.svg";
+import eyeOffIcon from "../../../assets/icons/eye-off.svg";
 
 const Wrapper = styled.div`
   display: flex;
@@ -55,6 +58,16 @@ const HintText = styled.p`
   margin: 0;
 `;
 
+const EyeButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+`;
 
 
 export default function Input({
@@ -67,6 +80,9 @@ export default function Input({
   icon,
   hint,
 }) {
+  const [showPassword, setShowPassword] = useState(false);
+  const isPassword = type === "password";
+
   return (
     <Wrapper>
       {label && <Label htmlFor={name}>{label}</Label>}
@@ -75,11 +91,21 @@ export default function Input({
         <StyledInput
           id={name}
           name={name}
-          type={type}
+          type={isPassword ? (showPassword ? "text" : "password") : type}
           value={value}
           onChange={onChange}
           placeholder={placeholder}
         />
+        {isPassword && (
+          <EyeButton type="button" onClick={() => setShowPassword((prev) => !prev)}>
+            <img
+              src={showPassword ? eyeOffIcon : eyeIcon}
+              alt=""
+              width={14}
+              height={14}
+            />
+          </EyeButton>
+        )}     
       </InputBox>
       {hint && <HintText>{hint}</HintText>}
     </Wrapper>
