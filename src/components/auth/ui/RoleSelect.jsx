@@ -20,14 +20,14 @@ const Option = styled.button`
   color: ${({ $active }) => ($active ? colors.textPrimary : "#8A8A93")};
 `;
 
-export default function RoleSelect({ value, onChange }) {
+export default function RoleSelect({ value, onChange, ownerLabel = "대표·관리자", memberLabel = "팀원"}) {
   return (
     <Wrapper>
       <Option type="button" $active={value === "owner"} onClick={() => onChange("owner")}>
-        대표·관리자
+        {ownerLabel}
       </Option>
       <Option type="button" $active={value === "member"} onClick={() => onChange("member")}>
-        팀원
+        {memberLabel}
       </Option>
     </Wrapper>
   );

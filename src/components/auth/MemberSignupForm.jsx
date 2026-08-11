@@ -11,43 +11,44 @@ export default function MemberSignupForm({
   email, setEmail,
   password, setPassword,
   inviteCode, setInviteCode,
+  t, // 번역 객체
 }) {
   return (
     <>
       <Input
-        label="이름"
+        label={t.nameLabel}
         name="name"
         type="text"
         icon={<img src={userIcon} alt="" width={14} height={14} />}
-        placeholder="예: 김민수"
+        placeholder={t.namePlaceholder}
         value={name}
         onChange={(e) => setName(e.target.value)}
       />
       <Input
-        label="업무용 이메일"
+        label={t.emailLabel}
         name="email"
         type="email"
         icon={<img src={mailIcon} alt="" width={14} height={14} />}
-        placeholder="daepyo@company.com"
+        placeholder={t.emailPlaceholder}
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
       <Input
-        label="비밀번호"
+        label={t.passwordLabel}
         name="password"
         type="password"
         icon={<img src={lockIcon} alt="" width={14} height={14} />}
-        placeholder="8자 이상"
+        placeholder={t.passwordPlaceholder}
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
       <Input
-        label="회사 코드"
+        label={t.inviteCodeLabel}
         name="inviteCode"
         type="text"
         icon={<img src={keyIcon} alt="" width={14} height={14} />}
-        placeholder="ECHO-4821"
-        hint="대표님에게 받은 코드를 입력하세요."
+        placeholder={t.inviteCodePlaceholder}
+        hint={t.inviteCodeHint}
         value={inviteCode}
         onChange={(e) => setInviteCode(e.target.value)}
       />

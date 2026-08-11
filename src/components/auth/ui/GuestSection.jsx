@@ -47,17 +47,17 @@ const PreviewButton = styled.button`
 `;
 
 
-export default function GuestSection({ onOwnerPreview, onMemberPreview }) {
+export default function GuestSection({ onOwnerPreview, onMemberPreview, t }) {
   return (
     <>
       <DividerRow>
         <Line />
-        <Text>로그인 없이 둘러보기</Text>
+        <Text>{t.guestLink}</Text>
         <Line />
       </DividerRow>
       <PreviewContainer>
-        <PreviewButton onClick={onOwnerPreview}>대표 화면</PreviewButton>
-        <PreviewButton onClick={onMemberPreview}>팀원 화면</PreviewButton>
+        <PreviewButton onClick={onOwnerPreview}>{t.previewOwner}</PreviewButton>
+        <PreviewButton onClick={onMemberPreview}>{t.previewMember}</PreviewButton>
       </PreviewContainer>
     </>
   );
