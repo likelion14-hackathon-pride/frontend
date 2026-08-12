@@ -1,16 +1,19 @@
-import Input from "./ui/Input";
-import userIcon from "../../assets/icons/user.svg";
-import mailIcon from "../../assets/icons/mail.svg";
-import lockIcon from "../../assets/icons/lock.svg";
-import buildingIcon from "../../assets/icons/building.svg";
-
+import Input from './ui/Input';
+import userIcon from '../../assets/icons/user.svg';
+import mailIcon from '../../assets/icons/mail.svg';
+import lockIcon from '../../assets/icons/lock.svg';
+import buildingIcon from '../../assets/icons/building.svg';
 
 export default function OwnerSignupForm({
-  name, setName,
-  email, setEmail,
-  password, setPassword,
-  companyName, setCompanyName,
-  t,    // 번역 객체
+  name,
+  setName,
+  email,
+  setEmail,
+  password,
+  setPassword,
+  companyName,
+  setCompanyName,
+  t, // 번역 객체
 }) {
   return (
     <>

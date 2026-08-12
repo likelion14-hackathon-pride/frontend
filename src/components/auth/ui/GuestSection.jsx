@@ -1,5 +1,5 @@
-import styled from "styled-components";
-import { colors } from "./theme";
+import styled from 'styled-components';
+import { colors } from './theme';
 
 const DividerRow = styled.div`
   display: flex;
@@ -11,13 +11,13 @@ const DividerRow = styled.div`
 const Line = styled.div`
   flex: 1;
   height: 1px;
-  background: #EFEFF1;
+  background: #efeff1;
 `;
 
 const Text = styled.span`
   font-size: 10.5px;
   font-weight: 600;
-  color: #C4C4CC;
+  color: #c4c4cc;
   white-space: nowrap;
 `;
 
@@ -36,16 +36,15 @@ const PreviewButton = styled.button`
   align-items: center;
   padding: 12px 0 14px 0;
   border-radius: 999px;
-  border: 1px solid #EAEAEE;
-  background: #F7F7F8;
-  color: #6B6B73;
+  border: 1px solid #eaeaee;
+  background: #f7f7f8;
+  color: #6b6b73;
   text-align: center;
   font-size: 12.5px;
   font-weight: 700;
   line-height: normal;
   cursor: pointer;
 `;
-
 
 export default function GuestSection({ onOwnerPreview, onMemberPreview, t }) {
   return (

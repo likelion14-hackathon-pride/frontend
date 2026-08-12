@@ -1,16 +1,19 @@
-import Input from "./ui/Input";
-import userIcon from "../../assets/icons/user.svg";
-import mailIcon from "../../assets/icons/mail.svg";
-import lockIcon from "../../assets/icons/lock.svg";
-import buildingIcon from "../../assets/icons/building.svg";
-import keyIcon from "../../assets/icons/key.svg";
-
+import Input from './ui/Input';
+import userIcon from '../../assets/icons/user.svg';
+import mailIcon from '../../assets/icons/mail.svg';
+import lockIcon from '../../assets/icons/lock.svg';
+import buildingIcon from '../../assets/icons/building.svg';
+import keyIcon from '../../assets/icons/key.svg';
 
 export default function MemberSignupForm({
-  name, setName,
-  email, setEmail,
-  password, setPassword,
-  inviteCode, setInviteCode,
+  name,
+  setName,
+  email,
+  setEmail,
+  password,
+  setPassword,
+  inviteCode,
+  setInviteCode,
   t, // 번역 객체
 }) {
   return (
