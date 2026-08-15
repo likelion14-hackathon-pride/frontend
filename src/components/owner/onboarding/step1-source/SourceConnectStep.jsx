@@ -9,6 +9,21 @@ import localFileIcon from '../../../../assets/owner/local-file.svg';
 import nextArrowTrans from '../../../../assets/owner/next_arrow_trans.svg';
 import nextArrowBlack from '../../../../assets/owner/next_arrow_black.svg';
 
+const GithubIconCrop = styled.span`
+  display: flex;
+  width: 27px;
+  height: 27px;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    width: 27px;
+    height: 27px;
+    transform: scale(1.4);
+  }
+`;
+
 const HeaderRow = styled.div`
   display: flex;
   padding: 4px 20px 8px 4px;
@@ -160,7 +175,11 @@ const SOURCES = [
   {
     key: 'github',
     variant: 'github',
-    icon: <img src={githubIcon} alt="" width={22} height={22} />,
+    icon: (
+      <GithubIconCrop>
+        <img src={githubIcon} alt="" />
+      </GithubIconCrop>
+    ),
     title: 'GitHub',
     subtitle: 'CI 설정 · README · PR 이력',
     description: '배포 절차, 리뷰 규칙, 브랜치 전략처럼 코드 옆에 이미 적혀 있는 규칙을 읽습니다.',
@@ -171,7 +190,7 @@ const SOURCES = [
   {
     key: 'slack',
     variant: 'slack',
-    icon: <img src={slackIcon} alt="" width={22} height={22} />,
+    icon: <img src={slackIcon} alt="" width={27} height={27} />,
     title: 'Slack',
     subtitle: '채널 히스토리 · 실시간',
     description: '대화 속에서 반복되는 결정과 규칙의 패턴을 찾아냅니다.',
