@@ -1,0 +1,44 @@
+export const INITIAL_SOURCES = {
+  github: {
+    key: 'github',
+    title: 'GitHub',
+    subtitle: '코드 저장소',
+    syncMode: 'live',
+    lastSync: '12분 전 동기화',
+    items: [
+      { id: 'gh-1', name: 'payment-api', meta: 'PR 218' },
+      { id: 'gh-2', name: 'admin-web', meta: 'PR 96' },
+      { id: 'gh-3', name: 'landing', meta: 'PR 24' },
+    ],
+    addLabel: '저장소 추가',
+    addPlaceholder: '예: org/repo-name',
+  },
+  slack: {
+    key: 'slack',
+    title: 'Slack',
+    subtitle: '팀 대화',
+    syncMode: 'live',
+    lastSync: '방금 전 수신',
+    items: [
+      { id: 'sl-1', name: '#dev-general', meta: '4,120건' },
+      { id: 'sl-2', name: '#payment', meta: '1,860건' },
+      { id: 'sl-3', name: '#general', meta: '980건' },
+    ],
+    addLabel: '채널 추가',
+    addPlaceholder: '예: #channel-name',
+  },
+  localFile: {
+    key: 'localFile',
+    title: '로컬 파일',
+    subtitle: '직접 업로드',
+    syncMode: 'manual',
+    lastSync: '3일 전 업로드',
+    items: [
+      { id: 'lf-1', name: '보안가이드.pdf', meta: '2.4MB' },
+      { id: 'lf-2', name: '온보딩.md', meta: '18KB' },
+      { id: 'lf-3', name: '회의록 08.pdf', meta: '640KB' },
+    ],
+    addLabel: '파일 업로드',
+    addPlaceholder: '예: 파일명.pdf',
+  },
+};
