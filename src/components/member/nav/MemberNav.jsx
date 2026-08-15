@@ -1,0 +1,284 @@
+import { useState } from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
+import styled, { css } from 'styled-components';
+import { useMemberNavigation } from '../../../context/member/MemberContext';
+import homeIcon from '../../../assets/icons/home.svg';
+import tasksIcon from '../../../assets/icons/sharp-grey.svg';
+import chatIcon from '../../../assets/icons/chat-grey.svg';
+import handbookIcon from '../../../assets/icons/book-grey.svg';
+import fileIcon from '../../../assets/icons/file.svg';
+import linkIcon from '../../../assets/icons/link.svg';
+
+const activeStyle = {
+  background: 'linear-gradient(135deg, #FF6000 0%, #FF8A3D 100%)',
+  color: '#fff',
+  boxShadow: '0 14px 34px -14px rgba(23, 44, 90, 0.22)',
+};
+
+const PROJECTS = [
+  { id: 'payment-api', label: 'payment-api', count: 3 },
+  { id: 'admin-web', label: 'admin-web', count: 2 },
+];
+
+export default function MemberNav({ taskCount = 3 }) {
+  const { pathname } = useLocation();
+  const { goToHandbook } = useMemberNavigation();
+  const isHandbookActive = pathname.startsWith('/member/handbook');
+  const isHandbookOpen = isHandbookActive; 
+  const [isProjectOpen, setIsProjectOpen] = useState(pathname.startsWith('/member/handbook/project'));
+
+  function handleHandbookClick() {
+    setIsHandbookOpen(true);
+    goToHandbook();
+  }
+
+  return (
+    <NavWrap>
+      <NavItem to="/member/home" style={({ isActive }) => (isActive ? activeStyle : undefined)}>
+        {({ isActive }) => (
+          <>
+            <IconImg src={homeIcon} alt="" width={15} height={15} $active={isActive} />
+            <span>Home</span>
+          </>
+        )}
+      </NavItem>
+
+      <NavItem to="/member/tasks" style={({ isActive }) => (isActive ? activeStyle : undefined)}>
+        {({ isActive }) => (
+          <>
+            <IconImg src={tasksIcon} alt="" width={15} height={15} $active={isActive} />
+            <span>Tasks</span>
+            <Badge>{taskCount}</Badge>
+          </>
+        )}
+      </NavItem>
+
+      <NavItem to="/member/ask" style={({ isActive }) => (isActive ? activeStyle : undefined)}>
+        {({ isActive }) => (
+          <>
+            <IconImg src={chatIcon} alt="" width={15} height={15} $active={isActive} />
+            <span>Ask SAI</span>
+          </>
+        )}
+      </NavItem>
+
+      <ToggleItem $active={isHandbookActive} onClick={goToHandbook}>
+        <IconImg src={handbookIcon} alt="" width={15} height={15} $active={isHandbookActive} />
+        <span>Handbook</span>
+        <Caret $open={isHandbookOpen}>▾</Caret>
+      </ToggleItem>
+
+      {isHandbookOpen && (
+        <SubMenu>
+          <SubItem to="/member/handbook/company">
+            <img src={fileIcon} alt="" width={13} height={13} />
+            <SubLabel>Company system</SubLabel>
+            <SubCount>12</SubCount>
+          </SubItem>
+
+          <SubToggle onClick={() => setIsProjectOpen((v) => !v)}>
+            <img src={linkIcon} alt="" width={13} height={13} />
+            <SubLabel>By project</SubLabel>
+            <SubCount>5</SubCount>
+          </SubToggle>
+
+          {isProjectOpen && (
+            <ProjectTree>
+              {PROJECTS.map((p) => {
+                const isActive = pathname === `/member/handbook/project/${p.id}`;
+                return (
+                  <ProjectRow key={p.id}>
+                    <TreeLine />
+                    <ProjectItem to={`/member/handbook/project/${p.id}`}>
+                      <Dot $active={isActive} />
+                      <ProjectLabel>{p.label}</ProjectLabel>
+                      <SubCount>{p.count}</SubCount>
+                    </ProjectItem>
+                  </ProjectRow>
+                );
+              })}
+            </ProjectTree>
+          )}
+        </SubMenu>
+      )}
+    </NavWrap>
+  );
+}
+
+const itemStyles = css`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 12px;
+  color: #6B6B73;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14.5px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+
+  &:hover {
+    box-shadow: inset 0 0 0 999px rgba(23, 23, 27, 0.045);
+  }
+`;
+
+const NavWrap = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+`;
+
+const NavItem = styled(NavLink)`
+  ${itemStyles}
+`;
+
+const ToggleItem = styled.button`
+  ${itemStyles}
+
+  ${(props) =>
+    props.$active &&
+    css`
+      background: linear-gradient(135deg, #FF6000 0%, #FF8A3D 100%);
+      color: #fff;
+      box-shadow: 0 14px 34px -14px rgba(23, 44, 90, 0.22);
+
+      &:hover {
+        box-shadow: 0 14px 34px -14px rgba(23, 44, 90, 0.22);
+      }
+    `}
+`;
+
+const IconImg = styled.img`
+  filter: ${(props) => (props.$active ? 'brightness(0) invert(1)' : 'none')};
+`;
+
+const Badge = styled.span`
+  margin-left: auto;
+  background: linear-gradient(135deg, #FF6000 0%, #FF8A3D 100%);
+  color: #fff;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 20px;
+  box-shadow: 0 6px 16px rgba(255, 96, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+`;
+
+const Caret = styled.span`
+  margin-left: auto;
+  flex: none;
+  font-size: 11px;
+  color: inherit;
+  transform: rotate(${(props) => (props.$open ? '0deg' : '-90deg')});
+  transition: transform 0.15s;
+`;
+
+
+const subItemStyles = css`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 9px;
+  color: #17171B;
+  text-decoration: none;
+  font-size: 14px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+
+  &:hover {
+    box-shadow: inset 0 0 0 999px rgba(23, 23, 27, 0.045);
+  }
+`;
+
+const SubMenu = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin: 4px 0 8px 20px;
+`;
+
+const SubItem = styled(NavLink)`
+  ${subItemStyles}
+`;
+
+const SubToggle = styled.button`
+  ${subItemStyles}
+`;
+
+const SubLabel = styled.span`
+  flex: 1;
+  min-width: 0;
+`;
+
+const SubCount = styled.span`
+  flex: none;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: inherit;
+  opacity: 0.65;
+`;
+
+
+const ProjectTree = styled.div`
+  position: relative;
+  padding-left: 30px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 14px;
+    top: 0;
+    bottom: 19px;
+    width: 1.5px;
+    background: #E6E6EB;
+  }
+`;
+
+const ProjectRow = styled.div`
+  position: relative;
+`;
+
+const TreeLine = styled.span`
+  position: absolute;
+  left: -16px;
+  top: 50%;
+  width: 12px;
+  height: 1.5px;
+  background: #E6E6EB;
+`;
+
+const ProjectItem = styled(NavLink)`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 9px;
+  text-decoration: none;
+  color: #17171B;
+
+  &:hover {
+    box-shadow: inset 0 0 0 999px rgba(23, 23, 27, 0.045);
+  }
+`;
+
+const Dot = styled.span`
+  width: 7px;
+  height: 7px;
+  flex: none;
+  border-radius: 2px;
+  background: ${(props) => (props.$active ? '#FF6000' : '#D8D8DE')};
+`;
+
+const ProjectLabel = styled.span`
+  flex: 1;
+  min-width: 0;
+  font-size: 13.5px;
+  font-family: 'IBM Plex Mono', monospace;
+`;
