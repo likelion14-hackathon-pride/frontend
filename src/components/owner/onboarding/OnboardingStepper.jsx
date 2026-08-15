@@ -22,15 +22,22 @@ const List = styled.ol`
   box-shadow: 0 8px 20px 0 rgba(23, 44, 90, 0.25);
 `;
 
-const StepItem = styled.li`
+const StepListItem = styled.li`
+  display: flex;
+`;
+
+const StepButton = styled.button`
   display: flex;
   padding: 10px 18px;
   align-items: center;
   gap: 8px;
+  border: none;
   border-radius: 999px;
+  font-family: inherit;
   font-size: 14px;
   font-weight: 600;
   white-space: nowrap;
+  cursor: ${({ $clickable }) => ($clickable ? 'pointer' : 'default')};
   background: ${({ $state }) => ($state === 'active' ? '#2563EB' : 'transparent')};
   box-shadow: ${({ $state }) => ($state === 'active' ? '0 5px 10px 0 rgba(37, 99, 235, 0.40)' : 'none')};
   color: ${({ $state }) => {
@@ -68,22 +75,31 @@ function stateFor(stepId, currentStep) {
   return 'upcoming';
 }
 
-function OnboardingStepper({ currentStep }) {
+function OnboardingStepper({ currentStep, onStepClick }) {
   return (
     <List>
       {ONBOARDING_STEPS.map((step) => {
         const state = stateFor(step.id, currentStep);
+        const clickable = state === 'done';
         return (
-          <StepItem key={step.id} $state={state}>
-            {state === 'done' ? (
-              <IconSlot>
-                <img src={stepperCheck} alt="완료" />
-              </IconSlot>
-            ) : (
-              <NumberCircle $state={state}>{step.id}</NumberCircle>
-            )}
-            {step.label}
-          </StepItem>
+          <StepListItem key={step.id}>
+            <StepButton
+              type="button"
+              $state={state}
+              $clickable={clickable}
+              disabled={!clickable}
+              onClick={clickable ? () => onStepClick(step.id) : undefined}
+            >
+              {state === 'done' ? (
+                <IconSlot>
+                  <img src={stepperCheck} alt="완료" />
+                </IconSlot>
+              ) : (
+                <NumberCircle $state={state}>{step.id}</NumberCircle>
+              )}
+              {step.label}
+            </StepButton>
+          </StepListItem>
         );
       })}
     </List>

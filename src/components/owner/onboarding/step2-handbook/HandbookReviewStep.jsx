@@ -6,46 +6,66 @@ import ProjectKnowledgeSection from './ProjectKnowledgeSection';
 import { colors, radii } from '../theme';
 import { HANDBOOK_CATEGORIES, TOTAL_HANDBOOK_QUESTIONS, countConfirmed } from './handbookData';
 
+const PageContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: stretch;
+  gap: 18px;
+`;
+
 const Content = styled.div`
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 24px;
-  margin-bottom: 32px;
+  align-self: stretch;
+`;
+
+const TextGroup = styled.div`
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 13.698px;
 `;
 
 const Heading = styled.h1`
   margin: 0;
-  font-size: 32px;
-  font-weight: 800;
-  color: ${colors.textPrimary};
+  color: #17171B;
+  font-family: 'Plus Jakarta Sans';
+  font-size: 38px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 43.7px;
+  letter-spacing: -1.2px;
 `;
 
 const Subheading = styled.p`
-  margin: 10px 0 0;
+  margin: 0;
+  color: #6B6B73;
+  font-family: 'Plus Jakarta Sans';
   font-size: 14px;
-  color: ${colors.textSecondary};
-`;
-
-const CompanyPanel = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin-bottom: 24px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 21px;
 `;
 
 const CategoryList = styled.div`
-  border-radius: ${radii.lg};
-  border: 1px solid ${colors.border};
-  padding: 4px 20px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: stretch;
+  gap: 22px;
+  padding-left: 26px;
 `;
 
 const Footer = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 16px;
-  margin-top: 24px;
+  align-self: stretch;
+  gap: 0;
 `;
 
 const FooterHint = styled.span`
@@ -78,34 +98,32 @@ function HandbookReviewStep({
   const confirmedCount = countConfirmed(allQuestions, handbookAnswers);
 
   return (
-    <div>
+    <PageContent>
       <Content>
-        <div>
+        <TextGroup>
           <Heading>회사의 기본 규칙부터 정할게요</Heading>
           <Subheading>핸드북으로 남아 팀원들에게 공유됩니다. 정해진 게 없다면 그냥 넘기세요.</Subheading>
-        </div>
-        <Mascot pose="checking" size={90} />
+        </TextGroup>
+        <Mascot pose="checking" width={148} height={111} />
       </Content>
 
-      <CompanyPanel>
-        <HandbookSectionBand
-          tone="company"
-          icon="▤"
-          title="회사 규칙"
-          description="프로젝트가 바뀌어도 그대로 적용되는 상위 계층"
-          count={`${TOTAL_HANDBOOK_QUESTIONS}개 항목`}
-        />
-        <CategoryList>
-          {HANDBOOK_CATEGORIES.map((category) => (
-            <HandbookCategoryGroup
-              key={category.key}
-              category={category}
-              answers={handbookAnswers}
-              onAnswerChange={(questionId, patch) => onAnswerChange(questionId, patch)}
-            />
-          ))}
-        </CategoryList>
-      </CompanyPanel>
+      <HandbookSectionBand
+        tone="company"
+        icon="▤"
+        title="회사 규칙"
+        description="프로젝트가 바뀌어도 그대로 적용되는 상위 계층"
+        count={`${TOTAL_HANDBOOK_QUESTIONS}개 항목`}
+      />
+      <CategoryList>
+        {HANDBOOK_CATEGORIES.map((category) => (
+          <HandbookCategoryGroup
+            key={category.key}
+            category={category}
+            answers={handbookAnswers}
+            onAnswerChange={(questionId, patch) => onAnswerChange(questionId, patch)}
+          />
+        ))}
+      </CategoryList>
 
       <ProjectKnowledgeSection
         projects={projects}
@@ -123,7 +141,7 @@ function HandbookReviewStep({
           답변 마치고 다음으로 →
         </FinishButton>
       </Footer>
-    </div>
+    </PageContent>
   );
 }
 

@@ -1,19 +1,34 @@
 import styled from 'styled-components';
-import { colors, radii } from '../theme';
+import { colors } from '../theme';
 
 const TONE = {
-  company: { background: colors.navy, color: '#FFFFFF', subtleColor: 'rgba(255, 255, 255, 0.6)' },
-  project: { background: colors.primaryBlue, color: '#FFFFFF', subtleColor: 'rgba(255, 255, 255, 0.75)' },
+  company: {
+    background: colors.navy,
+    color: '#FFFFFF',
+    subtleColor: 'rgba(255, 255, 255, 0.6)',
+    border: '0.667px solid #22376A',
+    boxShadow: '0 1px 0 0 rgba(255, 255, 255, 0.14) inset',
+  },
+  project: {
+    background: colors.primaryBlue,
+    color: '#FFFFFF',
+    subtleColor: 'rgba(255, 255, 255, 0.75)',
+    border: 'none',
+    boxShadow: 'none',
+  },
 };
 
 const Band = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  align-self: stretch;
   gap: 16px;
   padding: 14px 20px;
-  border-radius: ${radii.lg};
+  border-radius: 16px;
+  border: ${({ $tone }) => TONE[$tone].border};
   background: ${({ $tone }) => TONE[$tone].background};
+  box-shadow: ${({ $tone }) => TONE[$tone].boxShadow};
   color: ${({ $tone }) => TONE[$tone].color};
 `;
 

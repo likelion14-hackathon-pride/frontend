@@ -17,18 +17,19 @@ const ASSET_BY_POSE = {
 };
 
 const Image = styled.img`
-  width: ${({ $size }) => $size}px;
-  height: ${({ $size }) => $size}px;
+  width: ${({ $width }) => $width}px;
+  height: ${({ $height }) => $height}px;
   object-fit: contain;
 `;
 
-function Mascot({ pose = 'default', size = 120, className }) {
+function Mascot({ pose = 'default', size = 120, width, height, className }) {
   return (
     <Image
       src={ASSET_BY_POSE[pose]}
       alt=""
       role="presentation"
-      $size={size}
+      $width={width ?? size}
+      $height={height ?? size}
       className={className}
     />
   );
