@@ -1,18 +1,29 @@
 import styled from 'styled-components';
 import QuestionRow from './QuestionRow';
-import { colors } from '../theme';
 import { EMPTY_ANSWER, getQuestionStatus } from './handbookData';
 
 const Group = styled.div`
-  padding: 4px 0;
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
 `;
 
 const Header = styled.div`
+  box-sizing: border-box;
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 10px;
-  padding: 16px 4px 8px;
-  border-bottom: 1px solid ${colors.border};
+  height: 14.667px;
+  margin-bottom: 12px;
+`;
+
+const CornerCurve = styled.span`
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  border-radius: 0 0 0 7px;
+  border-bottom: 1.333px solid #e0e0e6;
+  border-left: 1.333px solid #e0e0e6;
 `;
 
 const Square = styled.span`
@@ -27,27 +38,44 @@ const Label = styled.span`
   font-family: 'IBM Plex Mono', monospace;
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.04em;
-  color: ${colors.textPrimary};
+  letter-spacing: 0.4px;
+  color: #3c3c44;
+  white-space: nowrap;
 `;
 
 const Description = styled.span`
-  font-size: 11px;
-  color: ${colors.textMuted};
-  flex-grow: 1;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 10.5px;
+  font-weight: 400;
+  line-height: 121%;
+  color: #b4b4bc;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+const DividerLine = styled.span`
+  flex: 1 1 auto;
+  height: 1px;
+  background: #e6e6eb;
+  min-width: 16px;
 `;
 
 const Fraction = styled.span`
-  font-size: 12px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
   font-weight: 700;
-  color: ${colors.textMuted};
+  color: #a0a0a8;
+  flex-shrink: 0;
+  white-space: nowrap;
 `;
 
 const ItemList = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 6px 0 16px;
+  align-items: flex-start;
+  align-self: stretch;
+  gap: 8px;
 `;
 
 function HandbookCategoryGroup({ category, answers, onAnswerChange }) {
@@ -58,11 +86,13 @@ function HandbookCategoryGroup({ category, answers, onAnswerChange }) {
   return (
     <Group>
       <Header>
+        <CornerCurve />
         <Square $color={category.dotColor} />
         <Label>{category.label}</Label>
         <Description>{category.description}</Description>
+        <DividerLine />
         <Fraction>
-          {confirmedCount} / {category.questions.length}
+          {confirmedCount}/{category.questions.length}
         </Fraction>
       </Header>
       <ItemList>

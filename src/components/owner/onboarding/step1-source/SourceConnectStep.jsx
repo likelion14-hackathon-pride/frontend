@@ -2,6 +2,7 @@ import { useState } from 'react';
 import styled from 'styled-components';
 import Mascot from '../Mascot';
 import SourceCard from './SourceCard';
+import SlackConnectModal from './SlackConnectModal';
 import { colors } from '../theme';
 import githubIcon from '../../../../assets/owner/github.svg';
 import slackIcon from '../../../../assets/owner/slack.svg';
@@ -215,6 +216,7 @@ const CONNECT_DELAY_MS = 900;
 
 function SourceConnectStep({ connectedSources, onToggleSource, onCreateDraft }) {
   const [connectingKeys, setConnectingKeys] = useState(new Set());
+  const [slackModalOpen, setSlackModalOpen] = useState(false);
   const connectedCount = connectedSources.size;
 
   const handleConnect = (key) => {
@@ -235,62 +237,81 @@ function SourceConnectStep({ connectedSources, onToggleSource, onCreateDraft }) 
     }, CONNECT_DELAY_MS);
   };
 
+  const handleCardToggle = (key) => {
+    if (key === 'slack' && !connectedSources.has(key)) {
+      setSlackModalOpen(true);
+      return;
+    }
+    handleConnect(key);
+  };
+
+  const handleSlackConnected = () => {
+    setSlackModalOpen(false);
+    onToggleSource('slack');
+  };
+
   return (
-    <StepContent>
-      <HeaderRow>
-        <TextColumnOuter>
-          <TextColumn>
-            <Heading>팀에서 쓰는 도구를 연결해주세요</Heading>
-          </TextColumn>
-        </TextColumnOuter>
-        <MascotContainer>
-          <Mascot pose="default" size={110} />
-        </MascotContainer>
-      </HeaderRow>
+    <>
+      <StepContent>
+        <HeaderRow>
+          <TextColumnOuter>
+            <TextColumn>
+              <Heading>팀에서 쓰는 도구를 연결해주세요</Heading>
+            </TextColumn>
+          </TextColumnOuter>
+          <MascotContainer>
+            <Mascot pose="default" size={110} />
+          </MascotContainer>
+        </HeaderRow>
 
-      <CardGrid>
-        {SOURCES.map((source) => {
-          const status = connectedSources.has(source.key)
-            ? 'connected'
-            : connectingKeys.has(source.key)
-              ? 'connecting'
-              : 'idle';
+        <CardGrid>
+          {SOURCES.map((source) => {
+            const status = connectedSources.has(source.key)
+              ? 'connected'
+              : connectingKeys.has(source.key)
+                ? 'connecting'
+                : 'idle';
 
-          return (
-            <SourceCard
-              key={source.key}
-              variant={source.variant}
-              icon={source.icon}
-              title={source.title}
-              subtitle={source.subtitle}
-              description={source.description}
-              buttonLabel={source.buttonLabel}
-              connectingLabel={source.connectingLabel}
-              connectedLabel={source.connectedLabel}
-              status={status}
-              onToggle={() => handleConnect(source.key)}
-            />
-          );
-        })}
-      </CardGrid>
+            return (
+              <SourceCard
+                key={source.key}
+                variant={source.variant}
+                icon={source.icon}
+                title={source.title}
+                subtitle={source.subtitle}
+                description={source.description}
+                buttonLabel={source.buttonLabel}
+                connectingLabel={source.connectingLabel}
+                connectedLabel={source.connectedLabel}
+                status={status}
+                onToggle={() => handleCardToggle(source.key)}
+              />
+            );
+          })}
+        </CardGrid>
 
-      <CtaBar>
-        <CtaTextGroup>
-          <CtaTitleWrap>
-            <CtaTitle>
-              {connectedCount === 0 ? '아직 연결된 소스가 없습니다' : `${connectedCount}개 소스가 연결되었습니다`}
-            </CtaTitle>
-          </CtaTitleWrap>
-          <CtaSubtitleWrap>
-            <CtaSubtitle>다음 단계에서 기본 규칙 질문에 답하면 핸드북이 시작됩니다. 소스는 그 위에 얹히는 자료입니다.</CtaSubtitle>
-          </CtaSubtitleWrap>
-        </CtaTextGroup>
-        <CtaButton type="button" disabled={connectedCount === 0} onClick={onCreateDraft}>
-          <CtaButtonLabel $disabled={connectedCount === 0}>기본 규칙 정하기</CtaButtonLabel>
-          <img src={connectedCount === 0 ? nextArrowTrans : nextArrowBlack} alt="" />
-        </CtaButton>
-      </CtaBar>
-    </StepContent>
+        <CtaBar>
+          <CtaTextGroup>
+            <CtaTitleWrap>
+              <CtaTitle>
+                {connectedCount === 0 ? '아직 연결된 소스가 없습니다' : `${connectedCount}개 소스가 연결되었습니다`}
+              </CtaTitle>
+            </CtaTitleWrap>
+            <CtaSubtitleWrap>
+              <CtaSubtitle>다음 단계에서 기본 규칙 질문에 답하면 핸드북이 시작됩니다. 소스는 그 위에 얹히는 자료입니다.</CtaSubtitle>
+            </CtaSubtitleWrap>
+          </CtaTextGroup>
+          <CtaButton type="button" disabled={connectedCount === 0} onClick={onCreateDraft}>
+            <CtaButtonLabel $disabled={connectedCount === 0}>기본 규칙 정하기</CtaButtonLabel>
+            <img src={connectedCount === 0 ? nextArrowTrans : nextArrowBlack} alt="" />
+          </CtaButton>
+        </CtaBar>
+      </StepContent>
+
+      {slackModalOpen && (
+        <SlackConnectModal onClose={() => setSlackModalOpen(false)} onConnected={handleSlackConnected} />
+      )}
+    </>
   );
 }
 
