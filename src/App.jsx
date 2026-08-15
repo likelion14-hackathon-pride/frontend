@@ -5,6 +5,9 @@ import MemberHomePage from './pages/member/MemberHomePage';
 import MemberTasksPage from './pages/member/MemberTasksPage';
 import MemberShell from './components/member/layout/MemberShell';
 import MemberAskPage from './pages/member/MemberAskPage';
+import MemberHandbookPage from './pages/member/MemberHandbookPage';
+import HandbookCompanyView from './components/member/handbook/HandbookCompanyView';
+import HandbookProjectView from './components/member/handbook/HandbookProjectView';
 
 function App() {
   return (
@@ -18,7 +21,11 @@ function App() {
           <Route path="home" element={<MemberHomePage />} />
           <Route path="tasks" element={<MemberTasksPage />} />
           <Route path="ask" element={<MemberAskPage />} />
-          <Route path="handbook/*" element={<MemberShell screenTitle="Handbook">Handbook 준비중</MemberShell>} />
+          <Route path="handbook" element={<MemberHandbookPage />}>
+            <Route index element={<Navigate to="company" replace />} />
+            <Route path="company" element={<HandbookCompanyView />} />
+            <Route path="project/:projectId" element={<HandbookProjectView />} />
+          </Route>
         </Route>
 
         <Route path="*" element={<LoginPage />} />

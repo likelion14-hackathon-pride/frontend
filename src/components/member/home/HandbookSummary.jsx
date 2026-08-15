@@ -178,14 +178,14 @@ export default function HandbookSummaryCard({
       </Header>
 
       <Body>
-        <NavButton onClick={goToHandbook}>
+        <NavButton onClick={() => goToHandbook('company')}>
           <img src={fileIcon} alt="" width={15} height={15} />
           <NavLabel>Company system</NavLabel>
           <NavCount>{companyRuleCount} rules</NavCount>
           <NavArrow>→</NavArrow>
         </NavButton>
 
-        <NavButton $spaced onClick={goToHandbook}>
+        <NavButton $spaced onClick={() => goToHandbook(`project/${projects[0]?.id ?? ''}`)}>
           <img src={linkIcon} alt="" width={15} height={15} />
           <NavLabel>By project</NavLabel>
           <NavCount>{projects.reduce((sum, p) => sum + p.count, 0)} rules</NavCount>
@@ -194,7 +194,7 @@ export default function HandbookSummaryCard({
 
         <SubList>
           {projects.map((p) => (
-            <SubButton key={p.id} onClick={goToHandbook}>
+            <SubButton key={p.id} onClick={() => goToHandbook(`project/${p.id}`)}>
               <TreeLine />
               <Dot $active={p.active} />
               <SubLabel $active={p.active}>{p.label}</SubLabel>

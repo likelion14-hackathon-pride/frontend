@@ -215,6 +215,9 @@ const SubToggle = styled.button`
 const SubLabel = styled.span`
   flex: 1;
   min-width: 0;
+  color: #6B6B73;
+  font-size: 14px;
+  font-weight: 700;
 `;
 
 const SubCount = styled.span`
@@ -273,12 +276,14 @@ const Dot = styled.span`
   height: 7px;
   flex: none;
   border-radius: 2px;
-  background: ${(props) => (props.$active ? '#FF6000' : '#D8D8DE')};
+  background: ${(props) => (props.$active ? '#8A94A3' : '#D8D8DE')};
 `;
 
 const ProjectLabel = styled.span`
   flex: 1;
   min-width: 0;
   font-size: 13.5px;
+  color: #5A6675;
+  font-weight: 700;
   font-family: 'IBM Plex Mono', monospace;
 `;

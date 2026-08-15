@@ -11,7 +11,7 @@ export function MemberProvider({ children }) {
       goToHome: () => navigate('/member/home'),
       goToAsk: () => navigate('/member/ask'),
       goToTasks: () => navigate('/member/tasks'),
-      goToHandbook: () => navigate('/member/handbook/company'),
+      goToHandbook: (path = 'company') => navigate(`/member/handbook/${path}`),
       // TODO: SAI 요약 수치(slackMessages, turnedIntoTasks, waitingAnswer) 등
       // 서버에서 가져와서 여기에 얹기 (apis/ 사용)
     }),
