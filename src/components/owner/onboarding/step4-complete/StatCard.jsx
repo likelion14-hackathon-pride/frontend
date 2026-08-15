@@ -1,76 +1,117 @@
 import styled from 'styled-components';
-import { colors, radii } from '../theme';
 
 const Card = styled.div`
-  padding: 24px;
-  border-radius: ${radii.lg};
-  background: ${({ $tint }) => $tint};
-`;
-
-const Head = styled.div`
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex: 1 0 0;
+  box-sizing: border-box;
+  padding: 18px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  border-radius: 22px;
+  border: 1px solid ${({ $border }) => $border || '#efeff1'};
+  background: ${({ $bg }) => $bg || '#f2f2f5'};
+  box-shadow:
+    0 14px 34px -14px rgba(23, 44, 90, 0.22),
+    0 3px 8px -2px rgba(23, 44, 90, 0.08);
 `;
 
-const Title = styled.p`
-  margin: 0;
-  font-size: 13px;
+const HeadRow = styled.div`
+  display: flex;
+  min-height: 30px;
+  align-items: center;
+  gap: 10px;
+  align-self: stretch;
+`;
+
+const TitleWrap = styled.span`
+  display: flex;
+  padding: 3px 0 2px 0;
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 1 0 0;
+`;
+
+const Title = styled.span`
+  color: #17171b;
+  font-family: Pretendard;
+  font-size: 14px;
+  font-style: normal;
   font-weight: 700;
-  color: ${colors.textSecondary};
+  line-height: normal;
 `;
 
-const IconRow = styled.div`
+const CountRow = styled.div`
   display: flex;
-  gap: 6px;
+  height: 38px;
+  align-self: stretch;
+  align-items: flex-end;
+  gap: 4px;
 `;
 
-const IconChip = styled.span`
+const CountNumber = styled.span`
+  color: #17171b;
+  font-family: Pretendard;
+  font-size: 38px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 38px; /* 100% */
+  letter-spacing: -1.6px;
+`;
+
+const CountUnitWrap = styled.span`
   display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 8px;
-  background: ${colors.surface};
+  padding: 3px 0 1px 0;
+  flex-direction: column;
+  align-items: flex-start;
 `;
 
-const Value = styled.p`
-  margin: 20px 0 0;
-  font-size: 32px;
-  font-weight: 800;
-  color: ${colors.textPrimary};
+const CountUnit = styled.span`
+  color: #a0a0a8;
+  font-family: Pretendard;
+  font-size: 11.5px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+`;
 
-  span {
-    font-size: 14px;
-    font-weight: 600;
-    margin-left: 4px;
-  }
+const DescriptionWrap = styled.div`
+  display: flex;
+  padding: 3px 0 1px 0;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: stretch;
 `;
 
 const Description = styled.p`
-  margin: 8px 0 0;
-  font-size: 12px;
-  color: ${colors.textMuted};
+  margin: 0;
+  align-self: stretch;
+  color: #a0a0a8;
+  font-family: Pretendard;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
 `;
 
-function StatCard({ title, icons, value, unit, description, tint = colors.surfaceMuted }) {
+function StatCard({ title, icons, count, unit, description, border, bg }) {
   return (
-    <Card $tint={tint}>
-      <Head>
-        <Title>{title}</Title>
-        <IconRow>
-          {icons.map((icon, index) => (
-            // eslint-disable-next-line react/no-array-index-key
-            <IconChip key={index}>{icon}</IconChip>
-          ))}
-        </IconRow>
-      </Head>
-      <Value>
-        {value}
-        {unit && <span>{unit}</span>}
-      </Value>
-      <Description>{description}</Description>
+    <Card $border={border} $bg={bg}>
+      <HeadRow>
+        <TitleWrap>
+          <Title>{title}</Title>
+        </TitleWrap>
+        {icons}
+      </HeadRow>
+      <CountRow>
+        <CountNumber>{count}</CountNumber>
+        <CountUnitWrap>
+          <CountUnit>{unit}</CountUnit>
+        </CountUnitWrap>
+      </CountRow>
+      <DescriptionWrap>
+        <Description>{description}</Description>
+      </DescriptionWrap>
     </Card>
   );
 }
