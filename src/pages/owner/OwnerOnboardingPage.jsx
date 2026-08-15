@@ -19,13 +19,32 @@ const INITIAL_RISK_KEYWORDS = [
   { id: 'risk-3', label: '삭제', level: 'warning' },
 ];
 
+const INITIAL_HANDBOOK_ANSWERS = {
+  'dc-1': {
+    selected: 'custom',
+    customText: '원격 개발자가 사수 없이도 같은 기준으로 판단하게 만드는 것',
+    customSaved: true,
+  },
+  'dc-2': {
+    selected: 'custom',
+    customText: '초기 지표 달성 (신속한 기능 배포 및 매출 확보)',
+    customSaved: true,
+  },
+  'dc-3': { selected: 1, customText: '', customSaved: false },
+  'dc-4': {
+    selected: 'custom',
+    customText: '즉시 공개 소통 채널에 서면으로 전체 상황 공유',
+    customSaved: true,
+  },
+};
+
 // 백엔드 발급 API가 준비되면 이 값을 대체하세요.
 const MOCK_COMPANY_CODE = 'LIMA-9976';
 
 function OwnerOnboardingPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [connectedSources, setConnectedSources] = useState(new Set());
-  const [handbookAnswers, setHandbookAnswers] = useState({});
+  const [handbookAnswers, setHandbookAnswers] = useState(INITIAL_HANDBOOK_ANSWERS);
   const [projects, setProjects] = useState([]);
   const [riskKeywords, setRiskKeywords] = useState(INITIAL_RISK_KEYWORDS);
 
@@ -84,7 +103,7 @@ function OwnerOnboardingPage() {
         if (project.id !== projectId) return project;
         const answers = {};
         PROJECT_QUESTION_TEMPLATE.forEach((question) => {
-          answers[question.id] = { ...EMPTY_ANSWER, selected: 'undecided' };
+          answers[question.id] = { ...EMPTY_ANSWER, selected: 'skip' };
         });
         return { ...project, answers, expanded: false };
       })

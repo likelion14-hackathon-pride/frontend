@@ -1,97 +1,141 @@
 import styled from 'styled-components';
 import QuestionRow from './QuestionRow';
-import { colors, radii } from '../theme';
 import { EMPTY_ANSWER, PROJECT_QUESTION_TEMPLATE, countConfirmed } from './handbookData';
 
 const Card = styled.div`
-  border: 1px solid ${colors.border};
-  border-radius: ${radii.lg};
-  overflow: hidden;
-  background: ${colors.surface};
+  box-sizing: border-box;
+  border-radius: ${({ $expanded }) => ($expanded ? '22px' : '18px')};
+  border: 0.667px solid ${({ $expanded }) => ($expanded ? '#C9DAFB' : '#DCE7FC')};
+  background: ${({ $expanded }) => ($expanded ? '#FFFFFF' : '#F7FAFF')};
+  box-shadow: ${({ $expanded }) => ($expanded ? '0 14px 34px -14px rgba(37, 99, 235, 0.22)' : 'none')};
+  padding: ${({ $expanded }) => ($expanded ? '18.667px' : '0')};
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 `;
 
 const Header = styled.button`
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   gap: 12px;
   width: 100%;
-  padding: 14px 18px;
+  height: ${({ $expanded }) => ($expanded ? 'auto' : '49.333px')};
+  padding: ${({ $expanded }) => ($expanded ? '0' : '0 18px')};
   border: none;
-  background: ${({ $expanded }) => ($expanded ? '#F7FAFF' : 'transparent')};
+  background: transparent;
   cursor: pointer;
   text-align: left;
 `;
 
 const Number = styled.span`
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: ${colors.surfaceSubtle};
-  font-size: 11px;
-  font-weight: 800;
-  color: ${colors.textMuted};
+  width: 20px;
+  padding: 3.667px 7px 3.333px 7px;
   flex-shrink: 0;
+  border-radius: 50px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  border: ${({ $expanded }) => ($expanded ? 'none' : '0.667px solid #C9DAFB')};
+  background: ${({ $expanded }) => ($expanded ? '#2563EB' : '#EAF1FE')};
+  color: ${({ $expanded }) => ($expanded ? '#FFFFFF' : '#1D4ED8')};
 `;
 
 const Name = styled.span`
-  font-size: 14px;
+  flex-shrink: 0;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
   font-weight: 700;
-  color: ${colors.textPrimary};
+  line-height: 128%;
+  color: #17171b;
+  white-space: nowrap;
 `;
 
 const Summary = styled.span`
-  font-size: 12px;
-  color: ${colors.textMuted};
-  flex-grow: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 127%;
+  color: #b4b4bc;
+`;
+
+const DividerLine = styled.span`
+  flex: 1 1 auto;
+  height: 1px;
+  background: #e6e6eb;
+  min-width: 16px;
+`;
+
+const Fraction = styled.span`
+  flex-shrink: 0;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: #a0a0a8;
+  white-space: nowrap;
 `;
 
 const Chevron = styled.span`
-  font-size: 12px;
-  color: ${colors.textMuted};
+  flex-shrink: 0;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13px;
+  color: #b4b4bc;
   transform: rotate(${({ $expanded }) => ($expanded ? '180deg' : '0deg')});
   transition: transform 0.15s ease;
 `;
 
 const Body = styled.div`
-  padding: 4px 18px 18px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 10px;
+  margin-top: 14px;
 `;
 
 const SkipRow = styled.div`
   display: flex;
   justify-content: flex-end;
-  padding: 4px 0 8px;
 `;
 
 const SkipButton = styled.button`
-  padding: 8px 14px;
-  border: 1px solid ${colors.border};
-  border-radius: ${radii.pill};
-  background: ${colors.surface};
-  font-size: 12px;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 7.667px 18px 6.667px 18px;
+  border: none;
+  border-radius: 999px;
+  background: #f0f0f2;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 11.5px;
   font-weight: 700;
-  color: ${colors.textPrimary};
+  color: #6b6b73;
   cursor: pointer;
 `;
 
 function ProjectKnowledgeItem({ project, index, onToggleExpand, onAnswerChange, onSkipToCompanyRules }) {
   const confirmedCount = countConfirmed(PROJECT_QUESTION_TEMPLATE, project.answers);
-  const summary =
-    confirmedCount === 0
-      ? '회사 규칙만 적용'
-      : `${confirmedCount}/${PROJECT_QUESTION_TEMPLATE.length} 답변 · 회사 규칙 상속`;
+  const summary = confirmedCount === 0 ? '회사 규칙만 적용' : '프로젝트에서만 다른 규칙';
 
   return (
-    <Card>
+    <Card $expanded={project.expanded}>
       <Header type="button" $expanded={project.expanded} onClick={onToggleExpand}>
-        <Number>{index + 1}</Number>
+        <Number $expanded={project.expanded}>{index + 1}</Number>
         <Name>{project.name}</Name>
         <Summary>{summary}</Summary>
+        {project.expanded && (
+          <>
+            <DividerLine />
+            <Fraction>
+              {confirmedCount}/{PROJECT_QUESTION_TEMPLATE.length}
+            </Fraction>
+          </>
+        )}
         <Chevron $expanded={project.expanded}>⌄</Chevron>
       </Header>
 
@@ -99,7 +143,7 @@ function ProjectKnowledgeItem({ project, index, onToggleExpand, onAnswerChange, 
         <Body>
           <SkipRow>
             <SkipButton type="button" onClick={onSkipToCompanyRules}>
-              회사 규칙만 쓰고 넘어가기
+              회사 규칙만 쓰고 넘기기
             </SkipButton>
           </SkipRow>
           {PROJECT_QUESTION_TEMPLATE.map((question) => (
