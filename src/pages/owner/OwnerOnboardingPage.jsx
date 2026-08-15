@@ -29,6 +29,10 @@ function OwnerOnboardingPage() {
   const [projects, setProjects] = useState([]);
   const [riskKeywords, setRiskKeywords] = useState(INITIAL_RISK_KEYWORDS);
 
+  const handleStepClick = (stepId) => {
+    if (stepId < currentStep) setCurrentStep(stepId);
+  };
+
   const handleToggleSource = (key) => {
     setConnectedSources((prev) => {
       const next = new Set(prev);
@@ -104,7 +108,7 @@ function OwnerOnboardingPage() {
 
   return (
     <OnboardingLayout>
-      <OnboardingHeader currentStep={currentStep} />
+      <OnboardingHeader currentStep={currentStep} onStepClick={handleStepClick} />
 
       {currentStep === 1 && (
         <SourceConnectStep

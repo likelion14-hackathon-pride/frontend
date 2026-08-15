@@ -61,7 +61,7 @@ const Avatar = styled.div`
   flex-shrink: 0;
 `;
 
-function OnboardingHeader({ currentStep, userInitial = '김' }) {
+function OnboardingHeader({ currentStep, userInitial = '김', onStepClick }) {
   return (
     <Bar>
       <Logo>
@@ -69,7 +69,7 @@ function OnboardingHeader({ currentStep, userInitial = '김' }) {
         <LogoWordmark />
       </Logo>
       <StepperWrapper>
-        <OnboardingStepper currentStep={currentStep} />
+        <OnboardingStepper currentStep={currentStep} onStepClick={onStepClick} />
       </StepperWrapper>
       <AvatarContainer>
         <Avatar>{userInitial}</Avatar>

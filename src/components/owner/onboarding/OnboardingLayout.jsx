@@ -20,21 +20,23 @@ const Background = styled.div`
 const Card = styled.div`
   box-sizing: border-box;
   width: 100%;
-  max-width: 1400px;
+  max-width: 1312px;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   align-items: flex-start;
-  gap: 40px;
-  padding: 32px;
+  flex-shrink: 0;
+  gap: 26px;
+  padding: 26.667px 31px 30.667px 30.667px;
   border-radius: 30px;
-  border: 1px solid rgba(255, 255, 255, 0.90);
+  border: 0.667px solid rgba(255, 255, 255, 0.90);
   background:
     radial-gradient(88.41% 64.94% at 78% -8%, rgba(37, 99, 235, 0.14) 0%, rgba(91, 141, 239, 0.06) 42%, rgba(91, 141, 239, 0.00) 72%),
     radial-gradient(81.61% 50.51% at 6% 108%, rgba(91, 141, 239, 0.10) 0%, rgba(91, 141, 239, 0.00) 68%),
     #FFF;
   box-shadow:
-    0 30px 80px -34px rgba(23, 44, 90, 0.30),
-    0 2px 6px 0 rgba(23, 44, 90, 0.06);
+    0 2px 6px 0 rgba(23, 44, 90, 0.06),
+    0 30px 80px -34px rgba(23, 44, 90, 0.30);
 `;
 
 function OnboardingLayout({ children }) {

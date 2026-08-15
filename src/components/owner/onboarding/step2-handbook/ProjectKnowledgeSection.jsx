@@ -7,12 +7,16 @@ import { colors, radii } from '../theme';
 const Wrap = styled.div`
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+  align-self: stretch;
   gap: 12px;
 `;
 
 const ProjectList = styled.div`
   display: flex;
   flex-direction: column;
+  align-self: stretch;
   gap: 10px;
 `;
 
@@ -45,6 +49,7 @@ const AddHint = styled.span`
 const AddRow = styled.div`
   display: flex;
   align-items: center;
+  align-self: stretch;
   gap: 10px;
 `;
 
