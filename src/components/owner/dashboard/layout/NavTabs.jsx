@@ -9,37 +9,49 @@ export const OWNER_TABS = [
 ];
 
 const Track = styled.nav`
+  box-sizing: border-box;
   display: flex;
+  width: 388.76px;
+  height: 52px;
+  padding: 0 7px;
+  flex-shrink: 0;
   align-items: center;
-  gap: 2px;
-  padding: 4px;
+  justify-content: space-between;
   border-radius: 999px;
-  background: #f0f0f2;
+  border: 1px solid #e6e6eb;
+  background: #fff;
+  box-shadow:
+    0 8px 20px -12px rgba(23, 44, 90, 0.22),
+    0 1px 0 1px #fff inset;
 `;
 
 const Tab = styled.button`
-  display: flex;
-  align-items: center;
+  box-sizing: border-box;
+  display: inline-flex;
+  padding: 10.667px 20px 10px 18px;
   justify-content: center;
-  height: 34px;
-  padding: 0 18px;
+  align-items: center;
+  flex-shrink: 0;
   border: none;
   border-radius: 999px;
   cursor: pointer;
-  white-space: nowrap;
-  font-family: Pretendard;
-  font-size: 13px;
+  text-align: center;
+  font-family: 'Plus Jakarta Sans';
+  font-size: 14px;
+  font-style: normal;
   font-weight: 700;
+  line-height: 129%;
   letter-spacing: -0.2px;
+  white-space: nowrap;
   transition:
     background 0.15s ease,
     color 0.15s ease;
 
   background: ${({ $active }) => ($active ? '#2563eb' : 'transparent')};
-  color: ${({ $active }) => ($active ? '#ffffff' : '#6b6b73')};
+  color: ${({ $active }) => ($active ? '#fff' : '#3c3c44')};
 
   &:hover {
-    color: ${({ $active }) => ($active ? '#ffffff' : '#17171b')};
+    color: ${({ $active }) => ($active ? '#fff' : '#17171b')};
   }
 `;
 
