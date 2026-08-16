@@ -85,13 +85,11 @@ const ReadLink = styled.span`
   line-height: 123%;
 `;
 
-export default function UnreadInstructionCard({
-  count = 1,
-  from = '김대표',
-  time = '09:47',
-  message,
-  onClick,
-}) {
+export default function UnreadInstructionCard({ count = 0, from, time, message, onClick }) {
+  // 슬랙 계정이 아직 매칭되지 않으면 requestedBy 가 비어 온다.
+  // 그때 'from · 09:47' 같은 반쪽짜리 문장이 나오지 않게 조각을 걸러서 잇는다.
+  const meta = [from ? `from ${from}` : null, time || null].filter(Boolean).join(' · ');
+
   return (
     <Card onClick={onClick}>
       <LabelRow>
@@ -101,9 +99,7 @@ export default function UnreadInstructionCard({
 
       <CountRow>
         <Count>{count}</Count>
-        <From>
-          from {from} · {time}
-        </From>
+        {meta && <From>{meta}</From>}
       </CountRow>
 
       <MessagePreview>{message}</MessagePreview>

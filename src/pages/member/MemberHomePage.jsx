@@ -1,4 +1,7 @@
+import { useMemo } from 'react';
 import styled from 'styled-components';
+
+import { SCOPE_KIND } from '../../apis/constants';
 import MemberShell from '../../components/member/layout/MemberShell';
 import AskCard from '../../components/member/home/AskCard';
 import UnreadInstructionCard from '../../components/member/home/UnreadInstructionCard';
@@ -6,8 +9,10 @@ import TodoBoard from '../../components/member/home/TodoBoard';
 import SaiResolutionCard from '../../components/member/home/SaiResolution';
 import HandbookGrowthCard from '../../components/member/home/HandbookGrowth';
 import HandbookSummary from '../../components/member/home/HandbookSummary';
+import { InlineError, LoadingState } from '../../components/common/AsyncStates';
 import logoMascot from '../../assets/logo-mascot.png';
 import { useMemberNavigation } from '../../context/member/MemberContext';
+import { formatClock, formatDateTime } from '../../utils/time';
 
 const PageContent = styled.div`
   display: flex;
@@ -66,54 +71,129 @@ const CardRow = styled.div`
   align-items: stretch;
 `;
 
+// 서버 시각(로컬 자정 기준)이 아니라 보는 사람의 시계로 인사한다.
+function greetingFor(date = new Date()) {
+  const hour = date.getHours();
+  if (hour < 12) return 'Good Morning';
+  if (hour < 18) return 'Good Afternoon';
+  return 'Good Evening';
+}
+
 export default function MemberHomePage() {
-  const { profile } = useMemberNavigation();
+  const {
+    profile,
+    home,
+    homeLoading,
+    homeError,
+    reloadHome,
+    goToTasks,
+    scopes,
+  } = useMemberNavigation();
+
+  const resolution = home?.resolution;
+  // 분모가 0이면 비율을 낼 수 없다. 카드가 'No data yet' 을 그리도록 null 을 넘긴다.
+  const resolutionPercent =
+    resolution && resolution.total > 0
+      ? Math.round((resolution.answered / resolution.total) * 100)
+      : null;
+
+  const growth = home?.handbook;
+  const weekly = growth?.weekly ?? [];
+  const weeklyLabels = useMemo(
+    () => weekly.map((_, index) => (index === weekly.length - 1 ? 'now' : `W${index + 1}`)),
+    [weekly]
+  );
+
+  // 핸드북 요약 카드는 지식공간 목록을 쓴다. /home 이 주는 scopes 를 먼저 쓰고,
+  // 아직 없으면 컨텍스트가 따로 받아 둔 목록을 쓴다.
+  const scopeList = growth?.scopes ?? scopes;
+  const companyScopeCount = scopeList
+    .filter((scope) => scope.kind === SCOPE_KIND.COMPANY)
+    .reduce((sum, scope) => sum + (scope.entryCount ?? 0), 0);
+  const projectItems = scopeList
+    .filter((scope) => scope.kind === SCOPE_KIND.PROJECT)
+    .map((scope) => ({
+      id: scope.id,
+      label: scope.name,
+      meta: scope.description || 'Project',
+      count: scope.entryCount ?? 0,
+      active: false,
+    }));
+
+  const unread = home?.unread;
 
   return (
     <MemberShell screenTitle="Home">
       <PageContent>
         <Greeting>
-          <GreetingText>Good Morning, {profile.name}</GreetingText>
+          <GreetingText>
+            {greetingFor()}
+            {profile.name ? `, ${profile.name}` : ''}
+          </GreetingText>
           <GreetingIcon src={logoMascot} alt="" />
         </Greeting>
 
-        <TopRow>
-          <AskCard />
-          <UnreadInstructionCard
-            count={1}
-            from="김대표"
-            time="09:47"
-            message="결제 쪽 이거 좀 봐주세요"
-            onClick={() => {
-              /* TODO: 메시지 상세로 이동 */
-            }}
-          />
-        </TopRow>
+        <InlineError error={homeError} onRetry={reloadHome} />
 
-        <MainGrid>
-          <TodoBoard
-            initialTasks={[
-              { id: 1, title: 'Investigate payment failure root cause' },
-              { id: 2, title: 'Investigate payment failure root cause' },
-              { id: 3, title: 'Investigate payment failure root cause' },
-              { id: 4, title: 'Investigate payment failure root cause' },
-            ]}
-          />
+        {homeLoading && !home ? (
+          <LoadingState label="홈 화면을 불러오는 중…" />
+        ) : (
+          <>
+            <TopRow>
+              <AskCard />
+              {unread?.latest ? (
+                <UnreadInstructionCard
+                  count={unread.count}
+                  from={unread.latest.requestedBy}
+                  time={formatClock(unread.latest.occurredAt, { fallback: '' })}
+                  message={unread.latest.text || unread.latest.purpose}
+                  onClick={goToTasks}
+                />
+              ) : (
+                <UnreadInstructionCard
+                  count={unread?.count ?? 0}
+                  from={null}
+                  time=""
+                  message="아직 읽지 않은 지시가 없습니다."
+                  onClick={goToTasks}
+                />
+              )}
+            </TopRow>
 
-          <RightColumn>
-            <CardRow>
-              <SaiResolutionCard percent={85} resolved={17} total={20} dateRange="Aug 1 – Aug 6" />
-              <HandbookGrowthCard
-                count={12}
-                delta="+6 this month"
-                points={[6, 8, 9, 12]}
-                labels={['W1', 'W2', 'W3', 'now']}
-              />
-            </CardRow>
+            <MainGrid>
+              <TodoBoard />
 
-            <HandbookSummary />
-          </RightColumn>
-        </MainGrid>
+              <RightColumn>
+                <CardRow>
+                  <SaiResolutionCard
+                    percent={resolutionPercent}
+                    resolved={resolution?.answered}
+                    total={resolution?.total}
+                    dateRange={
+                      resolution?.since
+                        ? `since ${formatDateTime(resolution.since, { fallback: '' })}`
+                        : null
+                    }
+                  />
+                  <HandbookGrowthCard
+                    count={growth?.confirmed ?? 0}
+                    delta={
+                      growth?.addedThisMonth != null ? `+${growth.addedThisMonth} this month` : ''
+                    }
+                    points={weekly}
+                    labels={weeklyLabels}
+                  />
+                </CardRow>
+
+                <HandbookSummary
+                  totalEntries={growth?.confirmed ?? 0}
+                  companyRuleCount={companyScopeCount}
+                  projects={projectItems}
+                />
+              </RightColumn>
+            </MainGrid>
+          </>
+        )}
       </PageContent>
     </MemberShell>
   );

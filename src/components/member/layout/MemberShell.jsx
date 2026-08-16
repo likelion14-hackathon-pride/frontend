@@ -6,6 +6,7 @@ import MemberNav from '../nav/MemberNav';
 import MemberHomeSummary from '../home/MemberHomeSummary';
 import logoMascot from '../../../assets/logo-mascot.png';
 import logoWordmark from '../../../assets/logo-wordmark.png';
+import { useAuth } from '../../../context/AuthContext';
 import { useMemberNavigation } from '../../../context/member/MemberContext';
 
 const Page = styled.div`
@@ -96,6 +97,24 @@ const UserCard = styled.div`
   margin-top: auto;
 `;
 
+const LogoutButton = styled.button`
+  margin-top: 8px;
+  width: 100%;
+  padding: 9px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: #a0a0a8;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:hover {
+    background: #f7f7f8;
+    color: #6b6b73;
+  }
+`;
+
 const Main = styled.main`
   flex: 1;
   min-width: 0;
@@ -121,7 +140,10 @@ const Content = styled.div`
 
 export default function MemberShell({ screenTitle, children }) {
   const [isTzOpen, setIsTzOpen] = useState(false);
-  const { profile, goToTasks } = useMemberNavigation();
+  const { profile, goToTasks, home } = useMemberNavigation();
+  const { logout } = useAuth();
+  // GET /home 의 readToday. 오늘 들어온 원문 수 / 그중 카드가 된 수 / 내가 기다리는 질문 수.
+  const readToday = home?.readToday;
 
   return (
     <Page>
@@ -136,11 +158,14 @@ export default function MemberShell({ screenTitle, children }) {
           </Nav>
           <UserCard>
             <MemberHomeSummary
-              slackMessages={37}
-              turnedIntoTasks={4}
-              waitingAnswer={1}
+              slackMessages={readToday?.messages}
+              turnedIntoTasks={readToday?.cards}
+              waitingAnswer={readToday?.waiting}
               user={profile}
             />
+            <LogoutButton type="button" onClick={logout}>
+              로그아웃
+            </LogoutButton>
           </UserCard>
         </Sidebar>
 

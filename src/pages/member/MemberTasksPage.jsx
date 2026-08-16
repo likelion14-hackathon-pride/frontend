@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import styled from 'styled-components';
+
 import MemberShell from '../../components/member/layout/MemberShell';
 import TasksGreeting from '../../components/member/tasks/TasksGreeting';
 import ProjectFilterChips from '../../components/member/tasks/ProjectFilterChips';
 import TaskBoard from '../../components/member/tasks/TaskBoard';
 import TaskDetailPanel from '../../components/member/tasks/TaskDetailPanel';
+import { InlineError, LoadingState } from '../../components/common/AsyncStates';
 import { useMemberNavigation } from '../../context/member/MemberContext';
 
 const PageContent = styled.div`
@@ -13,65 +15,103 @@ const PageContent = styled.div`
   gap: 20px;
 `;
 
-const PROJECTS = [
-  { id: 'payment-api', label: 'payment-api' },
-  { id: 'admin-web', label: 'admin-web' },
-];
-
 export default function MemberTasksPage() {
-  const { goToAsk, columns, handleCtaClick, handleReopen } = useMemberNavigation();
+  const {
+    goToAsk,
+    profile,
+    columns,
+    cardsLoading,
+    cardsError,
+    reloadCards,
+    handleCtaClick,
+    handleReopen,
+    projectScopes,
+    moveError,
+    clearMoveError,
+  } = useMemberNavigation();
+
+  // 프로젝트 칩은 서버의 PROJECT 지식공간에서 온다. 하드코딩한 목록을 쓰지 않는다.
+  const projects = useMemo(
+    () => projectScopes.map((scope) => ({ id: scope.id, label: scope.name })),
+    [projectScopes]
+  );
+
   const [activeProject, setActiveProject] = useState('all');
-  const [selectedTask, setSelectedTask] = useState(null);
+  const [selectedCard, setSelectedCard] = useState(null);
   const [isPanelWide, setIsPanelWide] = useState(false);
 
-  const filteredColumns =
-    activeProject === 'all'
-      ? columns
-      : columns.map((col) => ({
-          ...col,
-          cards: col.cards.filter((c) => c.tags?.some((t) => t.label === activeProject)),
-        }));
+  const filteredColumns = useMemo(
+    () =>
+      activeProject === 'all'
+        ? columns
+        : columns.map((col) => ({
+            ...col,
+            cards: col.cards.filter((card) => card.scopeId === activeProject),
+          })),
+    [columns, activeProject]
+  );
 
-  const totalFiltered = filteredColumns.reduce((sum, c) => sum + c.cards.length, 0);
+  const totalFiltered = filteredColumns.reduce((sum, col) => sum + col.cards.length, 0);
+  const activeProjectLabel =
+    projects.find((project) => project.id === activeProject)?.label ?? activeProject;
 
   function handleCardClick(card, columnId) {
-    setSelectedTask({ ...card, columnId });
+    setSelectedCard({ ...card, columnId });
+  }
+
+  async function handleMoveFromPanel() {
+    if (!selectedCard) return;
+    const result =
+      selectedCard.column === 'DONE'
+        ? await handleReopen(selectedCard)
+        : await handleCtaClick(selectedCard, selectedCard.columnId ?? selectedCard.column);
+    if (result?.ok) setSelectedCard(null);
   }
 
   return (
     <MemberShell screenTitle="Tasks">
       <PageContent>
-        <TasksGreeting onAskClick={goToAsk} />
-        <ProjectFilterChips
-          projects={PROJECTS}
-          activeId={activeProject}
-          onSelect={setActiveProject}
+        {/* 아직 아무도 열어 보지 않은 지시 수. 서버의 isRead 를 그대로 센다. */}
+        <TasksGreeting
+          taskCount={columns.reduce(
+            (sum, col) => sum + col.cards.filter((card) => !card.isRead).length,
+            0
+          )}
+          userName={profile.name}
+          onAskClick={goToAsk}
         />
-        <TaskBoard
-          columns={filteredColumns}
-          isEmpty={activeProject !== 'all' && totalFiltered === 0}
-          emptyLabel={activeProject}
-          onEmptyReset={() => setActiveProject('all')}
-          onCardClick={handleCardClick}
-          onCtaClick={handleCtaClick}
-        />
+
+        <InlineError error={cardsError} onRetry={reloadCards} />
+        <InlineError error={moveError} onRetry={clearMoveError} retryLabel="닫기" />
+
+        {projects.length > 0 && (
+          <ProjectFilterChips
+            projects={projects}
+            activeId={activeProject}
+            onSelect={setActiveProject}
+          />
+        )}
+
+        {cardsLoading && columns.every((col) => col.cards.length === 0) ? (
+          <LoadingState label="지시 카드를 불러오는 중…" />
+        ) : (
+          <TaskBoard
+            columns={filteredColumns}
+            isEmpty={activeProject !== 'all' && totalFiltered === 0}
+            emptyLabel={activeProjectLabel}
+            onEmptyReset={() => setActiveProject('all')}
+            onCardClick={handleCardClick}
+            onCtaClick={handleCtaClick}
+          />
+        )}
       </PageContent>
 
       <TaskDetailPanel
-        task={selectedTask}
+        card={selectedCard}
         isWide={isPanelWide}
         onToggleWide={() => setIsPanelWide((v) => !v)}
-        onClose={() => setSelectedTask(null)}
-        onMoveAction={() => {
-          if (selectedTask) {
-            if (selectedTask.isDone) {
-              handleReopen(selectedTask);
-            } else {
-              handleCtaClick(selectedTask, selectedTask.columnId);
-            }
-            setSelectedTask(null);
-          }
-        }}
+        onClose={() => setSelectedCard(null)}
+        onMoveAction={handleMoveFromPanel}
       />
     </MemberShell>
   );

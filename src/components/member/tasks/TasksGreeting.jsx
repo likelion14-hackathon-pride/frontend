@@ -90,14 +90,17 @@ const EnterChip = styled.span`
   background: #f4f4f6;
 `;
 
-export default function TasksGreeting({ taskCount = 4, userName = 'Minh', onAskClick }) {
+export default function TasksGreeting({ taskCount = 0, userName, onAskClick }) {
   return (
     <Wrap>
       <Header>
         <GreetingIcon src={mascot} alt="" />
         <TextBlock>
           <Title>
-            {taskCount} new tasks, {userName}
+            {taskCount === 0
+              ? '아직 들어온 지시가 없습니다'
+              : `${taskCount} new task${taskCount === 1 ? '' : 's'}`}
+            {userName ? `, ${userName}` : ''}
           </Title>
         </TextBlock>
       </Header>
