@@ -3,11 +3,14 @@ import styled from 'styled-components';
 import { PENDING_OWNER_QUESTIONS } from './homeData';
 
 const Panel = styled.div`
+  box-sizing: border-box;
   display: flex;
+  width: 660.333px;
+  height: 290.917px;
+  flex-shrink: 0;
   flex-direction: column;
+  padding: 20px 20.667px;
   gap: 14px;
-  flex: 1 0 0;
-  padding: 20px;
   border-radius: 22px;
   background: linear-gradient(160deg, #10163a 0%, #171d3f 60%, #1c2247 100%);
   box-shadow:
@@ -19,119 +22,156 @@ const HeadRow = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-shrink: 0;
 `;
 
 const TitleGroup = styled.div`
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  gap: 4px;
 `;
 
-const Title = styled.h2`
-  margin: 0;
-  font-family: Pretendard;
+const Title = styled.span`
+  color: #fff;
+  font-family: 'Plus Jakarta Sans';
   font-size: 15px;
-  font-weight: 800;
-  color: #ffffff;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 124%;
+  letter-spacing: -0.3px;
 `;
 
-const CountPill = styled.span`
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.12);
-  color: #ffffff;
-  font-family: 'IBM Plex Mono';
-  font-size: 10.5px;
-  font-weight: 700;
+const Subtitle = styled.span`
+  color: rgba(255, 255, 255, 0.6);
+  font-family: 'Plus Jakarta Sans';
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 127%;
 `;
 
-const ViewAll = styled.button`
+const Chevron = styled.button`
+  flex-shrink: 0;
   border: none;
   background: none;
-  color: rgba(255, 255, 255, 0.5);
-  font-family: Pretendard;
-  font-size: 11px;
-  font-weight: 600;
   cursor: pointer;
+  color: #fff;
+  font-family: 'Plus Jakarta Sans';
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 14px;
+  opacity: 0.9;
 
   &:hover {
-    color: #ffffff;
+    opacity: 1;
   }
 `;
 
 const List = styled.div`
   display: flex;
   flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-start;
   gap: 8px;
 `;
 
 const Row = styled.div`
+  box-sizing: border-box;
   display: flex;
+  width: 100%;
+  height: 43.698px;
+  padding: 7px 9px;
   align-items: center;
-  gap: 12px;
-  padding: 12px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  gap: 10px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
 `;
 
-const CheckButton = styled.button`
+const IconBox = styled.span`
   display: flex;
-  align-items: center;
+  width: 26px;
+  height: 26px;
+  padding: 8.5px;
   justify-content: center;
-  width: 20px;
-  height: 20px;
+  align-items: center;
   flex-shrink: 0;
-  border-radius: 999px;
-  cursor: pointer;
-  transition: all 0.15s ease;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.12);
+`;
 
-  border: 1.5px solid ${({ $done }) => ($done ? '#3d5afe' : 'rgba(255, 255, 255, 0.28)')};
-  background: ${({ $done }) => ($done ? '#3d5afe' : 'transparent')};
-  color: #ffffff;
-  font-size: 11px;
+const IconShape = styled.span`
+  width: 9px;
+  height: 9px;
+  flex-shrink: 0;
+  border-radius: 2px;
+  border: 1.333px solid rgba(255, 255, 255, 0.7);
 `;
 
 const TextGroup = styled.div`
   display: flex;
-  flex-direction: column;
-  gap: 2px;
   flex: 1 0 0;
   min-width: 0;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
 `;
 
 const QuestionText = styled.span`
-  font-family: Pretendard;
-  font-size: 12.5px;
-  font-weight: 700;
-  color: ${({ $done }) => ($done ? 'rgba(255, 255, 255, 0.4)' : '#ffffff')};
-  text-decoration: ${({ $done }) => ($done ? 'line-through' : 'none')};
+  color: #fff;
+  font-family: 'Plus Jakarta Sans';
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 16.2px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 `;
 
-const SourceText = styled.span`
-  font-family: Pretendard;
-  font-size: 10.5px;
-  color: rgba(255, 255, 255, 0.4);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-`;
-
-const TimeText = styled.span`
-  flex-shrink: 0;
+const MetaText = styled.span`
+  color: rgba(255, 255, 255, 0.5);
   font-family: 'IBM Plex Mono';
-  font-size: 10.5px;
-  color: rgba(255, 255, 255, 0.35);
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 13.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
+
+const CheckButton = styled.button`
+  display: flex;
+  width: 20px;
+  height: 20px;
+  padding: 5px;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  background: ${({ $resolved }) => ($resolved ? 'rgba(255, 255, 255, 0.14)' : '#2563EB')};
+  opacity: ${({ $resolved }) => ($resolved ? 0.55 : 1)};
+`;
+
+function CheckIcon() {
+  return (
+    <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+      <path d="M2 5.2L4 7.2L8 3" stroke="white" strokeWidth="1.8" />
+    </svg>
+  );
+}
 
 function PendingApprovalPanel() {
-  const [doneIds, setDoneIds] = useState(new Set());
+  const [resolvedIds, setResolvedIds] = useState(
+    () => new Set(PENDING_OWNER_QUESTIONS.filter((q) => q.variant === 'muted').map((q) => q.id))
+  );
 
-  const toggleDone = (id) => {
-    setDoneIds((prev) => {
+  const toggleResolved = (id) => {
+    setResolvedIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) {
         next.delete(id);
@@ -142,35 +182,38 @@ function PendingApprovalPanel() {
     });
   };
 
-  const remaining = PENDING_OWNER_QUESTIONS.length - doneIds.size;
-
   return (
     <Panel>
       <HeadRow>
         <TitleGroup>
-          <Title>대표님 기다리는 질문</Title>
-          <CountPill>{remaining}건</CountPill>
+          <Title>대표님을 기다리는 질문</Title>
+          <Subtitle>핸드북에 근거가 없는 질문</Subtitle>
         </TitleGroup>
-        <ViewAll type="button">전체 보기</ViewAll>
+        <Chevron type="button" aria-label="전체 보기">
+          ›
+        </Chevron>
       </HeadRow>
+
       <List>
         {PENDING_OWNER_QUESTIONS.map((q) => {
-          const done = doneIds.has(q.id);
+          const resolved = resolvedIds.has(q.id);
           return (
             <Row key={q.id}>
+              <IconBox>
+                <IconShape />
+              </IconBox>
+              <TextGroup>
+                <QuestionText>{q.text}</QuestionText>
+                <MetaText>{q.meta}</MetaText>
+              </TextGroup>
               <CheckButton
                 type="button"
-                $done={done}
-                onClick={() => toggleDone(q.id)}
-                aria-label={done ? '완료 취소' : '완료로 표시'}
+                $resolved={resolved}
+                onClick={() => toggleResolved(q.id)}
+                aria-label={resolved ? '미확인으로 표시' : '확인함으로 표시'}
               >
-                {done ? '✓' : ''}
+                <CheckIcon />
               </CheckButton>
-              <TextGroup>
-                <QuestionText $done={done}>{q.text}</QuestionText>
-                <SourceText>{q.source}</SourceText>
-              </TextGroup>
-              <TimeText>{q.time}</TimeText>
             </Row>
           );
         })}

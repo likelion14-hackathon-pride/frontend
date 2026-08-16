@@ -50,9 +50,12 @@ const SubheadingStrong = styled.strong`
 
 const SplitRow = styled.div`
   display: flex;
-  align-items: stretch;
+  width: 100%;
+  height: 290.917px;
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: flex-start;
   gap: 14px;
-  align-self: stretch;
 `;
 
 function DashboardHomeTab({ ownerName = '김대표' }) {
