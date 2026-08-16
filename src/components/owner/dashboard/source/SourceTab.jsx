@@ -8,46 +8,64 @@ import localFileIcon from '../../../../assets/owner/local-file.svg';
 
 const TabContent = styled.div`
   display: flex;
+  width: 100%;
   flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
   gap: 18px;
-  align-self: stretch;
+`;
+
+const HeaderTextGroup = styled.div`
+  display: flex;
+  width: 100%;
+  padding-bottom: 1.333px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 7.792px;
 `;
 
 const Heading = styled.h1`
   margin: 0;
-  font-family: Pretendard;
-  font-size: 26px;
-  font-weight: 800;
   color: #17171b;
-  letter-spacing: -0.6px;
+  font-family: 'Plus Jakarta Sans';
+  font-size: 38px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 41.8px;
+  letter-spacing: -1.2px;
 `;
 
 const Subheading = styled.p`
-  margin: 6px 0 0;
-  font-family: Pretendard;
-  font-size: 13px;
+  margin: 0;
   color: #6b6b73;
+  font-family: 'Plus Jakarta Sans';
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 123%;
 `;
 
 const Grid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-  align-self: stretch;
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 16px;
 `;
 
 const GithubIconCrop = styled.span`
   display: flex;
-  width: 27px;
-  height: 27px;
+  width: 27.79px;
+  height: 27.79px;
   overflow: hidden;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 
   img {
-    width: 27px;
-    height: 27px;
+    width: 27.79px;
+    height: 27.79px;
     transform: scale(1.4);
   }
 `;
@@ -67,10 +85,10 @@ function SourceTab() {
 
   return (
     <TabContent>
-      <div>
+      <HeaderTextGroup>
         <Heading>소스</Heading>
-        <Subheading>팀이 이미 쓰고 있는 도구를 핸드북의 자료로 끌어옵니다</Subheading>
-      </div>
+        <Subheading>팀이 이미 쓰는 도구에서 핸드북이 자동으로 모입니다</Subheading>
+      </HeaderTextGroup>
 
       <Grid>
         <SourceBoxCard
@@ -84,7 +102,7 @@ function SourceTab() {
           onAddItem={(name) => handleAddItem('github', name)}
         />
         <SourceBoxCard
-          icon={<img src={slackIcon} alt="" width={27} height={27} />}
+          icon={<img src={slackIcon} alt="" width={27.79} height={27.79} />}
           config={sources.slack}
           items={sources.slack.items}
           onAddItem={(name) => handleAddItem('slack', name)}
