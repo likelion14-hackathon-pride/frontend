@@ -207,6 +207,11 @@ const ConfirmButton = styled.button`
   font-style: normal;
   font-weight: 700;
   line-height: 128%;
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
 `;
 
 const EmptyRow = styled.div`
@@ -233,7 +238,7 @@ const EmptyText = styled.span`
   line-height: 123%;
 `;
 
-function ConfirmInboxPanel({ items, onConfirm, onConfirmAll, onClose }) {
+function ConfirmInboxPanel({ items, pending = false, onConfirm, onConfirmAll, onClose }) {
   return (
     <Panel>
       <HeadRow>
@@ -241,8 +246,12 @@ function ConfirmInboxPanel({ items, onConfirm, onConfirmAll, onClose }) {
         <Description>
           소스에서 추출됐지만 대표 확인을 거치지 않은 항목입니다. 확인하면 핸드북 목록에 나타납니다.
         </Description>
-        <AllConfirmButton type="button" onClick={onConfirmAll} disabled={items.length === 0}>
-          전체 확인
+        <AllConfirmButton
+          type="button"
+          onClick={onConfirmAll}
+          disabled={items.length === 0 || pending}
+        >
+          {pending ? '확인 중…' : '전체 확인'}
         </AllConfirmButton>
         <CloseButton type="button" onClick={onClose} aria-label="확인 보관함 닫기">
           ✕
@@ -261,13 +270,18 @@ function ConfirmInboxPanel({ items, onConfirm, onConfirmAll, onClose }) {
               <TextGroup>
                 <ItemText>{item.text || '(내용 없음)'}</ItemText>
                 <SourceText>
-                  {getGroupLabel(item.groupKey)} · {item.sourceLabel}
+                  {item.groupLabel || getGroupLabel(item.groupKey)} · {item.sourceLabel}
                 </SourceText>
               </TextGroup>
               <StatusBadge $variant={item.status}>
                 {item.status === 'empty' ? '빈칸' : '미확인'}
               </StatusBadge>
-              <ConfirmButton type="button" onClick={() => onConfirm(item.id)}>
+              {/* 내용이 없는 BLANK 항목은 서버가 승인을 거절한다(cannot_approve_blank). */}
+              <ConfirmButton
+                type="button"
+                onClick={() => onConfirm(item.id)}
+                disabled={pending || item.status === 'empty'}
+              >
                 확인
               </ConfirmButton>
             </Row>
