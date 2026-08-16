@@ -335,7 +335,9 @@ function RiskKeywordStep({ keywords, onAddKeyword, onRemoveKeyword, onFinish }) 
                     </LevelSectionLabelWrap>
                     <LevelLine $color={DANGER_SOFT} />
                     <LevelSectionCountWrap>
-                      <LevelSectionCount $color={DANGER_LINE}>{grouped.danger.length}건</LevelSectionCount>
+                      <LevelSectionCount $color={DANGER_LINE}>
+                        {grouped.danger.length}건
+                      </LevelSectionCount>
                     </LevelSectionCountWrap>
                   </LevelSectionHeader>
                   {grouped.danger.map((keyword) => (
@@ -359,7 +361,9 @@ function RiskKeywordStep({ keywords, onAddKeyword, onRemoveKeyword, onFinish }) 
                     </LevelSectionLabelWrap>
                     <LevelLine $color={WARNING_SOFT} />
                     <LevelSectionCountWrap>
-                      <LevelSectionCount $color={WARNING_LINE}>{grouped.warning.length}건</LevelSectionCount>
+                      <LevelSectionCount $color={WARNING_LINE}>
+                        {grouped.warning.length}건
+                      </LevelSectionCount>
                     </LevelSectionCountWrap>
                   </LevelSectionHeader>
                   {grouped.warning.map((keyword) => (

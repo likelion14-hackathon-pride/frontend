@@ -125,7 +125,10 @@ function HandbookReviewStep({
       <Content>
         <TextGroup>
           <Heading>회사의 기본 규칙부터 정할게요</Heading>
-          <Subheading>핸드북으로 남아 팀원들과 공유됩니다. 정해진 게 없으면 그냥 넘기세요. 추후에 수정·추가도 가능합니다.</Subheading>
+          <Subheading>
+            핸드북으로 남아 팀원들과 공유됩니다. 정해진 게 없으면 그냥 넘기세요. 추후에 수정·추가도
+            가능합니다.
+          </Subheading>
         </TextGroup>
         <Mascot pose="checking" width={148} height={111} />
       </Content>

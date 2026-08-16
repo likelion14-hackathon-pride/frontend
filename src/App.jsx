@@ -10,7 +10,6 @@ import HandbookCompanyView from './components/member/handbook/HandbookCompanyVie
 import HandbookProjectView from './components/member/handbook/HandbookProjectView';
 import OwnerOnboardingPage from './pages/owner/OwnerOnboardingPage';
 
-
 function App() {
   return (
     <BrowserRouter>

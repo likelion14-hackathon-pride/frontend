@@ -9,7 +9,10 @@ const Card = styled.div`
   background: ${({ $expanded }) => ($expanded ? '#FFFFFF' : '#F7FAFF')};
   box-shadow: ${({ $expanded }) => ($expanded ? '0 14px 34px -14px rgba(37, 99, 235, 0.22)' : 'none')};
   padding: ${({ $expanded }) => ($expanded ? '18.667px' : '0')};
-  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 `;
 
 const Header = styled.button`
@@ -118,7 +121,13 @@ const SkipButton = styled.button`
   cursor: pointer;
 `;
 
-function ProjectKnowledgeItem({ project, index, onToggleExpand, onAnswerChange, onSkipToCompanyRules }) {
+function ProjectKnowledgeItem({
+  project,
+  index,
+  onToggleExpand,
+  onAnswerChange,
+  onSkipToCompanyRules,
+}) {
   const confirmedCount = countConfirmed(PROJECT_QUESTION_TEMPLATE, project.answers);
   const summary = confirmedCount === 0 ? '회사 규칙만 적용' : '프로젝트에서만 다른 규칙';
 
