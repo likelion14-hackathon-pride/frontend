@@ -28,7 +28,9 @@ const Row = styled.div`
   background: #ffffff;
   box-shadow: ${({ $status }) => elevatedShadow($status)};
   opacity: ${({ $status }) => ($status === 'skip' ? 0.55 : 1)};
-  transition: opacity 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    opacity 0.15s ease,
+    box-shadow 0.15s ease;
 `;
 
 const Header = styled.button`
@@ -137,7 +139,9 @@ const OptionCard = styled.button`
   box-shadow: ${({ $active }) => ($active ? '0 10px 24px -14px rgba(37, 99, 235, 0.35)' : 'none')};
   cursor: pointer;
   text-align: left;
-  transition: border-color 0.15s ease, background 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
 
   &:hover {
     border-color: rgba(37, 99, 235, 0.45);
@@ -364,10 +368,20 @@ function QuestionRow({ question, answer, onChange }) {
           ) : (
             <>
               <ActionRow>
-                <ActionButton type="button" $kind="input" $active={answer.selected === 'custom'} onClick={handleStartCustom}>
+                <ActionButton
+                  type="button"
+                  $kind="input"
+                  $active={answer.selected === 'custom'}
+                  onClick={handleStartCustom}
+                >
                   직접 입력
                 </ActionButton>
-                <ActionButton type="button" $kind="skip" $active={answer.selected === 'skip'} onClick={handleSkip}>
+                <ActionButton
+                  type="button"
+                  $kind="skip"
+                  $active={answer.selected === 'skip'}
+                  onClick={handleSkip}
+                >
                   넘어가기
                 </ActionButton>
                 {!hasOptions && <NoOptionHint>선지 없이 직접 입력하는 문항입니다</NoOptionHint>}

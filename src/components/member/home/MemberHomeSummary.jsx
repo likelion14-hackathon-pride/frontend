@@ -1,0 +1,147 @@
+import styled from 'styled-components';
+import ProfileSettingModal from './ProfileSettingModal';
+import { useState } from 'react';
+import { useMemberNavigation } from '../../../context/member/MemberContext';
+
+const Wrap = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+`;
+
+const SummaryCard = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 14px 15px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 96, 0, 0.14);
+  background: linear-gradient(135deg, rgba(255, 96, 0, 0.08), rgba(255, 138, 61, 0.03));
+`;
+
+const SummaryTitle = styled.div`
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #e35b00;
+  letter-spacing: 1.035px;
+`;
+
+const Row = styled.div`
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  font-size: 14px;
+  color: #6b6b73;
+  font-weight: 600;
+`;
+
+const HighlightValue = styled.strong`
+  color: #e35b00;
+`;
+
+const UserRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px;
+  border-radius: 12px;
+  background: #f7f7f8;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+`;
+
+const Avatar = styled.div`
+  width: 28px;
+  height: 28px;
+  flex: none;
+  border-radius: 50%;
+  background: #e4e4e8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #6b6b73;
+`;
+
+const UserText = styled.div`
+  flex: 1;
+  min-width: 0;
+  line-height: 1.3;
+`;
+
+const UserName = styled.div`
+  font-size: 14px;
+  font-weight: 700;
+  color: #17171b;
+`;
+
+const UserMeta = styled.div`
+  font-size: 11.5px;
+  color: #a0a0a8;
+`;
+
+const LOCATION_LABELS = {
+  hanoi: 'Hanoi (UTC+7)',
+  hcm: 'Ho Chi Minh (UTC+7)',
+  bangkok: 'Bangkok (UTC+7)',
+  jakarta: 'Jakarta (UTC+7)',
+  manila: 'Manila (UTC+8)',
+  seoul: 'Seoul (UTC+9)',
+  tokyo: 'Tokyo (UTC+9)',
+};
+
+export default function MemberHomeSummary({ slackMessages, turnedIntoTasks, waitingAnswer, user }) {
+  const [isSettingOpen, setIsSettingOpen] = useState(false);
+  const initial = user?.name?.[0]?.toUpperCase() ?? '?';
+  const { setProfile } = useMemberNavigation();
+
+  return (
+    <Wrap>
+      <SummaryCard>
+        <SummaryTitle>SAI READ FOR YOU TODAY</SummaryTitle>
+        <Row>
+          <span>Slack messages</span>
+          <strong>{slackMessages}</strong>
+        </Row>
+        <Row>
+          <span>Turned into tasks</span>
+          <strong>{turnedIntoTasks}</strong>
+        </Row>
+        <Row>
+          <span>Waiting the answered</span>
+          <HighlightValue>{waitingAnswer}</HighlightValue>
+        </Row>
+      </SummaryCard>
+
+      <UserRow as="button" onClick={() => setIsSettingOpen(true)}>
+        <Avatar>{initial}</Avatar>
+        <UserText>
+          <UserName>{user?.name}</UserName>
+          <UserMeta>
+            {user?.role} · {LOCATION_LABELS[user?.locationId]}
+          </UserMeta>
+        </UserText>
+      </UserRow>
+
+      {isSettingOpen && (
+        <ProfileSettingModal
+          initialName={user?.name}
+          initialLocationId={user?.locationId}
+          initialRole={user?.role}
+          onClose={() => setIsSettingOpen(false)}
+          onSave={(data) => {
+            setProfile((prev) => ({ ...prev, ...data }));
+            setIsSettingOpen(false);
+          }}
+          onRunSetupAgain={() => console.log('setup 다시 실행')}
+        />
+      )}
+    </Wrap>
+  );
+}

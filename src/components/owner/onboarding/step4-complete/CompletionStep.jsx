@@ -466,7 +466,11 @@ function CompletionStep({
                 <IconBoxImg src={exclamationIcon} alt="" style={{ width: 20, height: 20 }} />
               </IconBox>
               <IconBox $radius="12px" $bg="#EA6A0A">
-                <IconBoxImg src={exclamationTriangleIcon} alt="" style={{ width: 20, height: 20 }} />
+                <IconBoxImg
+                  src={exclamationTriangleIcon}
+                  alt=""
+                  style={{ width: 20, height: 20 }}
+                />
               </IconBox>
             </>
           }
@@ -485,7 +489,8 @@ function CompletionStep({
           </BannerTitleWrap>
           <BannerSubtitleWrap>
             <BannerSubtitle>
-              SAI로 원격 팀원과의 협업을 더 쉽게 만들어보세요. 팀의 규칙에 맞춰 정확한 지시로 안내해드립니다.
+              SAI로 원격 팀원과의 협업을 더 쉽게 만들어보세요. 팀의 규칙에 맞춰 정확한 지시로
+              안내해드립니다.
             </BannerSubtitle>
           </BannerSubtitleWrap>
         </BannerTextGroup>

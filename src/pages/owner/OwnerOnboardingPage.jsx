@@ -72,12 +72,17 @@ function OwnerOnboardingPage() {
   };
 
   const handleAddProject = (name) => {
-    setProjects((prev) => [...prev, { id: `project-${Date.now()}`, name, expanded: true, answers: {} }]);
+    setProjects((prev) => [
+      ...prev,
+      { id: `project-${Date.now()}`, name, expanded: true, answers: {} },
+    ]);
   };
 
   const handleToggleProjectExpand = (projectId) => {
     setProjects((prev) =>
-      prev.map((project) => (project.id === projectId ? { ...project, expanded: !project.expanded } : project))
+      prev.map((project) =>
+        project.id === projectId ? { ...project, expanded: !project.expanded } : project
+      )
     );
   };
 

@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import Mascot from '../Mascot';
 import SourceCard from './SourceCard';
 import SlackConnectModal from './SlackConnectModal';
+import GithubConnectModal from './GithubConnectModal';
 import { colors } from '../theme';
 import githubIcon from '../../../../assets/owner/github.svg';
 import slackIcon from '../../../../assets/owner/slack.svg';
@@ -97,9 +98,11 @@ const CtaBar = styled.div`
   gap: 20px;
   align-self: stretch;
   border-radius: 22px;
-  border: 1px solid #22376A;
-  background: linear-gradient(92deg, #101828 0%, #1B2A4A 62%, #22376A 100%);
-  box-shadow: 0 18px 40px -14px rgba(17, 17, 20, 0.42), 0 1px 0 1px rgba(255, 255, 255, 0.14) inset;
+  border: 1px solid #22376a;
+  background: linear-gradient(92deg, #101828 0%, #1b2a4a 62%, #22376a 100%);
+  box-shadow:
+    0 18px 40px -14px rgba(17, 17, 20, 0.42),
+    0 1px 0 1px rgba(255, 255, 255, 0.14) inset;
 `;
 
 const CtaTextGroup = styled.div`
@@ -121,7 +124,7 @@ const CtaTitleWrap = styled.div`
 const CtaTitle = styled.p`
   margin: 0;
   align-self: stretch;
-  color: #FFF;
+  color: #fff;
   font-family: Pretendard;
   font-size: 14px;
   font-style: normal;
@@ -205,7 +208,8 @@ const SOURCES = [
     icon: <img src={localFileIcon} alt="" width={22} height={22} />,
     title: '로컬 파일',
     subtitle: 'md · txt · pdf 등',
-    description: '어느 도구에도 올라가 있지 않은 문서를 그대로 올려 주세요. 파일명이 출처로 남습니다.',
+    description:
+      '어느 도구에도 올라가 있지 않은 문서를 그대로 올려 주세요. 파일명이 출처로 남습니다.',
     buttonLabel: '업로드하기',
     connectingLabel: '업로드 중…',
     connectedLabel: '업로드 완료 ✓ ',
@@ -217,6 +221,7 @@ const CONNECT_DELAY_MS = 900;
 function SourceConnectStep({ connectedSources, onToggleSource, onCreateDraft }) {
   const [connectingKeys, setConnectingKeys] = useState(new Set());
   const [slackModalOpen, setSlackModalOpen] = useState(false);
+  const [githubModalOpen, setGithubModalOpen] = useState(false);
   const connectedCount = connectedSources.size;
 
   const handleConnect = (key) => {
@@ -242,12 +247,21 @@ function SourceConnectStep({ connectedSources, onToggleSource, onCreateDraft }) 
       setSlackModalOpen(true);
       return;
     }
+    if (key === 'github' && !connectedSources.has(key)) {
+      setGithubModalOpen(true);
+      return;
+    }
     handleConnect(key);
   };
 
   const handleSlackConnected = () => {
     setSlackModalOpen(false);
     onToggleSource('slack');
+  };
+
+  const handleGithubConnected = () => {
+    setGithubModalOpen(false);
+    onToggleSource('github');
   };
 
   return (
@@ -294,11 +308,16 @@ function SourceConnectStep({ connectedSources, onToggleSource, onCreateDraft }) 
           <CtaTextGroup>
             <CtaTitleWrap>
               <CtaTitle>
-                {connectedCount === 0 ? '아직 연결된 소스가 없습니다' : `${connectedCount}개 소스가 연결되었습니다`}
+                {connectedCount === 0
+                  ? '아직 연결된 소스가 없습니다'
+                  : `${connectedCount}개 소스가 연결되었습니다`}
               </CtaTitle>
             </CtaTitleWrap>
             <CtaSubtitleWrap>
-              <CtaSubtitle>다음 단계에서 기본 규칙 질문에 답하면 핸드북이 시작됩니다. 소스는 그 위에 얹히는 자료입니다.</CtaSubtitle>
+              <CtaSubtitle>
+                다음 단계에서 기본 규칙 질문에 답하면 핸드북이 시작됩니다. 소스는 그 위에 얹히는
+                자료입니다.
+              </CtaSubtitle>
             </CtaSubtitleWrap>
           </CtaTextGroup>
           <CtaButton type="button" disabled={connectedCount === 0} onClick={onCreateDraft}>
@@ -309,7 +328,17 @@ function SourceConnectStep({ connectedSources, onToggleSource, onCreateDraft }) 
       </StepContent>
 
       {slackModalOpen && (
-        <SlackConnectModal onClose={() => setSlackModalOpen(false)} onConnected={handleSlackConnected} />
+        <SlackConnectModal
+          onClose={() => setSlackModalOpen(false)}
+          onConnected={handleSlackConnected}
+        />
+      )}
+
+      {githubModalOpen && (
+        <GithubConnectModal
+          onClose={() => setGithubModalOpen(false)}
+          onConnected={handleGithubConnected}
+        />
       )}
     </>
   );
