@@ -97,6 +97,11 @@ function HandbookTab() {
     setItems((prev) => prev.map((item) => (item.id === id ? { ...item, text, lastConfirmed: '방금' } : item)));
   };
 
+  const handleDeleteItem = (id) => {
+    setItems((prev) => prev.filter((item) => item.id !== id));
+    setSelectedItemId((prev) => (prev === id ? null : prev));
+  };
+
   return (
     <TabContent>
       <HandbookHeaderControls
@@ -137,7 +142,7 @@ function HandbookTab() {
           />
         </LeftColumn>
         <RightColumn>
-          <HandbookDetailPanel item={selectedItem} onSave={handleUpdateItemText} />
+          <HandbookDetailPanel item={selectedItem} onSave={handleUpdateItemText} onDelete={handleDeleteItem} />
         </RightColumn>
       </Body>
     </TabContent>

@@ -177,6 +177,28 @@ const EditButton = styled.button`
   white-space: nowrap;
 `;
 
+const DeleteButton = styled.button`
+  display: flex;
+  width: 57px;
+  height: 36.667px;
+  padding: 10px 16px;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 11px;
+  background: #fef2f2;
+  cursor: pointer;
+  color: #dc2626;
+  text-align: center;
+  font-family: 'Plus Jakarta Sans';
+  font-size: 12.5px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 123%;
+  white-space: nowrap;
+`;
+
 const TimestampText = styled.span`
   margin-left: auto;
   color: #a0a0a8;
@@ -200,7 +222,7 @@ const EmptyPanel = styled.div`
   width: 100%;
 `;
 
-function HandbookDetailPanel({ item, onSave }) {
+function HandbookDetailPanel({ item, onSave, onDelete }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState('');
 
@@ -261,6 +283,9 @@ function HandbookDetailPanel({ item, onSave }) {
             수정
           </EditButton>
         )}
+        <DeleteButton type="button" onClick={() => onDelete(item.id)}>
+          삭제
+        </DeleteButton>
         <TimestampText>{item.lastConfirmed ? `최근 확인 ${item.lastConfirmed}` : '확인 이력 없음'}</TimestampText>
       </ButtonRow>
     </Panel>
