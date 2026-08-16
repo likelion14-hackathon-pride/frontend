@@ -26,7 +26,7 @@ const CTA_NEXT_COLUMN = {
 };
 
 export default function MemberTasksPage() {
-  const { goToAsk, goToHandbook } = useMemberNavigation();
+  const { goToAsk, goToHandbook, profile } = useMemberNavigation();
   const [activeProject, setActiveProject] = useState('all');
   const [selectedTask, setSelectedTask] = useState(null);
   const [isPanelWide, setIsPanelWide] = useState(false);
@@ -163,7 +163,7 @@ export default function MemberTasksPage() {
   return (
     <MemberShell screenTitle="Tasks">
       <PageContent>
-        <TasksGreeting onAskClick={goToAsk} />
+        <TasksGreeting userName={profile.name} onAskClick={goToAsk} />
         <ProjectFilterChips
           projects={PROJECTS}
           activeId={activeProject}

@@ -11,13 +11,13 @@ const CTA_LABEL = {
 };
 
 const Overlay = styled.div`
-  position: fixed;
+  position: absolute;
   top: 0;
   right: 0;
   bottom: 0;
   z-index: 40;
   width: ${(props) => (props.$wide ? '620px' : '420px')};
-  max-width: 90vw;
+  max-width: 90%;
   display: flex;
   flex-direction: column;
   background: #f7f7f8;
@@ -682,7 +682,7 @@ export default function TaskDetailPanel({ task, isWide, onToggleWide, onClose, o
     <Overlay $wide={isWide}>
       <Header>
         <HeaderTitle>Task detail</HeaderTitle>
-        <WidenButton onClick={onToggleWide}>{isWide ? 'Narrow' : 'Widen'}</WidenButton>
+        <WidenButton onClick={onToggleWide}>{isWide ? '⤡ Collapse' : '⤢ Expand'}</WidenButton>
         <CloseButton onClick={onClose}>×</CloseButton>
       </Header>
 

@@ -29,6 +29,7 @@ const TextBlock = styled.div`
 
 const Title = styled.div`
   font-size: clamp(28px, 5vw, 40px);
+  font-family: Tahoma;
   font-weight: 700;
   letter-spacing: -1.3px;
   line-height: 1.1;
