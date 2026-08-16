@@ -40,6 +40,7 @@ const Grid = styled.div`
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 12px;
   align-items: start;
+  overflow-x: auto;
 `;
 
 export default function TaskBoard({ columns = [], isEmpty = false, emptyLabel = '', onEmptyReset, onCardClick, onCtaClick }) {

@@ -126,6 +126,8 @@ export default function MemberTasksPage() {
           ...col,
           cards: col.cards.filter((c) => c.tags?.some((t) => t.label === activeProject)),
         }));
+  
+  const totalFiltered = filteredColumns.reduce((sum, c) => sum + c.cards.length, 0);
 
   function handleCardClick(card, columnId) {
     setSelectedTask({ ...card, columnId });
@@ -151,10 +153,6 @@ export default function MemberTasksPage() {
     });
   }
 
-  function handleCardMove(cardId, fromColumnId, toColumnId) {
-    moveCard(cardId, fromColumnId, toColumnId);
-  }
-
   function handleCtaClick(card, columnId) {
     const nextColumnId = CTA_NEXT_COLUMN[columnId];
     if (nextColumnId) {
@@ -169,6 +167,9 @@ export default function MemberTasksPage() {
         <ProjectFilterChips projects={PROJECTS} activeId={activeProject} onSelect={setActiveProject} />
         <TaskBoard
           columns={filteredColumns}
+          isEmpty={activeProject !== 'all' && totalFiltered === 0}
+          emptyLabel={activeProject}
+          onEmptyReset={() => setActiveProject('all')}
           onCardClick={handleCardClick}
           onCtaClick={handleCtaClick}
         />

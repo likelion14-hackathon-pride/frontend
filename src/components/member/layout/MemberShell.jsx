@@ -16,9 +16,18 @@ const Page = styled.div`
   justify-content: center;
   align-items: center;
   background:
-  radial-gradient(900px 700px at 88% 4%, rgba(239,147,91,.32) 0%, rgba(239,147,91,0) 62%),
-  radial-gradient(760px 620px at 4% 96%, rgba(235,112,37,.40) 0%, rgba(239,147,91,.20) 45%, rgba(239,147,91,0) 72%),
-  linear-gradient(140deg, #FBE8DC 0%, #FEF4EE 46%, #FAE2D3 100%);
+    radial-gradient(
+      77.78% 62.5% at 88% 4%,
+      rgba(255, 96, 0, 0.42) 0%,
+      rgba(255, 138, 61, 0.2) 46%,
+      rgba(255, 138, 61, 0) 74%
+    ),
+    radial-gradient(
+      68.89% 52.78% at 4% 96%,
+      rgba(255, 138, 61, 0.34) 0%,
+      rgba(255, 138, 61, 0) 70%
+    ),
+    linear-gradient(127deg, #ffe7d4 0%, #fff2e8 46%, #ffdcc2 100%);
 `;
 
 const Shell = styled.div`

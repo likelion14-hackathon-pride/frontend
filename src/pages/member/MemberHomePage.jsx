@@ -7,6 +7,7 @@ import SaiResolutionCard from '../../components/member/home/SaiResolution';
 import HandbookGrowthCard from '../../components/member/home/HandbookGrowth';
 import HandbookSummary from '../../components/member/home/HandbookSummary';
 import logoMascot from '../../assets/logo-mascot.png';
+import { useMemberNavigation } from '../../context/member/MemberContext';
 
 const PageContent = styled.div`
   display: flex;
@@ -22,7 +23,7 @@ const Greeting = styled.div`
 `;
 
 const GreetingText = styled.div`
-  font-size: 40px;
+  font-size: clamp(28px, 5vw, 40px);
   font-family: Tahoma;
   font-weight: 700;
   letter-spacing: -1.3px;
@@ -42,6 +43,7 @@ const TopRow = styled.div`
   display: flex;
   align-items: stretch;
   gap: 20px;
+  flex-wrap: wrap; 
 `;
 
 const MainGrid = styled.div`
@@ -64,12 +66,14 @@ const CardRow = styled.div`
   align-items: stretch;
 `;
 
-export default function MemberHomePage({ userName = 'Minh' }) {
+export default function MemberHomePage() {
+  const { profile } = useMemberNavigation();
+
   return (
     <MemberShell screenTitle="Home">
       <PageContent>
         <Greeting>
-          <GreetingText>Good Morning, {userName}</GreetingText>
+          <GreetingText>Good Morning, {profile.name}</GreetingText>
           <GreetingIcon src={logoMascot} alt="" />
         </Greeting>
 
