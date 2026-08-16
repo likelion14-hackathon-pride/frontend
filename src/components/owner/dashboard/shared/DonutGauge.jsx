@@ -2,8 +2,11 @@ import styled from 'styled-components';
 
 const Wrap = styled.div`
   position: relative;
-  width: ${({ $size }) => $size}px;
-  height: ${({ $size }) => $size}px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: ${({ $wrapSize }) => $wrapSize}px;
+  height: ${({ $wrapSize }) => $wrapSize}px;
   flex-shrink: 0;
 `;
 
@@ -20,22 +23,24 @@ const Label = styled.div`
   letter-spacing: -0.5px;
 `;
 
-function DonutGauge({ value, size = 64, stroke = 8, trackColor = '#eaf1fe', progressColor = '#2563eb' }) {
+function DonutGauge({
+  value,
+  size = 64,
+  stroke = 8,
+  trackColor = '#eaf1fe',
+  progressColor = '#2563eb',
+  rounded = true,
+  wrapSize,
+  children,
+}) {
   const radius = (size - stroke) / 2;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference * (1 - value / 100);
 
   return (
-    <Wrap $size={size}>
+    <Wrap $wrapSize={wrapSize ?? size}>
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke={trackColor}
-          strokeWidth={stroke}
-        />
+        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke={trackColor} strokeWidth={stroke} />
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -43,13 +48,13 @@ function DonutGauge({ value, size = 64, stroke = 8, trackColor = '#eaf1fe', prog
           fill="none"
           stroke={progressColor}
           strokeWidth={stroke}
-          strokeLinecap="round"
+          strokeLinecap={rounded ? 'round' : 'butt'}
           strokeDasharray={circumference}
           strokeDashoffset={offset}
           transform={`rotate(-90 ${size / 2} ${size / 2})`}
         />
       </svg>
-      <Label $size={size}>{value}%</Label>
+      {children ?? <Label $size={size}>{value}%</Label>}
     </Wrap>
   );
 }

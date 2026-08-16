@@ -1,47 +1,26 @@
 import styled from 'styled-components';
-import DonutGauge from '../shared/DonutGauge';
+import StatCardShell from './StatCardShell';
+import AdoptionRateCard from './AdoptionRateCard';
 import MiniBarChart from '../shared/MiniBarChart';
 import MiniLineChart from '../shared/MiniLineChart';
 import { STAT_SUMMARY, VISIT_TREND, TIME_SAVED_TREND } from './homeData';
 
-const Grid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
-  align-self: stretch;
-`;
-
-const Card = styled.div`
+const Row = styled.div`
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 18px;
-  border-radius: 22px;
-  border: 1px solid #efeff1;
-  background: #fff;
-  box-shadow:
-    0 14px 34px -14px rgba(23, 44, 90, 0.16),
-    0 3px 8px -2px rgba(23, 44, 90, 0.06);
-`;
-
-const Title = styled.span`
-  font-family: Pretendard;
-  font-size: 12.5px;
-  font-weight: 700;
-  color: #6b6b73;
+  width: 100%;
+  height: 250.333px;
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 14px;
 `;
 
 const Body = styled.div`
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-`;
-
-const NumberBlock = styled.div`
-  display: flex;
   flex-direction: column;
-  gap: 4px;
+  justify-content: center;
+  flex: 1 0 0;
+  gap: 10px;
 `;
 
 const NumberRow = styled.div`
@@ -51,16 +30,16 @@ const NumberRow = styled.div`
 `;
 
 const Number = styled.span`
-  font-family: Pretendard;
-  font-size: 30px;
-  font-weight: 800;
+  font-family: 'Plus Jakarta Sans';
+  font-size: 32px;
+  font-weight: 700;
   color: #17171b;
   letter-spacing: -1px;
   line-height: 1;
 `;
 
 const Unit = styled.span`
-  font-family: Pretendard;
+  font-family: 'Plus Jakarta Sans';
   font-size: 12px;
   font-weight: 600;
   color: #a0a0a8;
@@ -68,23 +47,21 @@ const Unit = styled.span`
 
 const Delta = styled.span`
   font-family: 'IBM Plex Mono';
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
   color: #1f7a45;
 `;
 
 const Footnote = styled.span`
-  font-family: Pretendard;
-  font-size: 10.5px;
+  font-family: 'Plus Jakarta Sans';
+  font-size: 11px;
   color: #a0a0a8;
 `;
 
 const ProgressStack = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  flex: 1 0 0;
-  margin-left: 14px;
+  gap: 8px;
 `;
 
 const ProgressTrack = styled.div`
@@ -103,21 +80,15 @@ const ProgressFill = styled.div`
 
 function StatCardsRow() {
   return (
-    <Grid>
-      <Card>
-        <Title>SAI 채택률</Title>
-        <Body>
-          <DonutGauge value={STAT_SUMMARY.adoptionRate} size={58} stroke={7} />
-          <NumberBlock>
-            <Delta>{STAT_SUMMARY.adoptionDelta}</Delta>
-            <Footnote>지난주 대비 상승</Footnote>
-          </NumberBlock>
-        </Body>
-        <Footnote>SAI 자동 답변 · 이용 팀원 수</Footnote>
-      </Card>
+    <Row>
+      <AdoptionRateCard
+        value={STAT_SUMMARY.adoptionRate}
+        delta={STAT_SUMMARY.adoptionDelta}
+        aiCount={STAT_SUMMARY.aiAnsweredCount}
+        ownerCount={STAT_SUMMARY.ownerAnsweredCount}
+      />
 
-      <Card>
-        <Title>답변 신뢰도</Title>
+      <StatCardShell title="답변 신뢰도">
         <Body>
           <NumberRow>
             <Number>{STAT_SUMMARY.answerCount}</Number>
@@ -131,36 +102,32 @@ function StatCardsRow() {
               <ProgressFill $pct={42} $color="#a0a0a8" />
             </ProgressTrack>
           </ProgressStack>
+          <Footnote>팀원 확인 · 대표 확인 완료</Footnote>
         </Body>
-        <Footnote>팀원 확인 · 대표 확인 완료</Footnote>
-      </Card>
+      </StatCardShell>
 
-      <Card>
-        <Title>이번 주 절약된 대응 시간</Title>
+      <StatCardShell title="이번 주 절약된 대응 시간">
         <Body>
-          <NumberBlock>
-            <Number style={{ fontSize: 22 }}>{STAT_SUMMARY.timeSavedLabel}</Number>
+          <NumberRow>
+            <Number>{STAT_SUMMARY.timeSavedLabel}</Number>
             <Delta>{STAT_SUMMARY.timeSavedDelta}</Delta>
-          </NumberBlock>
-          <MiniLineChart values={TIME_SAVED_TREND} width={110} height={34} />
+          </NumberRow>
+          <MiniLineChart values={TIME_SAVED_TREND} width={200} height={64} />
+          <Footnote>SAI가 대신 응답한 시간 합계</Footnote>
         </Body>
-        <Footnote>SAI가 대신 응답한 시간 합계</Footnote>
-      </Card>
+      </StatCardShell>
 
-      <Card>
-        <Title>방문 빈도</Title>
+      <StatCardShell title="방문 빈도">
         <Body>
-          <NumberBlock>
-            <NumberRow>
-              <Number>{STAT_SUMMARY.visitCount}</Number>
-            </NumberRow>
+          <NumberRow>
+            <Number>{STAT_SUMMARY.visitCount}</Number>
             <Delta>{STAT_SUMMARY.visitDelta}</Delta>
-          </NumberBlock>
-          <MiniBarChart values={VISIT_TREND} height={34} />
+          </NumberRow>
+          <MiniBarChart values={VISIT_TREND} height={64} />
+          <Footnote>이번 주 핸드북 방문수</Footnote>
         </Body>
-        <Footnote>이번 주 핸드북 방문수</Footnote>
-      </Card>
-    </Grid>
+      </StatCardShell>
+    </Row>
   );
 }
 

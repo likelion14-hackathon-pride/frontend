@@ -19,13 +19,13 @@ const Background = styled.div`
 const Card = styled.div`
   box-sizing: border-box;
   width: 100%;
-  max-width: 1312px;
+  max-width: 1388px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   flex-shrink: 0;
-  gap: 22px;
-  padding: 24px 30px 32px 30px;
+  gap: 20px;
+  padding: 22.667px 26.667px 26.667px 26.667px;
   border-radius: 30px;
   border: 0.667px solid rgba(255, 255, 255, 0.9);
   background:

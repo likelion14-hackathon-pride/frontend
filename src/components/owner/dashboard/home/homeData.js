@@ -50,8 +50,11 @@ export const PENDING_OWNER_QUESTIONS = [
 ];
 
 export const STAT_SUMMARY = {
+  totalQuestions: 96,
+  aiAnsweredCount: 79,
+  ownerAnsweredCount: 17,
   adoptionRate: 82,
-  adoptionDelta: '+14%',
+  adoptionDelta: '+14%p',
   answerCount: 5.3,
   visitCount: 342,
   visitDelta: '+7',
