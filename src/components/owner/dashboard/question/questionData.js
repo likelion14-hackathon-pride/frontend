@@ -1,30 +1,70 @@
+export const QUESTION_STATS = {
+  waitingCount: 2,
+  waitingFootnote: '가장 오래된 질문 18시간 경과',
+  approvalCount: 2,
+  approvalFootnote: '답변에서 만들어진 항목 제안',
+  weeklySaved: 7,
+  weeklySavedFootnote: '질문-답변 1쌍당 항목 1개',
+};
+
 export const INITIAL_QUESTIONS = [
   {
     id: 'q-1',
-    text: 'payment-api PR 리뷰어는 누구로 지정하나요?',
-    project: 'payment-api',
-    source: 'Slack #payment-api',
-    receivedAt: '08.07 11:02',
-    aiDraftText: 'Assign 지훈 as the reviewer on payment-api pull requests. If unavailable, tag the CEO instead.',
-    koDraftText: '경력직 지훈님을 리뷰어로 넣어주세요. 지훈님 부재 시엔 대표님을 태그해주세요.',
-    status: 'pending',
+    employee: 'Minh',
+    text: '장애 시 에스컬레이션 순서가 있나요?',
+    project: '공통 규칙',
+    time: '08.06 14:45',
+    status: 'waiting',
   },
   {
     id: 'q-2',
-    text: '장애 시 메세스 답변려는 순서가 있나요?',
-    project: 'admin-web',
-    source: 'Slack #dev-general',
-    receivedAt: '08.07 09:40',
-    aiDraftText: 'Escalate P0 incidents to the CEO first, then notify the on-call engineer in #dev-general.',
-    koDraftText: 'P0 장애는 대표님께 먼저 알리고, 그다음 #dev-general에 온콜 담당자를 태그해주세요.',
-    status: 'pending',
+    employee: 'Minh',
+    text: '핫픽스일 때 제가 배포해도 되나요?',
+    project: 'payment-api',
+    time: '08.06 21:40',
+    status: 'waiting',
+    declined: true,
+  },
+  {
+    id: 'q-3',
+    employee: 'Linh',
+    text: 'PR 리뷰어는 누구로 지정하나요?',
+    project: 'payment-api',
+    time: '08.07 10:30',
+    status: 'pending_approval',
+    queueNumber: 3,
+    relativeTime: '2시간 전',
+    ownerReply: '결제 쪽은 지훈님을 리뷰어로 넣어주세요. 지훈님 부재면 저 태그하시면 됩니다.',
+    suggestion: {
+      tag: '프로젝트',
+      title: 'payment-api PR 리뷰어는 지훈, 부재 시 대표',
+      en: 'Assign 지훈 as the reviewer on payment-api pull requests. If unavailable, tag the CEO instead.',
+      source: 'slack #payment · 08.07 11:02',
+    },
+  },
+  {
+    id: 'q-4',
+    employee: 'Minh',
+    text: '테스트도 작성해야 하나요?',
+    project: 'payment-api',
+    time: '08.07 09:20',
+    status: 'pending_approval',
+    queueNumber: 4,
+    relativeTime: '4시간 전',
+    ownerReply: '유닛 테스트는 필수는 아니고, 결제 관련 로직만 작성해주세요.',
+    suggestion: {
+      tag: '프로젝트',
+      title: 'payment-api는 결제 로직만 테스트 작성',
+      en: 'Unit tests are not required except for payment logic in payment-api.',
+      source: 'slack #payment · 08.07 09:41',
+    },
+  },
+  {
+    id: 'q-5',
+    employee: 'Minh',
+    text: '장비 반납은 어떻게 하나요?',
+    project: '공통 규칙',
+    time: '08.05 16:50',
+    status: 'saved',
   },
 ];
-
-export const RECENT_AI_ANSWERED = [
-  { id: 'ra-1', text: '연차는 언제부터 적용해야 하나요?', time: '08.07 10:20' },
-  { id: 'ra-2', text: 'PR 리뷰어는 누구로 지정하나요?', time: '08.06 18:02' },
-  { id: 'ra-3', text: '결제 실패 안내는 어떻게 하나요?', time: '08.06 15:47' },
-];
-
-export const WEEKLY_ANSWERED_BASE = 7;

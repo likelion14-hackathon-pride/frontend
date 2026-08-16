@@ -1,80 +1,76 @@
 import styled from 'styled-components';
 
 const Grid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-  align-self: stretch;
+  display: flex;
+  width: 100%;
+  height: 125.333px;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 16px;
 `;
 
 const Card = styled.div`
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 18px;
-  border-radius: 22px;
-  border: 1px solid #efeff1;
-  background: #fff;
+  gap: 8px;
+  flex: 1 0 0;
+  height: 125.333px;
+  flex-shrink: 0;
+  padding: 20px;
+  border-radius: 20px;
+  border: 0.667px solid #efeff1;
+  background: ${({ $tinted }) => ($tinted ? '#EEF3FF' : '#FFFFFF')};
   box-shadow:
-    0 14px 34px -14px rgba(23, 44, 90, 0.16),
-    0 3px 8px -2px rgba(23, 44, 90, 0.06);
+    0 14px 34px -14px rgba(23, 44, 90, 0.22),
+    0 3px 8px -2px rgba(23, 44, 90, 0.08);
 `;
 
 const Title = styled.span`
-  font-family: Pretendard;
-  font-size: 12.5px;
-  font-weight: 700;
   color: #6b6b73;
+  font-family: 'Plus Jakarta Sans';
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 128%;
 `;
 
 const Number = styled.span`
-  font-family: Pretendard;
-  font-size: 30px;
-  font-weight: 800;
   color: #17171b;
-  letter-spacing: -1px;
-`;
-
-const Unit = styled.span`
-  font-family: Pretendard;
-  font-size: 12px;
-  font-weight: 600;
-  color: #a0a0a8;
-  margin-left: 4px;
+  font-family: 'Plus Jakarta Sans';
+  font-size: 34px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 125%;
+  letter-spacing: -1.2px;
 `;
 
 const Footnote = styled.span`
-  font-family: Pretendard;
-  font-size: 10.5px;
   color: #a0a0a8;
+  font-family: 'Plus Jakarta Sans';
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 127%;
 `;
 
-function QuestionStatCards({ todayWaiting, approvalWaiting, weeklyAnswered }) {
+function QuestionStatCards({ waitingCount, waitingFootnote, approvalCount, approvalFootnote, weeklySaved, weeklySavedFootnote }) {
   return (
     <Grid>
       <Card>
-        <Title>오늘 답변 대기</Title>
-        <div>
-          <Number>{todayWaiting}</Number>
-          <Unit>건</Unit>
-        </div>
-        <Footnote>AI 답변 대기 질문</Footnote>
+        <Title>대표 답변 대기</Title>
+        <Number>{waitingCount}건</Number>
+        <Footnote>{waitingFootnote}</Footnote>
       </Card>
-      <Card>
+      <Card $tinted>
         <Title>승인 대기</Title>
-        <div>
-          <Number>{approvalWaiting}</Number>
-          <Unit>건</Unit>
-        </div>
-        <Footnote>핸드북 저장 승인 필요</Footnote>
+        <Number>{approvalCount}건</Number>
+        <Footnote>{approvalFootnote}</Footnote>
       </Card>
       <Card>
-        <Title>이번주 답변</Title>
-        <div>
-          <Number>{weeklyAnswered}</Number>
-          <Unit>건</Unit>
-        </div>
-        <Footnote>승인 후 핸드북 반영</Footnote>
+        <Title>이번 주 저장</Title>
+        <Number>{weeklySaved}건</Number>
+        <Footnote>{weeklySavedFootnote}</Footnote>
       </Card>
     </Grid>
   );
