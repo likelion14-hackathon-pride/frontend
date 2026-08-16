@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import LoginPage from './pages/auth/LoginPage';
+import LoadingScreen from './pages/common/LoadingScreen';
 import { MemberProvider } from './context/member/MemberContext';
 import MemberHomePage from './pages/member/MemberHomePage';
 import MemberTasksPage from './pages/member/MemberTasksPage';
@@ -10,7 +12,20 @@ import HandbookCompanyView from './components/member/handbook/HandbookCompanyVie
 import HandbookProjectView from './components/member/handbook/HandbookProjectView';
 import OwnerOnboardingPage from './pages/owner/OwnerOnboardingPage';
 
+const SPLASH_DURATION = 1800; // ms, 필요하면 조절
+
 function App() {
+  const [showSplash, setShowSplash] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowSplash(false), SPLASH_DURATION);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (showSplash) {
+    return <LoadingScreen />;
+  }
+
   return (
     <BrowserRouter>
       <Routes>
