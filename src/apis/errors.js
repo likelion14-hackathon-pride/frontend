@@ -1,11 +1,6 @@
-// 서버 에러는 한 가지 모양으로만 온다 (config/exceptions.py).
-//
 //   {"error": {"code": "scope_not_found", "field": "scopeId", "message": "scope not found"}}
-//
-// field 가 있으면 그 입력 칸 밑에, null 이면 배너로 띄운다.
-// 상태 코드는 봉투에 없고 응답 상태줄에만 있다.
 
-// config/errors.py 의 코드 카탈로그. 화면이 분기하는 것만 옮겨 적었다.
+
 export const ERROR_CODE = {
   SERVER_ERROR: 'server_error',
   RATE_LIMITED: 'rate_limited',

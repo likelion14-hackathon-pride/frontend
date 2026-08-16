@@ -1,5 +1,3 @@
-// 백엔드가 정한 값들. 전부 소스에서 그대로 옮겨 적었다. 추측한 값은 하나도 없다.
-// 값 하나가 틀리면 화면이 통째로 죽으므로, 고칠 때는 반드시 아래 출처 파일을 다시 확인할 것.
 
 // WorkLocation(models.TextChoices) — accounts/profile.py:7
 export const WORK_LOCATION = {
@@ -11,8 +9,7 @@ export const WORK_LOCATION = {
   TOKYO: 'TOKYO',
 };
 
-// 라벨은 백엔드 choices 의 두 번째 값. /profile-options 응답이 오면 그쪽을 우선 쓰고,
-// 응답 전이거나 서버가 모르는 값을 보냈을 때만 이 표를 쓴다.
+
 export const WORK_LOCATION_LABEL = {
   HANOI: 'Hanoi',
   DA_NANG: 'Da Nang',
