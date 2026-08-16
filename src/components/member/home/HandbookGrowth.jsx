@@ -64,6 +64,13 @@ const Description = styled.div`
   line-height: 1.5;
 `;
 
+const ChartWrap = styled.svg`
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  margin-top: 10px;
+  overflow: visible;
+`;
 
 const AxisRow = styled.div`
   display: flex;
@@ -77,7 +84,35 @@ const AxisLabel = styled.span`
   color: ${(props) => (props.$active ? '#17171B' : '#B4B4BC')};
 `;
 
-export default function HandbookGrowthCard({ count = 12, delta = '+6 this month' }) {
+function buildPath(points, width = 260, height = 96, padding = 6) {
+  if (points.length === 0) return { linePath: '', areaPath: '', coords: [] };
+
+  const max = Math.max(...points, 1);
+  const min = Math.min(...points, 0);
+  const range = max - min || 1;
+  const stepX = (width - padding * 2) / (points.length - 1 || 1);
+
+  const coords = points.map((p, i) => {
+    const x = padding + i * stepX;
+    const y = height - padding - ((p - min) / range) * (height - padding * 2);
+    return [x, y];
+  });
+
+  const linePath = coords.map(([x, y], i) => `${i === 0 ? 'M' : 'L'}${x} ${y}`).join(' ');
+  const areaPath = `${linePath} L${coords[coords.length - 1][0]} ${height} L${coords[0][0]} ${height} Z`;
+
+  return { linePath, areaPath, coords };
+}
+
+export default function HandbookGrowthCard({
+  count,
+  delta,
+  dateRange,
+  points = [],
+  labels = [],
+}) {
+  const { linePath, areaPath, coords } = buildPath(points);
+
   return (
     <Card>
       <Header>
@@ -92,13 +127,41 @@ export default function HandbookGrowthCard({ count = 12, delta = '+6 this month'
         </NumberRow>
 
         <Description>Answers to your questions become team rules.</Description>
-        <img src={growthGraphIcon} alt="" style={{ width: '100%', flex: 1, minHeight: 0, marginTop: '10px' }} />
-        <AxisRow>
-          <AxisLabel>W1</AxisLabel>
-          <AxisLabel>W2</AxisLabel>
-          <AxisLabel>W3</AxisLabel>
-          <AxisLabel $active>now</AxisLabel>
-        </AxisRow>
+
+        {coords.length > 0 && (
+          <ChartWrap viewBox="0 0 260 96" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="hbGrow" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#FF6000" stopOpacity="0.22" />
+                <stop offset="100%" stopColor="#FF6000" stopOpacity="0" />
+              </linearGradient>
+            </defs>
+            <path d={areaPath} fill="url(#hbGrow)" />
+            <path d={linePath} fill="none" stroke="#FF6000" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+            {coords.map(([x, y], i) => {
+              const isLast = i === coords.length - 1;
+              return (
+                <circle
+                  key={i}
+                  cx={x}
+                  cy={y}
+                  r={isLast ? 4.5 : 3.2}
+                  fill={isLast ? '#FF6000' : '#fff'}
+                  stroke={isLast ? '#fff' : '#FFC49B'}
+                  strokeWidth={isLast ? 2.5 : 2}
+                />
+              );
+            })}
+          </ChartWrap>
+        )}
+
+        {labels.length > 0 && (
+          <AxisRow>
+            {labels.map((label, i) => (
+              <AxisLabel key={label} $active={i === labels.length - 1}>{label}</AxisLabel>
+            ))}
+          </AxisRow>
+        )}
       </Body>
     </Card>
   );

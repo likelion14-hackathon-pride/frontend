@@ -119,6 +119,14 @@ export default function MemberTasksPage() {
     },
   ]);
 
+  const filteredColumns =
+    activeProject === 'all'
+      ? columns
+      : columns.map((col) => ({
+          ...col,
+          cards: col.cards.filter((c) => c.tags?.some((t) => t.label === activeProject)),
+        }));
+
   function handleCardClick(card, columnId) {
     setSelectedTask({ ...card, columnId });
   }
@@ -160,7 +168,7 @@ export default function MemberTasksPage() {
         <TasksGreeting onAskClick={goToAsk} />
         <ProjectFilterChips projects={PROJECTS} activeId={activeProject} onSelect={setActiveProject} />
         <TaskBoard
-          columns={columns}
+          columns={filteredColumns}
           onCardClick={handleCardClick}
           onCtaClick={handleCtaClick}
         />

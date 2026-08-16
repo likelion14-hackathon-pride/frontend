@@ -96,8 +96,18 @@ export default function MemberHomePage({ userName = 'Minh' }) {
 
           <RightColumn>
             <CardRow>
-              <SaiResolutionCard />
-              <HandbookGrowthCard count={12} delta="+6 this month" />
+              <SaiResolutionCard
+                percent={85}
+                resolved={17}
+                total={20}
+                dateRange="Aug 1 – Aug 6"
+              />
+              <HandbookGrowthCard
+                count={12}
+                delta="+6 this month"
+                points={[6, 8, 9, 12]}
+                labels={['W1', 'W2', 'W3', 'now']}
+              />
             </CardRow>
 
             <HandbookSummary />

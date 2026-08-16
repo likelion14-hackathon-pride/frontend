@@ -70,10 +70,17 @@ const DateRange = styled.div`
   color: #B4B4BC;
 `;
 
-export default function SaiResolutionCard({ percent = 85, resolved = 17, total = 20, dateRange = 'Aug 1 – Aug 6' }) {
+const EmptyText = styled.div`
+  font-size: 13px;
+  color: #B4B4BC;
+`;
+
+export default function SaiResolutionCard({ percent, resolved, total, dateRange }) {
+  const hasData = percent != null && resolved != null && total != null;
+
   const radius = 46;
   const circumference = 2 * Math.PI * radius;
-  const offset = circumference * (1 - percent / 100);
+  const offset = hasData ? circumference * (1 - percent / 100) : circumference;
 
   return (
     <Card>
@@ -83,29 +90,35 @@ export default function SaiResolutionCard({ percent = 85, resolved = 17, total =
       </Header>
 
       <Body>
-        <RingWrap>
-          <svg width="108" height="108" viewBox="0 0 108 108">
-            <circle cx="54" cy="54" r={radius} fill="none" stroke="#F2F2F4" strokeWidth="10" />
-            <circle
-              cx="54"
-              cy="54"
-              r={radius}
-              fill="none"
-              stroke="#FF6000"
-              strokeWidth="10"
-              strokeLinecap="round"
-              strokeDasharray={circumference}
-              strokeDashoffset={offset}
-              transform="rotate(-90 54 54)"
-            />
-          </svg>
-          <CenterText>
-            <Percent>{percent}%</Percent>
-            <Fraction>{resolved} of {total}</Fraction>
-          </CenterText>
-        </RingWrap>
+        {hasData ? (
+          <>
+            <RingWrap>
+              <svg width="108" height="108" viewBox="0 0 108 108">
+                <circle cx="54" cy="54" r={radius} fill="none" stroke="#F2F2F4" strokeWidth="10" />
+                <circle
+                  cx="54"
+                  cy="54"
+                  r={radius}
+                  fill="none"
+                  stroke="#FF6000"
+                  strokeWidth="10"
+                  strokeLinecap="round"
+                  strokeDasharray={circumference}
+                  strokeDashoffset={offset}
+                  transform="rotate(-90 54 54)"
+                />
+              </svg>
+              <CenterText>
+                <Percent>{percent}%</Percent>
+                <Fraction>{resolved} of {total}</Fraction>
+              </CenterText>
+            </RingWrap>
 
-        <DateRange>{dateRange}</DateRange>
+            {dateRange && <DateRange>{dateRange}</DateRange>}
+          </>
+        ) : (
+          <EmptyText>No data yet</EmptyText>
+        )}
       </Body>
     </Card>
   );

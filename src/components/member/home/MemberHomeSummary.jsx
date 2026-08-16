@@ -33,6 +33,9 @@ const Row = styled.div`
   justify-content: space-between;
   gap: 8px;
   width: 100%;
+  font-size: 14px;
+  color: #6B6B73;
+  font-weight: 600;
 `;
 
 const HighlightValue = styled.strong`
