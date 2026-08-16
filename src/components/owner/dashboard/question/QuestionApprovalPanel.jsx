@@ -247,6 +247,29 @@ const ScopeSelect = styled.select`
   }
 `;
 
+const ThreadLinkButton = styled.a`
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  height: 40.667px;
+  justify-content: center;
+  align-items: center;
+  margin-top: auto;
+  border-radius: 12px;
+  text-decoration: none;
+  background: ${({ $disabled }) => ($disabled ? '#F4F4F6' : '#2563EB')};
+  color: ${({ $disabled }) => ($disabled ? '#A0A0A8' : '#FFFFFF')};
+  cursor: ${({ $disabled }) => ($disabled ? 'default' : 'pointer')};
+  font-family: 'Plus Jakarta Sans';
+  font-size: 12.5px;
+  font-weight: 700;
+  line-height: 123%;
+
+  &:hover {
+    background: ${({ $disabled }) => ($disabled ? '#F4F4F6' : '#1D4ED8')};
+  }
+`;
+
 const ButtonsRow = styled.div`
   display: flex;
   width: 100%;
@@ -356,8 +379,7 @@ const STATUS_META = {
   DEFAULT: { label: '알 수 없음', bg: '#F4F4F6', color: '#6B6B73' },
 };
 
-// 대표는 슬랙 스레드에 답장한다. 대시보드에서 직접 답을 입력하는 API 는 없으므로
-// 여기서는 '슬랙 답장 가져오기'(check-answer)만 부른다.
+// 대표는 슬랙 스레드에 답장한다. 대시보드에서 직접 답을 입력하는 API 는 없다.
 function QuestionApprovalPanel({
   question,
   detail,
@@ -366,7 +388,8 @@ function QuestionApprovalPanel({
   onRetryDetail,
   scopes = [],
   pending = false,
-  onCheckAnswer,
+  threadUrl,
+  onOpenThread,
   onApprove,
   onDismiss,
 }) {
@@ -447,21 +470,27 @@ function QuestionApprovalPanel({
             <StatusBannerHint>
               {question.declined
                 ? `직전 답장은 답으로 보지 않았습니다 · ${question.answerReason ?? ''}`
-                : '답장을 남긴 뒤 아래 버튼을 누르면 SAI가 가져와 정리합니다.'}
+                : '답장하고 이 화면으로 돌아오면 SAI가 답을 가져와 정리합니다.'}
             </StatusBannerHint>
           </StatusBanner>
-          <ButtonsRow>
-            <ApproveButton
-              type="button"
-              onClick={onCheckAnswer}
-              disabled={pending || question.serverStatus === 'DRAFT'}
+
+          {/* 보내기 전에는 스레드가 없어 열 곳이 없다. */}
+          {threadUrl ? (
+            <ThreadLinkButton
+              href={threadUrl}
+              target="_blank"
+              rel="noreferrer"
+              onClick={onOpenThread}
             >
-              {pending ? '가져오는 중…' : '슬랙 답장 가져오기'}
-            </ApproveButton>
-            <GhostButton type="button" $muted onClick={onDismiss} disabled={pending}>
-              물리기
-            </GhostButton>
-          </ButtonsRow>
+              슬랙 스레드에서 답하기 ↗
+            </ThreadLinkButton>
+          ) : (
+            <ThreadLinkButton as="span" $disabled>
+              {question.serverStatus === 'DRAFT'
+                ? '아직 보내지 않은 질문입니다'
+                : '슬랙 스레드를 찾을 수 없습니다'}
+            </ThreadLinkButton>
+          )}
         </>
       )}
 

@@ -49,5 +49,7 @@ export function toQuestionRow(escalation) {
     sentAt: escalation.sentAt,
     answeredAt: escalation.answeredAt,
     proposedEntryId: escalation.proposedEntryId,
+    // 보내기 전(DRAFT)에는 스레드가 아직 없다.
+    slackThreadRef: escalation.slackThreadRef,
   };
 }

@@ -1,11 +1,13 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 
 import * as handbookApi from '../../../../apis/handbook';
 import * as qnaApi from '../../../../apis/qna';
-import { SCOPE_KIND } from '../../../../apis/constants';
+import * as sourcesApi from '../../../../apis/sources';
+import { CONNECTION_KIND, SCOPE_KIND } from '../../../../apis/constants';
 import { ErrorState, InlineError, LoadingState } from '../../../common/AsyncStates';
 import { useAsync, useMutation } from '../../../../hooks/useAsync';
+import { slackThreadUrl } from '../../../../utils/slack';
 import QuestionStatCards from './QuestionStatCards';
 import QuestionList from './QuestionList';
 import QuestionApprovalPanel from './QuestionApprovalPanel';
@@ -95,6 +97,35 @@ function QuestionTab({ companyId }) {
     detailQuery.reload();
   };
 
+  // 슬랙 스레드 주소를 만들려면 워크스페이스(팀) id 가 필요하다.
+  const connectionsQuery = useAsync(
+    () => sourcesApi.fetchConnections(companyId),
+    [companyId],
+    { enabled: Boolean(companyId) }
+  );
+  const slackWorkspaceId = (connectionsQuery.data?.items ?? []).find(
+    (connection) => connection.provider === CONNECTION_KIND.SLACK
+  )?.workspaceId;
+
+  // 대표가 슬랙에 답장하고 이 화면으로 돌아오면 답을 회수한다.
+  // 서버는 스스로 회수하지 않고(qna/views.py 의 check-answer 만 존재),
+  // 화면에도 '가져오기' 버튼이 없으므로 돌아오는 시점을 신호로 쓴다.
+  const pendingCheckRef = useRef(null);
+  const collectOnReturnRef = useRef(() => {});
+  collectOnReturnRef.current = async () => {
+    const id = pendingCheckRef.current;
+    if (!id) return;
+    pendingCheckRef.current = null;
+    const result = await checkAnswer.mutate(id);
+    if (result.ok) reload();
+  };
+
+  useEffect(() => {
+    const onFocus = () => collectOnReturnRef.current();
+    window.addEventListener('focus', onFocus);
+    return () => window.removeEventListener('focus', onFocus);
+  }, []);
+
   const waitingCount = rows.filter((row) => row.status === UI_STATUS.WAITING).length;
   const approvalCount = rows.filter((row) => row.status === UI_STATUS.PENDING_APPROVAL).length;
   const savedCount = rows.filter((row) => row.status === UI_STATUS.SAVED).length;
@@ -159,9 +190,9 @@ function QuestionTab({ companyId }) {
           onRetryDetail={detailQuery.reload}
           scopes={scopes}
           pending={checkAnswer.pending || approve.pending || dismiss.pending}
-          onCheckAnswer={async () => {
-            const result = await checkAnswer.mutate(activeId);
-            if (result.ok) reload();
+          threadUrl={slackThreadUrl(slackWorkspaceId, selectedRow?.slackThreadRef)}
+          onOpenThread={() => {
+            pendingCheckRef.current = activeId;
           }}
           onApprove={async (edits) => {
             const result = await approve.mutate({ id: activeId, edits });
