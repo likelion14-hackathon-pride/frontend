@@ -6,6 +6,7 @@ import MemberNav from '../nav/MemberNav';
 import MemberHomeSummary from '../home/MemberHomeSummary';
 import logoMascot from '../../../assets/logo-mascot.png';
 import logoWordmark from '../../../assets/logo-wordmark.png';
+import { useMemberNavigation } from '../../../context/member/MemberContext';
 
 const Page = styled.div`
   display: flex;
@@ -98,6 +99,7 @@ const Content = styled.div`
 
 export default function MemberShell({ screenTitle, children }) {
   const [isTzOpen, setIsTzOpen] = useState(false);
+  const { profile } = useMemberNavigation();
 
   return (
     <Page>
@@ -106,17 +108,16 @@ export default function MemberShell({ screenTitle, children }) {
           <Logo>
             <MascotImg src={logoMascot} alt="SAI" />
             <WordmarkImg src={logoWordmark} alt="SAI" />
-        </Logo>
+          </Logo>
           <Nav>
             <MemberNav />
           </Nav>
           <UserCard>
-            {/* TODO: 실제 데이터는 apis/로 연결 */}
             <MemberHomeSummary
               slackMessages={37}
               turnedIntoTasks={4}
               waitingAnswer={1}
-              user={{ name: 'Minh', role: 'Backend', timezone: 'Hanoi (UTC+7)' }}
+              user={profile}
             />
           </UserCard>
         </Sidebar>

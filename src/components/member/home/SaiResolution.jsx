@@ -24,27 +24,89 @@ const HeaderTitle = styled.span`
   flex: 1;
   min-width: 0;
   font-size: 16px;
-  font-weight: 700;
-  line-height: 125%;
+  font-weight: 800;
 `;
 
 const Body = styled.div`
   flex: 1;
+  min-height: 0;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: #B4B4BC;
-  font-size: 13px;
+  gap: 8px;
 `;
 
-export default function SaiResolutionCard() {
+const RingWrap = styled.div`
+  position: relative;
+  width: 108px;
+  height: 108px;
+`;
+
+const CenterText = styled.div`
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+`;
+
+const Percent = styled.div`
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: #17171B;
+`;
+
+const Fraction = styled.div`
+  font-size: 11.5px;
+  color: #A0A0A8;
+  margin-top: 2px;
+`;
+
+const DateRange = styled.div`
+  font-size: 12px;
+  color: #B4B4BC;
+`;
+
+export default function SaiResolutionCard({ percent = 85, resolved = 17, total = 20, dateRange = 'Aug 1 – Aug 6' }) {
+  const radius = 46;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference * (1 - percent / 100);
+
   return (
     <Card>
       <Header>
         <img src={graphIcon} alt="" width={15} height={15} />
         <HeaderTitle>SAI resolution</HeaderTitle>
       </Header>
-      <Body>TODO: 도넛 차트</Body>
+
+      <Body>
+        <RingWrap>
+          <svg width="108" height="108" viewBox="0 0 108 108">
+            <circle cx="54" cy="54" r={radius} fill="none" stroke="#F2F2F4" strokeWidth="10" />
+            <circle
+              cx="54"
+              cy="54"
+              r={radius}
+              fill="none"
+              stroke="#FF6000"
+              strokeWidth="10"
+              strokeLinecap="round"
+              strokeDasharray={circumference}
+              strokeDashoffset={offset}
+              transform="rotate(-90 54 54)"
+            />
+          </svg>
+          <CenterText>
+            <Percent>{percent}%</Percent>
+            <Fraction>{resolved} of {total}</Fraction>
+          </CenterText>
+        </RingWrap>
+
+        <DateRange>{dateRange}</DateRange>
+      </Body>
     </Card>
   );
 }

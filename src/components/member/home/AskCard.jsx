@@ -4,6 +4,9 @@ import chatBubbleIcon from '../../../assets/icons/chat-bubble.svg';
 import searchIcon from '../../../assets/icons/search.svg';
 
 const Card = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
   flex: 1;
   min-width: 0;
   border: 0.1px dotted #FF8A3D;
@@ -66,7 +69,6 @@ const SearchButton = styled.button`
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-top: 14px;
   background: #fff;
   border: 1px solid rgba(255, 255, 255, 0.9);
   border-radius: 14px;
@@ -103,7 +105,6 @@ const ChipRow = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: 21px;
-  margin-top: 14px;
 `;
 
 const Chip = styled.button`

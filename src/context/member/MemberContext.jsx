@@ -1,25 +1,40 @@
-import { createContext, useContext, useMemo } from 'react';
+import { createContext, useContext, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const MemberContext = createContext(null);
 
+const DEFAULT_PROFILE = {
+  name: 'Minh',
+  locationId: 'hanoi',
+  role: 'Backend',
+};
+
 export function MemberProvider({ children }) {
   const navigate = useNavigate();
+  const [profile, setProfile] = useState(DEFAULT_PROFILE);
+  const [pendingQuestion, setPendingQuestion] = useState(null);
 
   const value = useMemo(
     () => ({
       goToHome: () => navigate('/member/home'),
       goToAsk: () => navigate('/member/ask'),
+      goToAskWithQuestion: (text) => {
+        setPendingQuestion(text);
+        navigate('/member/ask');
+      },
       goToTasks: () => navigate('/member/tasks'),
       goToHandbook: (path = 'company') => navigate(`/member/handbook/${path}`),
-      // TODO: SAI 요약 수치(slackMessages, turnedIntoTasks, waitingAnswer) 등
-      // 서버에서 가져와서 여기에 얹기 (apis/ 사용)
+      profile,
+      setProfile,
+      pendingQuestion,
+      clearPendingQuestion: () => setPendingQuestion(null),
     }),
-    [navigate]
+    [navigate, profile, pendingQuestion]
   );
 
   return <MemberContext.Provider value={value}>{children}</MemberContext.Provider>;
 }
+
 
 export function useMemberNavigation() {
   const ctx = useContext(MemberContext);

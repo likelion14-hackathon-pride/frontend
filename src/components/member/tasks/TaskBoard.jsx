@@ -42,7 +42,7 @@ const Grid = styled.div`
   align-items: start;
 `;
 
-export default function TaskBoard({ columns = [], isEmpty = false, emptyLabel = '', onEmptyReset, onCardClick }) {
+export default function TaskBoard({ columns = [], isEmpty = false, emptyLabel = '', onEmptyReset, onCardClick, onCtaClick }) {
   if (isEmpty) {
     return (
       <EmptyCard>
@@ -56,7 +56,14 @@ export default function TaskBoard({ columns = [], isEmpty = false, emptyLabel = 
   return (
     <Grid>
       {columns.map((col) => (
-        <TaskColumn key={col.id} id={col.id} name={col.name} cards={col.cards} onCardClick={onCardClick} />
+        <TaskColumn
+          key={col.id}
+          id={col.id}
+          name={col.name}
+          cards={col.cards}
+          onCardClick={onCardClick}
+          onCtaClick={onCtaClick}
+        />
       ))}
     </Grid>
   );

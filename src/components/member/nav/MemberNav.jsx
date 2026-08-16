@@ -62,7 +62,7 @@ export default function MemberNav({ taskCount = 3 }) {
         )}
       </NavItem>
 
-      <ToggleItem $active={isHandbookActive} onClick={goToHandbook}>
+      <ToggleItem $active={isHandbookActive} onClick={() => goToHandbook()}>
         <IconImg src={handbookIcon} alt="" width={15} height={15} $active={isHandbookActive} />
         <span>Handbook</span>
         <Caret $open={isHandbookOpen}>▾</Caret>

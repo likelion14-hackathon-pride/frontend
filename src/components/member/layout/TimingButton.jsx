@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { useZoneTime } from '../../../hooks/member/useZoneTime.js';
+import { useMemberNavigation } from '../../../context/member/MemberContext';
 
 const Wrapper = styled.div`
   margin-left: auto;
@@ -93,9 +94,34 @@ const ReplyTime = styled.span`
   color: #17171B;
 `;
 
+const LOCATION_LABELS = {
+  hanoi: 'Hanoi',
+  hcm: 'Ho Chi Minh',
+  bangkok: 'Bangkok',
+  jakarta: 'Jakarta',
+  manila: 'Manila',
+  seoul: 'Seoul',
+  tokyo: 'Tokyo',
+};
+
+const LOCATION_TIMEZONES = {
+  hanoi: 'Asia/Ho_Chi_Minh',
+  hcm: 'Asia/Ho_Chi_Minh',
+  bangkok: 'Asia/Bangkok',
+  jakarta: 'Asia/Jakarta',
+  manila: 'Asia/Manila',
+  seoul: 'Asia/Seoul',
+  tokyo: 'Asia/Tokyo',
+};
+
+
 export default function TimingButton({ onClick }) {
+  const { profile } = useMemberNavigation();
+  const myLocation = LOCATION_LABELS[profile.locationId] ?? 'Hanoi';
+  const myTimeZone = LOCATION_TIMEZONES[profile.locationId] ?? 'Asia/Ho_Chi_Minh';
+  
   const seoulTime = useZoneTime('Asia/Seoul');
-  const hanoiTime = useZoneTime('Asia/Ho_Chi_Minh');
+  const myTime = useZoneTime(myTimeZone);
 
   return (
     <Wrapper>
@@ -107,9 +133,9 @@ export default function TimingButton({ onClick }) {
           <TimeText>Seoul {seoulTime}</TimeText>
 
           <Dot $color="#3BA55C" />
-          <Name>You</Name>
+          <Name>{profile.name}</Name>
           <StatusText>online</StatusText>
-          <TimeText>Hanoi {hanoiTime}</TimeText>
+          <TimeText>{myLocation} {myTime}</TimeText>
         </StatusGrid>
 
         <Divider />

@@ -1,5 +1,7 @@
 import styled from 'styled-components';
-
+import ProfileSettingModal from './ProfileSettingModal';
+import { useState } from 'react';
+import { useMemberNavigation } from '../../../context/member/MemberContext';
 
 const Wrap = styled.div`
   display: flex;
@@ -44,6 +46,10 @@ const UserRow = styled.div`
   padding: 10px;
   border-radius: 12px;
   background: #F7F7F8;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
 `;
 
 const Avatar = styled.div`
@@ -77,8 +83,20 @@ const UserMeta = styled.div`
   color: #A0A0A8;
 `;
 
+const LOCATION_LABELS = {
+  hanoi: 'Hanoi (UTC+7)',
+  hcm: 'Ho Chi Minh (UTC+7)',
+  bangkok: 'Bangkok (UTC+7)',
+  jakarta: 'Jakarta (UTC+7)',
+  manila: 'Manila (UTC+8)',
+  seoul: 'Seoul (UTC+9)',
+  tokyo: 'Tokyo (UTC+9)',
+};
+
 export default function MemberHomeSummary({ slackMessages, turnedIntoTasks, waitingAnswer, user }) {
+  const [isSettingOpen, setIsSettingOpen] = useState(false);
   const initial = user?.name?.[0]?.toUpperCase() ?? '?';
+  const { setProfile } = useMemberNavigation();
 
   return (
     <Wrap>
@@ -98,13 +116,28 @@ export default function MemberHomeSummary({ slackMessages, turnedIntoTasks, wait
         </Row>
       </SummaryCard>
 
-      <UserRow>
+      <UserRow as="button" onClick={() => setIsSettingOpen(true)}>
         <Avatar>{initial}</Avatar>
         <UserText>
           <UserName>{user?.name}</UserName>
-          <UserMeta>{user?.role} · {user?.timezone}</UserMeta>
+          <UserMeta>{user?.role} · {LOCATION_LABELS[user?.locationId]}</UserMeta>
         </UserText>
       </UserRow>
+
+      {isSettingOpen && (
+        <ProfileSettingModal
+          initialName={user?.name}
+          initialLocationId={user?.locationId}
+          initialRole={user?.role}
+          onClose={() => setIsSettingOpen(false)}
+          onSave={(data) => {
+            setProfile((prev) => ({ ...prev, ...data }));
+            setIsSettingOpen(false);
+          }}
+          onRunSetupAgain={() => console.log('setup 다시 실행')}
+        />
+      )}
+
     </Wrap>
   );
 }

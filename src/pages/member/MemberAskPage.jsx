@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import MemberShell from '../../components/member/layout/MemberShell';
 import AskEmptyState from '../../components/member/ask/AskEmptyState';
 import AskScopeChips from '../../components/member/ask/AskScopeChips';
 import ChatInputBar from '../../components/member/ask/ChatInputBar';
 import ChatBubble from '../../components/member/ask/ChatBubble';
+import { useMemberNavigation } from '../../context/member/MemberContext';
 
 const Layout = styled.div`
   width: 100%;
@@ -63,6 +64,7 @@ const EXAMPLE_MESSAGES_BY_SCOPE = {
 export default function MemberAskPage() {
   const [scope, setScope] = useState('payment-api');
   const [messagesByScope, setMessagesByScope] = useState(EXAMPLE_MESSAGES_BY_SCOPE);
+const { pendingQuestion, clearPendingQuestion } = useMemberNavigation();
 
   const messages = messagesByScope[scope] ?? [];
 
@@ -72,6 +74,14 @@ export default function MemberAskPage() {
       [scope]: [...(prev[scope] ?? []), { role: 'user', body: text }],
     }));
   }
+
+  useEffect(() => {
+    if (pendingQuestion) {
+      handleSend(pendingQuestion);
+      clearPendingQuestion();
+    }
+  }, [pendingQuestion]);
+
 
   function handleSuggestionClick(question) {
     handleSend(question);

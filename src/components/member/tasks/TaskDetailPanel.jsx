@@ -1,12 +1,13 @@
+import { useState } from 'react';
 import styled from 'styled-components';
 import { useMemberNavigation } from '../../../context/member/MemberContext';
-import chatBubbleIcon from '../../../assets/icons/chat-bubble.svg';
-import bookIcon from '../../../assets/icons/book.svg';
+import chatBubbleIcon from '../../../assets/icons/chat-org.svg';
+import bookIcon from '../../../assets/icons/book-org.svg';
 
 const CTA_LABEL = {
   ready: "I'll take this on",
   inprogress: 'Mark as done',
-  answered: 'That answers it',
+  answered: 'Mark as done',
 };
 
 const Overlay = styled.div`
@@ -118,7 +119,7 @@ const KickerDot = styled.div`
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #8A8A93;
+  background: ${(props) => props.$color ?? '#8A8A93'};
 `;
 
 const Kicker = styled.span`
@@ -156,8 +157,8 @@ const EntryCard = styled.div`
 const EntryTag = styled.span`
   font-size: 11px;
   font-weight: 700;
-  color: #B67E38;
-  background: #F9F1E5;
+  color: ${(props) => (props.$theme === 'positive' ? '#4B7950' : '#B67E38')};
+  background: ${(props) => (props.$theme === 'positive' ? '#E6F0E6' : '#F9F1E5')};
   padding: 3px 8px;
   border-radius: 5px;
 `;
@@ -192,8 +193,7 @@ const EntryAction = styled.button`
 const MainCard = styled.div`
   background: #FF6000;
   border-radius: 18px;
-  box-shadow: 0 1px 20px rgba(255, 96, 0, 0.42), 0 14px 34px rgba(255, 96, 0, 0.20);
-  overflow: hidden;
+  box-shadow: 0 14px 34px -14px rgba(23, 44, 90, 0.22), 0 3px 8px -2px rgba(23, 44, 90, 0.08);
 `;
 
 const MainCardTop = styled.div`
@@ -424,15 +424,21 @@ const AskInputRow = styled.div`
   margin-top: 12px;
 `;
 
-const AskInputLook = styled.div`
+const AskInput = styled.input`
   flex: 1;
   min-width: 0;
   font-size: 14px;
-  color: #B4B4BC;
+  color: #17171B;
   background: #FAFAFB;
   border: 1px solid #EFEFF1;
   padding: 11px 14px;
   border-radius: 11px;
+  outline: none;
+
+  &:focus {
+    border-color: #FF6000;
+    box-shadow: 0 0 0 3px rgba(255, 96, 0, 0.12);
+  }
 `;
 
 const AskButton = styled.button`
@@ -484,6 +490,85 @@ const ResolvedDesc = styled.div`
   color: #6B6B73;
   line-height: 1.65;
   margin-top: 5px;
+`;
+
+const StillCard = styled.div`
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0px 1px 20px 0px #0000002E;
+  padding: 18px 20px;
+`;
+
+const StillHeader = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 9px;
+`;
+
+const StillBadge = styled.span`
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 9px;
+  background: #F1EEFE;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #7B5BD6;
+  font-size: 12.5px;
+  font-weight: 800;
+`;
+
+const StillTitle = styled.span`
+  flex: 1;
+  min-width: 0;
+  font-size: 14.5px;
+  font-weight: 800;
+`;
+
+const StillDesc = styled.div`
+  font-size: 13px;
+  color: #8A8A93;
+  line-height: 1.65;
+  margin-top: 7px;
+`;
+
+const StillInputRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 11px;
+`;
+
+const StillInput = styled.input`
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  color: #17171B;
+  background: #FAFAFB;
+  border: 1px solid #EFEFF1;
+  padding: 11px 14px;
+  border-radius: 11px;
+  outline: none;
+
+  &:focus {
+    border-color: #FF6000;
+    box-shadow: 0 0 0 3px rgba(255, 96, 0, 0.12);
+  }
+`;
+
+const StillButton = styled.button`
+  flex: none;
+  white-space: nowrap;
+  background: linear-gradient(135deg, #FF6000 0%, #FF8A3D 100%);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 11px 16px;
+  border-radius: 11px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(255, 96, 0, 0.28);
 `;
 
 const StatusCard = styled.div`
@@ -545,12 +630,41 @@ const DoneLabel = styled.span`
   font-weight: 800;
 `;
 
+const DoneButton = styled.button`
+  flex: none;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 700;
+  color: #6B6B73;
+  border: 1px solid #EAEAEE;
+  padding: 8px 13px;
+  border-radius: 10px;
+  background: none;
+  cursor: pointer;
+
+  &:hover {
+    box-shadow: inset 0 0 0 999px rgba(23, 23, 27, 0.045);
+  }
+`;
+
 export default function TaskDetailPanel({ task, isWide, onToggleWide, onClose, onMoveAction }) {
-  const { goToAsk } = useMemberNavigation();
+  const { goToAskWithQuestion } = useMemberNavigation();
+  const [askDraft, setAskDraft] = useState('');
+  const [stillDraft, setStillDraft] = useState('');
 
   if (!task) return null;
 
   const ctaLabel = CTA_LABEL[task.columnId];
+
+  function handleAskSend() {
+    if (!askDraft.trim()) return;
+    goToAskWithQuestion(askDraft.trim());
+  }
+
+  function handleStillSend() {
+    if (!stillDraft.trim()) return;
+    goToAskWithQuestion(stillDraft.trim());
+  }
 
   return (
     <Overlay $wide={isWide}>
@@ -572,7 +686,7 @@ export default function TaskDetailPanel({ task, isWide, onToggleWide, onClose, o
           <>
             <MessageCard>
               <KickerRow>
-                <KickerDot />
+                <KickerDot $color={task.kickerColor ?? '#8A8A93'} />
                 <Kicker>{task.kicker}</Kicker>
               </KickerRow>
               <MessageEn>{task.en}</MessageEn>
@@ -581,11 +695,11 @@ export default function TaskDetailPanel({ task, isWide, onToggleWide, onClose, o
 
             <EntryCard>
               <KickerRow>
-                <EntryTag>{task.entryTag}</EntryTag>
+                <EntryTag $theme={task.entryTagTheme ?? 'neutral'}>{task.entryTag}</EntryTag>
                 <EntryProject>{task.entryProject}</EntryProject>
               </KickerRow>
               <EntryTitle>{task.entryTitle}</EntryTitle>
-              <EntryAction onClick={task.onToHandbook}>{task.entryAction}</EntryAction>
+              <EntryAction onClick={task.onToHandbook}>{task.entryAction} →</EntryAction>
             </EntryCard>
           </>
         )}
@@ -659,32 +773,55 @@ export default function TaskDetailPanel({ task, isWide, onToggleWide, onClose, o
               </AskHeader>
 
               <AskInputRow>
-                <AskInputLook>Ask something else…</AskInputLook>
-                <AskButton onClick={goToAsk}>Ask</AskButton>
+                <AskInput
+                  value={askDraft}
+                  onChange={(e) => setAskDraft(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleAskSend()}
+                  placeholder="Ask something else…"
+                />
+                <AskButton onClick={handleAskSend}>Ask</AskButton>
               </AskInputRow>
             </AskCard>
 
-            {task.isDone ? (
-              <StatusCard>
-                <DoneRow>
-                  <DoneCheck>
-                    <svg width="11" height="11" viewBox="0 0 10 10" fill="none" stroke="#fff" strokeWidth="1.9">
-                      <path d="M2 5.2l2 2L8 3" />
-                    </svg>
-                  </DoneCheck>
-                  <DoneLabel>Done</DoneLabel>
-                </DoneRow>
-              </StatusCard>
-            ) : (
-              ctaLabel && (
-                <StatusCard>
-                  <StatusLabel>TASK STATUS</StatusLabel>
-                  <StatusButton onClick={onMoveAction}>{ctaLabel}</StatusButton>
-                  <StatusHint>{task.moveHint}</StatusHint>
-                </StatusCard>
-              )
-            )}
+            <StillCard>
+              <StillHeader>
+                <StillBadge>한</StillBadge>
+                <StillTitle>Still not clear? Write it in your language.</StillTitle>
+              </StillHeader>
+              <StillDesc>Type it in English — SAI turns it into a Korean message for 김대표 and opens it in Ask SAI.</StillDesc>
+              <StillInputRow>
+                <StillInput
+                  value={stillDraft}
+                  onChange={(e) => setStillDraft(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleStillSend()}
+                  placeholder="e.g. Should the fix include tests?"
+                />
+                <StillButton onClick={handleStillSend}>Make it Korean →</StillButton>
+              </StillInputRow>
+            </StillCard>
           </>
+        )}
+
+        {task.isDone ? (
+          <StatusCard>
+            <DoneRow>
+              <DoneCheck>
+                <svg width="11" height="11" viewBox="0 0 10 10" fill="none" stroke="#fff" strokeWidth="1.9">
+                  <path d="M2 5.2l2 2L8 3" />
+                </svg>
+              </DoneCheck>
+              <DoneLabel>Done</DoneLabel>
+              <DoneButton onClick={onMoveAction}>{task.undoLabel ?? 'Undo'}</DoneButton>
+            </DoneRow>
+          </StatusCard>
+        ) : (
+          ctaLabel && (
+            <StatusCard>
+              <StatusLabel>TASK STATUS</StatusLabel>
+              <StatusButton onClick={onMoveAction}>{ctaLabel}</StatusButton>
+              {task.moveHint && <StatusHint>{task.moveHint}</StatusHint>}
+            </StatusCard>
+          )
         )}
       </Body>
     </Overlay>

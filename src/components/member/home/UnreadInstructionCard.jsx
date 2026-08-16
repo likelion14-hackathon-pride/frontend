@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 const Card = styled.button`
   flex: none;
-  width: 238px; 
+  max-width: 238px; 
   background: #FF6000;
   border-radius: 18px;
   box-shadow: 0 14px 34px -14px rgba(23, 44, 90, 0.22), 0 3px 8px -2px rgba(23, 44, 90, 0.08);
