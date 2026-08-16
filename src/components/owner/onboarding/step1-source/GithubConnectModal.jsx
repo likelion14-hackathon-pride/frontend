@@ -29,7 +29,13 @@ const STEP2_TABLE_ROWS = [
   ['Metadata', '레포 기본 정보 읽기'],
 ];
 
-const STEP5_EVENTS = ['Push', 'Issues', 'Issue comment', 'Pull request', 'Pull request review comment'];
+const STEP5_EVENTS = [
+  'Push',
+  'Issues',
+  'Issue comment',
+  'Pull request',
+  'Pull request review comment',
+];
 
 const WEBHOOK_URL = 'https://saisai.n-e.kr/api/github/events/';
 const WEBHOOK_SECRET = 'whsec_9f2c1ab74d5e0836ca77b1e4d90f';
@@ -806,7 +812,8 @@ function GithubConnectModal({ onClose, onConnected }) {
     }, CONNECT_DELAY_MS);
   };
 
-  const canSubmitStep4 = appId.trim().length > 0 && installationId.trim().length > 0 && privateKeyFile !== null;
+  const canSubmitStep4 =
+    appId.trim().length > 0 && installationId.trim().length > 0 && privateKeyFile !== null;
 
   return (
     <Overlay onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
@@ -817,7 +824,9 @@ function GithubConnectModal({ onClose, onConnected }) {
           </HeaderIconBox>
           <HeaderTextGroup>
             <HeaderTitle>깃허브 연결</HeaderTitle>
-            <HeaderSubtitle>SAI가 레포의 README·Issue·PR을 읽을 수 있도록 연결합니다.</HeaderSubtitle>
+            <HeaderSubtitle>
+              SAI가 레포의 README·Issue·PR을 읽을 수 있도록 연결합니다.
+            </HeaderSubtitle>
           </HeaderTextGroup>
           <StepAndCloseGroup>
             <ProgressBar>
@@ -868,20 +877,31 @@ function GithubConnectModal({ onClose, onConnected }) {
               <>
                 <Badge $type="github">◆ GitHub에서 할 일</Badge>
                 <ContentHeading>깃허브 앱 만들기</ContentHeading>
-                <ContentDescription>AI가 레포의 README·Issue·PR을 읽을 수 있도록 GitHub App을 만듭니다.</ContentDescription>
+                <ContentDescription>
+                  AI가 레포의 README·Issue·PR을 읽을 수 있도록 GitHub App을 만듭니다.
+                </ContentDescription>
 
                 <InstructionBox>
                   <Instruction
                     number={1}
                     segments={[
                       { text: 'GitHub App 설정 페이지에 접속해 로그인하세요.' },
-                      { chip: 'github.com/settings/apps', href: 'https://github.com/settings/apps' },
+                      {
+                        chip: 'github.com/settings/apps',
+                        href: 'https://github.com/settings/apps',
+                      },
                     ]}
                   />
-                  <Instruction number={2} segments={[{ chip: 'New GitHub App' }, { text: '을 누르세요.' }]} />
+                  <Instruction
+                    number={2}
+                    segments={[{ chip: 'New GitHub App' }, { text: '을 누르세요.' }]}
+                  />
                   <Instruction number={3} segments={[{ text: '아래 내용을 입력하세요.' }]} />
                   <InfoTableComponent headers={['항목', '입력값']} rows={STEP1_TABLE_ROWS} />
-                  <Instruction number={4} segments={[{ chip: 'Create GitHub App' }, { text: '을 누르세요.' }]} />
+                  <Instruction
+                    number={4}
+                    segments={[{ chip: 'Create GitHub App' }, { text: '을 누르세요.' }]}
+                  />
                 </InstructionBox>
               </>
             )}
@@ -890,7 +910,9 @@ function GithubConnectModal({ onClose, onConnected }) {
               <>
                 <Badge $type="github">◆ GitHub에서 할 일</Badge>
                 <ContentHeading>권한 설정</ContentHeading>
-                <ContentDescription>SAI가 레포지토리의 문서와 작업 내용을 읽을 수 있도록 권한을 설정합니다.</ContentDescription>
+                <ContentDescription>
+                  SAI가 레포지토리의 문서와 작업 내용을 읽을 수 있도록 권한을 설정합니다.
+                </ContentDescription>
 
                 <InstructionBox>
                   <Instruction
@@ -911,10 +933,15 @@ function GithubConnectModal({ onClose, onConnected }) {
                     ]}
                   />
                   <InfoTableComponent headers={['권한', '용도']} rows={STEP2_TABLE_ROWS} />
-                  <Instruction number={3} segments={[{ chip: 'Save changes' }, { text: '를 누르세요.' }]} />
+                  <Instruction
+                    number={3}
+                    segments={[{ chip: 'Save changes' }, { text: '를 누르세요.' }]}
+                  />
                 </InstructionBox>
 
-                <WarningBox>⚠ Metadata는 Read-only가 기본값입니다. 이미 설정되어 있다면 그대로 두세요.</WarningBox>
+                <WarningBox>
+                  ⚠ Metadata는 Read-only가 기본값입니다. 이미 설정되어 있다면 그대로 두세요.
+                </WarningBox>
               </>
             )}
 
@@ -922,16 +949,26 @@ function GithubConnectModal({ onClose, onConnected }) {
               <>
                 <Badge $type="github">◆ GitHub에서 할 일</Badge>
                 <ContentHeading>레포지토리에 설치</ContentHeading>
-                <ContentDescription>SAI가 사용할 레포지토리에 GitHub App을 설치합니다.</ContentDescription>
+                <ContentDescription>
+                  SAI가 사용할 레포지토리에 GitHub App을 설치합니다.
+                </ContentDescription>
 
                 <InstructionBox>
                   <Instruction
                     number={1}
-                    segments={[{ text: 'GitHub App 설정의' }, { chip: 'Install App' }, { text: '메뉴로 이동하세요.' }]}
+                    segments={[
+                      { text: 'GitHub App 설정의' },
+                      { chip: 'Install App' },
+                      { text: '메뉴로 이동하세요.' },
+                    ]}
                   />
                   <Instruction
                     number={2}
-                    segments={[{ text: '연결할 GitHub 계정의' }, { chip: 'Install' }, { text: '을 누르세요.' }]}
+                    segments={[
+                      { text: '연결할 GitHub 계정의' },
+                      { chip: 'Install' },
+                      { text: '을 누르세요.' },
+                    ]}
                   />
                   <Instruction
                     number={3}
@@ -939,11 +976,17 @@ function GithubConnectModal({ onClose, onConnected }) {
                   />
                   <Instruction
                     number={4}
-                    segments={[{ text: '연결할 레포지토리를 선택하고' }, { chip: 'Install' }, { text: '을 누르세요.' }]}
+                    segments={[
+                      { text: '연결할 레포지토리를 선택하고' },
+                      { chip: 'Install' },
+                      { text: '을 누르세요.' },
+                    ]}
                   />
                 </InstructionBox>
 
-                <WarningBox>⚠ 설치를 마치면 주소창의 마지막 숫자가 4단계에서 필요한 Installation ID입니다.</WarningBox>
+                <WarningBox>
+                  ⚠ 설치를 마치면 주소창의 마지막 숫자가 4단계에서 필요한 Installation ID입니다.
+                </WarningBox>
               </>
             )}
 
@@ -956,19 +999,32 @@ function GithubConnectModal({ onClose, onConnected }) {
                 <InstructionBox>
                   <Instruction
                     number={1}
-                    segments={[{ text: 'GitHub App의' }, { chip: 'General' }, { text: '화면에서' }, { chip: 'App ID' }, { text: '를 확인하세요.' }]}
+                    segments={[
+                      { text: 'GitHub App의' },
+                      { chip: 'General' },
+                      { text: '화면에서' },
+                      { chip: 'App ID' },
+                      { text: '를 확인하세요.' },
+                    ]}
                   />
                   <Instruction
                     number={2}
-                    segments={[{ chip: 'Generate a private key' }, { text: '를 눌러 Private Key 파일을 받으세요.' }]}
+                    segments={[
+                      { chip: 'Generate a private key' },
+                      { text: '를 눌러 Private Key 파일을 받으세요.' },
+                    ]}
                   />
                   <Instruction
                     number={3}
-                    segments={[{ text: 'App 설치 화면 주소의 마지막 숫자인 Installation ID를 확인하세요.' }]}
+                    segments={[
+                      { text: 'App 설치 화면 주소의 마지막 숫자인 Installation ID를 확인하세요.' },
+                    ]}
                   />
-                  <InstructionText style={{ marginLeft: 28, color: colors.textMuted, fontSize: 12 }}>
-                    예시: <Chip>github.com/settings/installations/154030988</Chip> → Installation ID:{' '}
-                    <Chip>154030988</Chip>
+                  <InstructionText
+                    style={{ marginLeft: 28, color: colors.textMuted, fontSize: 12 }}
+                  >
+                    예시: <Chip>github.com/settings/installations/154030988</Chip> → Installation
+                    ID: <Chip>154030988</Chip>
                   </InstructionText>
                 </InstructionBox>
 
@@ -996,14 +1052,18 @@ function GithubConnectModal({ onClose, onConnected }) {
                 <FieldStack>
                   <Field>
                     <FieldLabel>Private Key 파일</FieldLabel>
-                    <FieldHint>내려받은 .pem 파일을 골라 주세요. 파일은 암호화되어 저장됩니다.</FieldHint>
+                    <FieldHint>
+                      내려받은 .pem 파일을 골라 주세요. 파일은 암호화되어 저장됩니다.
+                    </FieldHint>
                     <DropZone>
                       <DropZoneIconBox>
                         <img src={fileIcon} alt="" />
                       </DropZoneIconBox>
                       <DropZoneTextGroup>
                         <DropZoneText>
-                          {privateKeyFile ? privateKeyFile.name : '파일을 선택하거나 여기로 끌어다 놓으세요.'}
+                          {privateKeyFile
+                            ? privateKeyFile.name
+                            : '파일을 선택하거나 여기로 끌어다 놓으세요.'}
                         </DropZoneText>
                         <DropZoneHint>.pem 파일 1개</DropZoneHint>
                       </DropZoneTextGroup>
@@ -1027,19 +1087,31 @@ function GithubConnectModal({ onClose, onConnected }) {
               <>
                 <Badge $type="github">◆ GitHub에서 할 일</Badge>
                 <ContentHeading>실시간 수신 설정</ContentHeading>
-                <ContentDescription>GitHub의 변경 사항을 SAI가 실시간으로 받을 수 있도록 설정합니다.</ContentDescription>
+                <ContentDescription>
+                  GitHub의 변경 사항을 SAI가 실시간으로 받을 수 있도록 설정합니다.
+                </ContentDescription>
 
                 <InstructionBox>
                   <Instruction
                     number={1}
-                    segments={[{ text: 'GitHub App의' }, { chip: 'General' }, { text: '화면으로 이동하세요.' }]}
+                    segments={[
+                      { text: 'GitHub App의' },
+                      { chip: 'General' },
+                      { text: '화면으로 이동하세요.' },
+                    ]}
                   />
-                  <Instruction number={2} segments={[{ chip: 'Webhook Active' }, { text: '를 선택하세요.' }]} />
+                  <Instruction
+                    number={2}
+                    segments={[{ chip: 'Webhook Active' }, { text: '를 선택하세요.' }]}
+                  />
                   <Instruction
                     number={3}
                     segments={[{ text: '아래 Webhook URL과 Webhook Secret을 각각 붙여넣으세요.' }]}
                   />
-                  <Instruction number={4} segments={[{ chip: 'Save changes' }, { text: '를 누르세요.' }]} />
+                  <Instruction
+                    number={4}
+                    segments={[{ chip: 'Save changes' }, { text: '를 누르세요.' }]}
+                  />
 
                   <WebhookField>
                     <WebhookLabel>WEBHOOK URL</WebhookLabel>
@@ -1071,7 +1143,10 @@ function GithubConnectModal({ onClose, onConnected }) {
                       <Chip key={eventName}>{eventName}</Chip>
                     ))}
                   </EventChipRow>
-                  <Instruction number={7} segments={[{ chip: 'Save changes' }, { text: '를 누르세요.' }]} />
+                  <Instruction
+                    number={7}
+                    segments={[{ chip: 'Save changes' }, { text: '를 누르세요.' }]}
+                  />
                 </InstructionBox>
               </>
             )}
@@ -1140,7 +1215,9 @@ function GithubConnectModal({ onClose, onConnected }) {
 
         {step === 5 && !connecting && (
           <Footer>
-            <FooterHint>언제든지 연결을 해제할 수 있습니다. 5분 내로 들어오는 변경 사항이 자동으로 수집됩니다.</FooterHint>
+            <FooterHint>
+              언제든지 연결을 해제할 수 있습니다. 5분 내로 들어오는 변경 사항이 자동으로 수집됩니다.
+            </FooterHint>
             <FooterButtons>
               <GhostButton type="button" onClick={() => setStep(4)}>
                 이전

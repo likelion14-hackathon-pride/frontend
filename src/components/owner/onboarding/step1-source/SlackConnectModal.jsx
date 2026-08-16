@@ -18,13 +18,27 @@ const STEP_META = [
 ];
 
 const STEP1_INSTRUCTIONS = [
-  [{ text: 'Slack 앱 관리 페이지에 접속해 로그인하세요.' }, { chip: 'api.slack.com/apps', href: 'https://api.slack.com/apps' }],
-  [{ chip: 'Create New App' }, { text: '→' }, { chip: 'From a manifest' }, { text: '→ 워크스페이스를 선택하세요.' }],
+  [
+    { text: 'Slack 앱 관리 페이지에 접속해 로그인하세요.' },
+    { chip: 'api.slack.com/apps', href: 'https://api.slack.com/apps' },
+  ],
+  [
+    { chip: 'Create New App' },
+    { text: '→' },
+    { chip: 'From a manifest' },
+    { text: '→ 워크스페이스를 선택하세요.' },
+  ],
   [{ text: '아래 코드를 복사해 붙여넣고' }, { chip: 'Create' }, { text: '를 누르세요.' }],
 ];
 
 const STEP2_INSTRUCTIONS = [
-  [{ chip: 'OAuth & Permissions' }, { text: '메뉴로 이동 →' }, { chip: 'Install to Workspace' }, { text: '→' }, { chip: '허용' }],
+  [
+    { chip: 'OAuth & Permissions' },
+    { text: '메뉴로 이동 →' },
+    { chip: 'Install to Workspace' },
+    { text: '→' },
+    { chip: '허용' },
+  ],
   [{ text: '화면 위쪽' }, { chip: 'Bot User OAuth Token' }, { text: '을 복사하세요.' }],
 ];
 
@@ -784,18 +798,31 @@ function SlackConnectModal({ onClose, onConnected }) {
               <>
                 <Badge $type="sai">● SAI에서 입력할 일</Badge>
                 <ContentHeading>Slack 앱 만들기</ContentHeading>
-                <ContentDescription>이름 2개를 정하면 아래 설정 코드가 자동으로 완성됩니다.</ContentDescription>
+                <ContentDescription>
+                  이름 2개를 정하면 아래 설정 코드가 자동으로 완성됩니다.
+                </ContentDescription>
 
                 <FieldRow>
                   <Field>
                     <FieldLabel>앱 이름</FieldLabel>
-                    <FieldHint>Slack 앱 목록과 설치 화면에 표시되는 이름입니다. 회사에서 알아볼 수 있는 이름으로 지으세요.</FieldHint>
-                    <TextInput value={appName} onChange={(event) => setAppName(event.target.value)} />
+                    <FieldHint>
+                      Slack 앱 목록과 설치 화면에 표시되는 이름입니다. 회사에서 알아볼 수 있는
+                      이름으로 지으세요.
+                    </FieldHint>
+                    <TextInput
+                      value={appName}
+                      onChange={(event) => setAppName(event.target.value)}
+                    />
                   </Field>
                   <Field>
                     <FieldLabel>봇 표시 이름</FieldLabel>
-                    <FieldHint>채널에서 이 봇이 말할 때 보이는 이름입니다. 직원들이 보게 되는 이름입니다.</FieldHint>
-                    <TextInput value={botDisplayName} onChange={(event) => setBotDisplayName(event.target.value)} />
+                    <FieldHint>
+                      채널에서 이 봇이 말할 때 보이는 이름입니다. 직원들이 보게 되는 이름입니다.
+                    </FieldHint>
+                    <TextInput
+                      value={botDisplayName}
+                      onChange={(event) => setBotDisplayName(event.target.value)}
+                    />
                   </Field>
                 </FieldRow>
 
@@ -834,7 +861,9 @@ function SlackConnectModal({ onClose, onConnected }) {
               <>
                 <Badge $type="slack">◆ Slack에서 할 일</Badge>
                 <ContentHeading>워크스페이스에 설치</ContentHeading>
-                <ContentDescription>방금 만든 앱을 회사 워크스페이스에 설치하면 토큰이 생깁니다.</ContentDescription>
+                <ContentDescription>
+                  방금 만든 앱을 회사 워크스페이스에 설치하면 토큰이 생깁니다.
+                </ContentDescription>
 
                 <InstructionBox>
                   {STEP2_INSTRUCTIONS.map((segments, index) => (
@@ -845,7 +874,9 @@ function SlackConnectModal({ onClose, onConnected }) {
                   ))}
                 </InstructionBox>
 
-                <WarningBox>⚠ 설치를 먼저 해야 토큰이 나타납니다. 설치 전에는 이 항목이 보이지 않습니다.</WarningBox>
+                <WarningBox>
+                  ⚠ 설치를 먼저 해야 토큰이 나타납니다. 설치 전에는 이 항목이 보이지 않습니다.
+                </WarningBox>
 
                 <HintLine>
                   <Chip>xoxb-</Chip>
@@ -860,7 +891,9 @@ function SlackConnectModal({ onClose, onConnected }) {
               <>
                 <Badge $type="slack">◆ Slack에서 할 일</Badge>
                 <ContentHeading>Signing Secret 복사</ContentHeading>
-                <ContentDescription>SAI가 Slack에서 온 요청인지 확인할 때 쓰는 값입니다.</ContentDescription>
+                <ContentDescription>
+                  SAI가 Slack에서 온 요청인지 확인할 때 쓰는 값입니다.
+                </ContentDescription>
 
                 <InstructionBox>
                   {STEP3_INSTRUCTIONS.map((segments, index) => (
@@ -879,7 +912,9 @@ function SlackConnectModal({ onClose, onConnected }) {
               <>
                 <Badge $type="sai">● SAI에서 입력할 일</Badge>
                 <ContentHeading>복사한 값 붙여넣기</ContentHeading>
-                <ContentDescription>2단계와 3단계에서 복사한 값을 각각 넣어 주세요.</ContentDescription>
+                <ContentDescription>
+                  2단계와 3단계에서 복사한 값을 각각 넣어 주세요.
+                </ContentDescription>
 
                 <FieldStack>
                   <Field>

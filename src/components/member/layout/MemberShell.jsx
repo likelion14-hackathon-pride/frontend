@@ -31,6 +31,7 @@ const Page = styled.div`
 `;
 
 const Shell = styled.div`
+  position: relative;
   display: flex;
   width: 100%;
   max-width: 1440px;

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import styled from 'styled-components';
 
 const Overlay = styled.div`
-  position: fixed;
+  position: absolute;
   inset: 0;
   z-index: 60;
   background: rgba(23, 23, 27, 0.42);

@@ -269,7 +269,14 @@ const Chip = styled.button`
   }
 `;
 
-const SUGGESTED_KEYWORDS = ['마이그레이션', '롤백', '스키마 변경', '권한 변경', '크론 수정', '환경변수'];
+const SUGGESTED_KEYWORDS = [
+  '마이그레이션',
+  '롤백',
+  '스키마 변경',
+  '권한 변경',
+  '크론 수정',
+  '환경변수',
+];
 
 function RiskKeywordForm({ onAddKeyword }) {
   const [value, setValue] = useState('');

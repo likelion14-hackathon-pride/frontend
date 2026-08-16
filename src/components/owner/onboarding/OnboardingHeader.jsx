@@ -1,8 +1,7 @@
 import styled from 'styled-components';
 import OnboardingStepper from './OnboardingStepper';
 import symbol from '../../../assets/owner/symbol.svg';
-import wordmark from '../../../assets/owner/wordmark.svg'
-
+import wordmark from '../../../assets/owner/wordmark.svg';
 
 const Bar = styled.header`
   display: grid;

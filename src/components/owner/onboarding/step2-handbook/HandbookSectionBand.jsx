@@ -13,7 +13,8 @@ const TONE = {
     color: '#FFFFFF',
     subtleColor: 'rgba(255, 255, 255, 0.75)',
     border: '0.667px solid #1D4ED8',
-    boxShadow: '0 1px 0 0 rgba(255, 255, 255, 0.22) inset, 0 14px 30px -14px rgba(37, 99, 235, 0.55)',
+    boxShadow:
+      '0 1px 0 0 rgba(255, 255, 255, 0.22) inset, 0 14px 30px -14px rgba(37, 99, 235, 0.55)',
   },
 };
 

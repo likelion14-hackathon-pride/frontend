@@ -17,8 +17,8 @@ const List = styled.ol`
   list-style: none;
   margin: 0;
   border-radius: 999px;
-  border-bottom: 1px solid rgba(180, 180, 188, 0.50);
-  background: #FFF;
+  border-bottom: 1px solid rgba(180, 180, 188, 0.5);
+  background: #fff;
   box-shadow: 0 8px 20px 0 rgba(23, 44, 90, 0.25);
 `;
 

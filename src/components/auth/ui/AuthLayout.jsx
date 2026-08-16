@@ -25,6 +25,11 @@ const PageWrapper = styled.div`
       rgba(255, 138, 61, 0) 70%
     ),
     linear-gradient(127deg, #ffe7d4 0%, #fff2e8 46%, #ffdcc2 100%);
+
+  @media (max-width: 900px) {
+    padding: 0;
+    align-items: stretch;
+  }
 `;
 
 const Content = styled.div`
@@ -39,6 +44,13 @@ const Content = styled.div`
     0 30px 80px 0 rgba(120, 55, 10, 0.18),
     0 2px 6px 0 rgba(120, 55, 10, 0.06);
   overflow: hidden;
+
+  @media (max-width: 900px) {
+    height: auto;
+    min-height: 100vh;
+    border-radius: 0;
+    box-shadow: none;
+  }
 `;
 
 //왼쪽 카드
@@ -59,6 +71,10 @@ const LeftPanel = styled.div`
       rgba(255, 138, 61, 0) 74%
     ),
     linear-gradient(165deg, #fff6ef 0%, #fff 62%);
+
+  @media (max-width: 900px) {
+    display: none;
+  }
 `;
 
 const Highlight = styled.span`
@@ -179,8 +195,22 @@ const RightPanel = styled.div`
   flex-direction: column;
   padding: 57.5px 60px;
   justify-content: center;
+  align-items: center;
+  gap: 22px;
+
+  @media (max-width: 900px) {
+    padding: 40px 24px;
+    width: 100%;
+  }
+`;
+
+const FormWrapper = styled.div`
+  display: flex;
+  width: 100%;
+  max-width: 380px;
+  flex-direction: column;
   align-items: flex-start;
-  gap: 18px;
+  gap: 22px;
 `;
 
 const RightBrandRow = styled.div`
@@ -269,7 +299,7 @@ export default function AuthLayout({
             <MascotHiImg src={mascotHiIcon} alt="" />
             <WelcomeImg src={welcomeImage} alt={brandWelcome} />
           </RightBrandRow>
-          {children}
+          <FormWrapper>{children}</FormWrapper>
         </RightPanel>
       </Content>
     </PageWrapper>

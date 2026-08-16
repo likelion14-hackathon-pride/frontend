@@ -155,7 +155,13 @@ const CancelButton = styled.button`
   white-space: nowrap;
 `;
 
-function ProjectKnowledgeSection({ projects, onAddProject, onToggleExpand, onAnswerChange, onSkipToCompanyRules }) {
+function ProjectKnowledgeSection({
+  projects,
+  onAddProject,
+  onToggleExpand,
+  onAnswerChange,
+  onSkipToCompanyRules,
+}) {
   const [isAdding, setIsAdding] = useState(false);
   const [nameDraft, setNameDraft] = useState('');
 

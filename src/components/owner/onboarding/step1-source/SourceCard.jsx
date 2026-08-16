@@ -19,7 +19,9 @@ const Card = styled.div`
   border-radius: 22px;
   border: 1px solid ${({ $status }) => ($status === 'connected' ? '#B3CAF8' : '#EFEFF1')};
   background: ${({ $status, $variant }) => ($status === 'connected' ? '#EAF1FE' : VARIANT_BACKGROUNDS[$variant])};
-  box-shadow: 0 14px 34px -14px rgba(23, 44, 90, 0.22), 0 3px 8px -2px rgba(23, 44, 90, 0.08);
+  box-shadow:
+    0 14px 34px -14px rgba(23, 44, 90, 0.22),
+    0 3px 8px -2px rgba(23, 44, 90, 0.08);
 `;
 
 const Head = styled.div`
@@ -36,8 +38,8 @@ const IconWrap = styled.div`
   justify-content: center;
   align-items: center;
   border-radius: 12px;
-  border: 1px solid #EAEAEE;
-  background: #FFF;
+  border: 1px solid #eaeaee;
+  background: #fff;
   box-shadow: 0 3px 8px -4px rgba(23, 44, 90, 0.22);
   flex-shrink: 0;
 `;
@@ -53,7 +55,7 @@ const TitleGroup = styled.div`
 
 const Title = styled.p`
   margin: 0;
-  color: #17171B;
+  color: #17171b;
   font-family: Pretendard;
   font-size: 15px;
   font-style: normal;
@@ -64,7 +66,7 @@ const Title = styled.p`
 
 const Subtitle = styled.p`
   margin: 0;
-  color: #A0A0A8;
+  color: #a0a0a8;
   font-family: Pretendard;
   font-size: 10.5px;
   font-style: normal;
@@ -83,7 +85,7 @@ const DescriptionWrap = styled.div`
 const Description = styled.p`
   margin: 0;
   align-self: stretch;
-  color: #6B6B73;
+  color: #6b6b73;
   font-family: Pretendard;
   font-size: 12px;
   font-style: normal;
@@ -134,7 +136,12 @@ function SourceCard({
   status,
   onToggle,
 }) {
-  const label = status === 'connected' ? connectedLabel : status === 'connecting' ? connectingLabel : buttonLabel;
+  const label =
+    status === 'connected'
+      ? connectedLabel
+      : status === 'connecting'
+        ? connectingLabel
+        : buttonLabel;
 
   return (
     <Card $variant={variant} $status={status}>
@@ -148,7 +155,12 @@ function SourceCard({
       <DescriptionWrap>
         <Description>{description}</Description>
       </DescriptionWrap>
-      <ConnectButton type="button" $status={status} disabled={status === 'connecting'} onClick={onToggle}>
+      <ConnectButton
+        type="button"
+        $status={status}
+        disabled={status === 'connecting'}
+        onClick={onToggle}
+      >
         {label}
       </ConnectButton>
     </Card>

@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { useZoneTime } from '../../../hooks/member/useZoneTime.js';
 
 const Overlay = styled.div`
-  position: fixed;
+  position: absolute;
   inset: 0;
   z-index: 60;
   background: rgba(23, 23, 27, 0.42);
