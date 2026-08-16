@@ -1,89 +1,187 @@
+import { useState } from 'react';
 import styled from 'styled-components';
-import RiskKeywordItem from '../../onboarding/step3-risk/RiskKeywordItem';
-import RiskKeywordForm from '../../onboarding/step3-risk/RiskKeywordForm';
+import KeywordAddModal from './KeywordAddModal';
+
+const LEVEL_META = {
+  danger: { label: '위험', color: '#DC2626', bg: '#FEF2F2', dot: '#DC2626' },
+  warning: { label: '주의', color: '#EA6A0A', bg: '#FFF7ED', dot: '#EA6A0A' },
+};
 
 const Card = styled.div`
+  box-sizing: border-box;
   display: flex;
+  flex: 1 0 0;
+  min-height: 248px;
   flex-direction: column;
   gap: 16px;
-  padding: 20px;
+  padding: 24px 22.667px;
   border-radius: 22px;
-  border: 1px solid #efeff1;
+  border: 0.667px solid #efeff1;
   background: #fff;
   box-shadow:
-    0 14px 34px -14px rgba(23, 44, 90, 0.16),
-    0 3px 8px -2px rgba(23, 44, 90, 0.06);
+    0 14px 34px -14px rgba(23, 44, 90, 0.22),
+    0 3px 8px -2px rgba(23, 44, 90, 0.08);
 `;
 
-const HeadRow = styled.div`
+const TitleRow = styled.div`
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  align-items: center;
+  gap: 3px;
 `;
 
-const Title = styled.h2`
-  margin: 0;
-  font-family: Pretendard;
-  font-size: 15px;
-  font-weight: 800;
+const Title = styled.span`
+  flex-shrink: 0;
   color: #17171b;
+  font-family: 'Plus Jakarta Sans';
+  font-size: 19px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 126%;
+  letter-spacing: -0.4px;
 `;
 
-const Hint = styled.p`
-  margin: 0;
-  font-family: Pretendard;
-  font-size: 11.5px;
+const CountText = styled.span`
+  flex-shrink: 0;
   color: #a0a0a8;
+  font-family: 'Plus Jakarta Sans';
+  font-size: 11.5px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 128%;
 `;
 
-const Layout = styled.div`
+const ChipWrap = styled.div`
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
-  gap: 20px;
-`;
-
-const ChipList = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   flex: 1 0 0;
 `;
 
-const EmptyState = styled.div`
-  padding: 20px;
-  border-radius: 14px;
-  border: 1.333px dashed #e6e6eb;
-  text-align: center;
-  font-family: Pretendard;
-  font-size: 11.5px;
+const KeywordChip = styled.div`
+  box-sizing: border-box;
+  display: inline-flex;
+  height: 39.333px;
+  padding: 0 10px 0 14px;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  border: 0.667px solid #f8dada;
+  background: #fff;
+  box-shadow: 0 6px 16px -10px rgba(23, 44, 90, 0.2);
+`;
+
+const Dot = styled.span`
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: ${({ $color }) => $color};
+`;
+
+const KeywordLabel = styled.span`
+  color: #3a3a42;
+  font-family: 'Plus Jakarta Sans';
+  font-size: 12.5px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 123%;
+  white-space: nowrap;
+`;
+
+const LevelBadge = styled.span`
+  display: inline-flex;
+  flex-shrink: 0;
+  padding: 3.667px 9px 3.333px 8px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 7px;
+  background: ${({ $bg }) => $bg};
+  color: ${({ $color }) => $color};
+  font-family: 'Plus Jakarta Sans';
+  font-size: 10.5px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 121%;
+  white-space: nowrap;
+`;
+
+const RemoveButton = styled.button`
+  display: flex;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  cursor: pointer;
   color: #b4b4bc;
+  font-family: 'Plus Jakarta Sans';
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 123%;
+`;
+
+const AddChip = styled.button`
+  display: inline-flex;
+  flex-shrink: 0;
+  padding: 10.333px 19.573px 10.667px 14.667px;
+  align-items: center;
+  border-radius: 999px;
+  border: 0.667px dashed #d8d8de;
+  background: none;
+  cursor: pointer;
+  color: #a0a0a8;
+  font-family: 'Plus Jakarta Sans';
+  font-size: 12.5px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 123%;
+  white-space: nowrap;
+
+  &:hover {
+    border-color: #2563eb;
+    color: #2563eb;
+  }
 `;
 
 function RiskKeywordCard({ keywords, onAddKeyword, onRemoveKeyword }) {
+  const [modalOpen, setModalOpen] = useState(false);
+
   return (
     <Card>
-      <HeadRow>
+      <TitleRow>
         <Title>위험 작업 키워드</Title>
-        <Hint>팀원이 이 단어가 들어간 질문을 하면 SAI는 답하지 않고 대표님께 먼저 확인하라고 안내합니다</Hint>
-      </HeadRow>
+        <CountText>{keywords.length}개 등록됨</CountText>
+      </TitleRow>
 
-      <Layout>
-        <ChipList>
-          {keywords.length === 0 ? (
-            <EmptyState>아직 등록된 단어가 없습니다</EmptyState>
-          ) : (
-            keywords.map((keyword) => (
-              <RiskKeywordItem
-                key={keyword.id}
-                label={keyword.label}
-                level={keyword.level}
-                onRemove={() => onRemoveKeyword(keyword.id)}
-              />
-            ))
-          )}
-        </ChipList>
-        <RiskKeywordForm onAddKeyword={onAddKeyword} />
-      </Layout>
+      <ChipWrap>
+        {keywords.map((keyword) => {
+          const meta = LEVEL_META[keyword.level];
+          return (
+            <KeywordChip key={keyword.id}>
+              <Dot $color={meta.dot} />
+              <KeywordLabel>{keyword.label}</KeywordLabel>
+              <LevelBadge $bg={meta.bg} $color={meta.color}>
+                {meta.label}
+              </LevelBadge>
+              <RemoveButton type="button" onClick={() => onRemoveKeyword(keyword.id)} aria-label={`${keyword.label} 삭제`}>
+                ✕
+              </RemoveButton>
+            </KeywordChip>
+          );
+        })}
+        <AddChip type="button" onClick={() => setModalOpen(true)}>
+          + 키워드 추가
+        </AddChip>
+      </ChipWrap>
+
+      {modalOpen && (
+        <KeywordAddModal onAddKeyword={onAddKeyword} onClose={() => setModalOpen(false)} />
+      )}
     </Card>
   );
 }

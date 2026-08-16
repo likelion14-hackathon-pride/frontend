@@ -271,7 +271,7 @@ const Chip = styled.button`
 
 const SUGGESTED_KEYWORDS = ['마이그레이션', '롤백', '스키마 변경', '권한 변경', '크론 수정', '환경변수'];
 
-function RiskKeywordForm({ onAddKeyword }) {
+function RiskKeywordForm({ onAddKeyword, showSuggestions = true }) {
   const [value, setValue] = useState('');
   const [level, setLevel] = useState('warning');
 
@@ -331,25 +331,29 @@ function RiskKeywordForm({ onAddKeyword }) {
         })}
       </LevelRow>
 
-      <Divider />
+      {showSuggestions && (
+        <>
+          <Divider />
 
-      <SuggestSection>
-        <SuggestRow>
-          <SuggestLabelWrap>
-            <SuggestLabel>추천</SuggestLabel>
-          </SuggestLabelWrap>
-          <SuggestHintWrap>
-            <SuggestHint>다른 팀이 자주 등록하는 단어입니다 · 누르면 바로 추가됩니다</SuggestHint>
-          </SuggestHintWrap>
-        </SuggestRow>
-        <ChipRow>
-          {SUGGESTED_KEYWORDS.map((keyword) => (
-            <Chip key={keyword} type="button" onClick={() => onAddKeyword(keyword, level)}>
-              + {keyword}
-            </Chip>
-          ))}
-        </ChipRow>
-      </SuggestSection>
+          <SuggestSection>
+            <SuggestRow>
+              <SuggestLabelWrap>
+                <SuggestLabel>추천</SuggestLabel>
+              </SuggestLabelWrap>
+              <SuggestHintWrap>
+                <SuggestHint>다른 팀이 자주 등록하는 단어입니다 · 누르면 바로 추가됩니다</SuggestHint>
+              </SuggestHintWrap>
+            </SuggestRow>
+            <ChipRow>
+              {SUGGESTED_KEYWORDS.map((keyword) => (
+                <Chip key={keyword} type="button" onClick={() => onAddKeyword(keyword, level)}>
+                  + {keyword}
+                </Chip>
+              ))}
+            </ChipRow>
+          </SuggestSection>
+        </>
+      )}
     </Panel>
   );
 }

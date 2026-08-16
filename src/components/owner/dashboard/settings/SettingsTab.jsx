@@ -1,48 +1,61 @@
 import { useState } from 'react';
 import styled from 'styled-components';
 import RiskKeywordCard from './RiskKeywordCard';
-import WorkHoursCard from './WorkHoursCard';
-import CompanyCodeCard from './CompanyCodeCard';
+import WorkHoursCompanyCodeCard from './WorkHoursCompanyCodeCard';
 import { INITIAL_SETTINGS_KEYWORDS, DEFAULT_WORK_HOURS, MOCK_COMPANY_CODE } from './settingsData';
 
 const TabContent = styled.div`
   display: flex;
+  width: 100%;
   flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
   gap: 18px;
-  align-self: stretch;
+`;
+
+const HeaderTextGroup = styled.div`
+  display: flex;
+  width: 100%;
+  padding-bottom: 1.333px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 7.792px;
 `;
 
 const Heading = styled.h1`
   margin: 0;
-  font-family: Pretendard;
-  font-size: 26px;
-  font-weight: 800;
   color: #17171b;
-  letter-spacing: -0.6px;
+  font-family: 'Plus Jakarta Sans';
+  font-size: 38px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 41.8px;
+  letter-spacing: -1.2px;
 `;
 
 const Subheading = styled.p`
-  margin: 6px 0 0;
-  font-family: Pretendard;
-  font-size: 13px;
+  margin: 0;
   color: #6b6b73;
+  font-family: 'Plus Jakarta Sans';
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 123%;
 `;
 
-const BottomRow = styled.div`
+const CardRow = styled.div`
   display: flex;
+  width: 100%;
+  justify-content: center;
   align-items: flex-start;
-  gap: 14px;
-  align-self: stretch;
-
-  > * {
-    flex: 1 0 0;
-  }
+  gap: 16px;
 `;
 
 function SettingsTab() {
   const [keywords, setKeywords] = useState(INITIAL_SETTINGS_KEYWORDS);
   const [workHoursEnabled, setWorkHoursEnabled] = useState(true);
-  const [workHours, setWorkHours] = useState(DEFAULT_WORK_HOURS);
+  const [workHours] = useState(DEFAULT_WORK_HOURS);
 
   const handleAddKeyword = (label, level) => {
     setKeywords((prev) => [...prev, { id: `sk-${Date.now()}`, label, level }]);
@@ -58,22 +71,21 @@ function SettingsTab() {
 
   return (
     <TabContent>
-      <div>
+      <HeaderTextGroup>
         <Heading>설정</Heading>
-        <Subheading>위험 작업 키워드와 근무 시간, 팀원 합류 코드를 관리합니다</Subheading>
-      </div>
+        <Subheading>위험 작업 키워드와 근무 시간은 팀원 화면의 사전 안내·시차 응답에 그대로 쓰입니다</Subheading>
+      </HeaderTextGroup>
 
-      <RiskKeywordCard keywords={keywords} onAddKeyword={handleAddKeyword} onRemoveKeyword={handleRemoveKeyword} />
-
-      <BottomRow>
-        <WorkHoursCard
-          enabled={workHoursEnabled}
-          onToggle={() => setWorkHoursEnabled((prev) => !prev)}
+      <CardRow>
+        <RiskKeywordCard keywords={keywords} onAddKeyword={handleAddKeyword} onRemoveKeyword={handleRemoveKeyword} />
+        <WorkHoursCompanyCodeCard
+          workHoursEnabled={workHoursEnabled}
+          onToggleWorkHours={() => setWorkHoursEnabled((prev) => !prev)}
           hours={workHours}
-          onChangeHours={setWorkHours}
+          companyCode={MOCK_COMPANY_CODE}
+          onCopyCode={handleCopyCode}
         />
-        <CompanyCodeCard companyCode={MOCK_COMPANY_CODE} onCopyCode={handleCopyCode} />
-      </BottomRow>
+      </CardRow>
     </TabContent>
   );
 }
