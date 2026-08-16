@@ -42,21 +42,44 @@ const HeaderTitle = styled.span`
   font-weight: 800;
 `;
 
-const WidenButton = styled.button`
+const ExpandButton = styled.button`
   flex: none;
-  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13.5px;
   font-weight: 700;
-  color: #8a8a93;
+  color: #6b6b73;
   border: 1px solid #eaeaee;
   background: #fff;
-  padding: 6px 11px;
-  border-radius: 9px;
+  padding: 8px 14px;
+  border-radius: 999px;
   cursor: pointer;
 
   &:hover {
     border-color: #d8d8de;
   }
 `;
+
+function ExpandIcon({ collapsed }) {
+  return (
+    <svg
+      width="13"
+      height="13"
+      viewBox="0 0 13 13"
+      fill="none"
+      style={{ transform: collapsed ? 'scaleX(-1)' : 'none' }}
+    >
+      <path
+        d="M4 9.5L9.5 4M9.5 4H5.5M9.5 4V8"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
 
 const CloseButton = styled.button`
   flex: none;
@@ -502,85 +525,6 @@ const ResolvedDesc = styled.div`
   margin-top: 5px;
 `;
 
-const StillCard = styled.div`
-  background: #fff;
-  border-radius: 18px;
-  box-shadow: 0px 1px 20px 0px #0000002e;
-  padding: 18px 20px;
-`;
-
-const StillHeader = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 9px;
-`;
-
-const StillBadge = styled.span`
-  flex: none;
-  width: 26px;
-  height: 26px;
-  border-radius: 9px;
-  background: #f1eefe;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #7b5bd6;
-  font-size: 12.5px;
-  font-weight: 800;
-`;
-
-const StillTitle = styled.span`
-  flex: 1;
-  min-width: 0;
-  font-size: 14.5px;
-  font-weight: 800;
-`;
-
-const StillDesc = styled.div`
-  font-size: 13px;
-  color: #8a8a93;
-  line-height: 1.65;
-  margin-top: 7px;
-`;
-
-const StillInputRow = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 11px;
-`;
-
-const StillInput = styled.input`
-  flex: 1;
-  min-width: 0;
-  font-size: 14px;
-  color: #17171b;
-  background: #fafafb;
-  border: 1px solid #efeff1;
-  padding: 11px 14px;
-  border-radius: 11px;
-  outline: none;
-
-  &:focus {
-    border-color: #ff6000;
-    box-shadow: 0 0 0 3px rgba(255, 96, 0, 0.12);
-  }
-`;
-
-const StillButton = styled.button`
-  flex: none;
-  white-space: nowrap;
-  background: linear-gradient(135deg, #ff6000 0%, #ff8a3d 100%);
-  color: #fff;
-  font-size: 14px;
-  font-weight: 700;
-  padding: 11px 16px;
-  border-radius: 11px;
-  border: none;
-  cursor: pointer;
-  box-shadow: 0 6px 16px rgba(255, 96, 0, 0.28);
-`;
-
 const StatusCard = styled.div`
   background: #fff;
   border-radius: 18px;
@@ -662,7 +606,6 @@ const DoneButton = styled.button`
 export default function TaskDetailPanel({ task, isWide, onToggleWide, onClose, onMoveAction }) {
   const { goToAskWithQuestion } = useMemberNavigation();
   const [askDraft, setAskDraft] = useState('');
-  const [stillDraft, setStillDraft] = useState('');
 
   if (!task) return null;
 
@@ -673,16 +616,14 @@ export default function TaskDetailPanel({ task, isWide, onToggleWide, onClose, o
     goToAskWithQuestion(askDraft.trim());
   }
 
-  function handleStillSend() {
-    if (!stillDraft.trim()) return;
-    goToAskWithQuestion(stillDraft.trim());
-  }
-
   return (
     <Overlay $wide={isWide}>
       <Header>
         <HeaderTitle>Task detail</HeaderTitle>
-        <WidenButton onClick={onToggleWide}>{isWide ? '⤡ Collapse' : '⤢ Expand'}</WidenButton>
+        <ExpandButton onClick={onToggleWide}>
+          <ExpandIcon collapsed={isWide} />
+          {isWide ? 'Collapse' : 'Expand'}
+        </ExpandButton>
         <CloseButton onClick={onClose}>×</CloseButton>
       </Header>
 
@@ -794,26 +735,6 @@ export default function TaskDetailPanel({ task, isWide, onToggleWide, onClose, o
                 <AskButton onClick={handleAskSend}>Ask</AskButton>
               </AskInputRow>
             </AskCard>
-
-            <StillCard>
-              <StillHeader>
-                <StillBadge>한</StillBadge>
-                <StillTitle>Still not clear? Write it in your language.</StillTitle>
-              </StillHeader>
-              <StillDesc>
-                Type it in English — SAI turns it into a Korean message for 김대표 and opens it in
-                Ask SAI.
-              </StillDesc>
-              <StillInputRow>
-                <StillInput
-                  value={stillDraft}
-                  onChange={(e) => setStillDraft(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleStillSend()}
-                  placeholder="e.g. Should the fix include tests?"
-                />
-                <StillButton onClick={handleStillSend}>Make it Korean →</StillButton>
-              </StillInputRow>
-            </StillCard>
           </>
         )}
 
