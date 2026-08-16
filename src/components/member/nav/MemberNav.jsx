@@ -24,8 +24,10 @@ export default function MemberNav({ taskCount = 3 }) {
   const { pathname } = useLocation();
   const { goToHandbook } = useMemberNavigation();
   const isHandbookActive = pathname.startsWith('/member/handbook');
-  const isHandbookOpen = isHandbookActive; 
-  const [isProjectOpen, setIsProjectOpen] = useState(pathname.startsWith('/member/handbook/project'));
+  const isHandbookOpen = isHandbookActive;
+  const [isProjectOpen, setIsProjectOpen] = useState(
+    pathname.startsWith('/member/handbook/project')
+  );
 
   function handleHandbookClick() {
     setIsHandbookOpen(true);
@@ -112,7 +114,7 @@ const itemStyles = css`
   height: 44px;
   padding: 0 16px;
   border-radius: 12px;
-  color: #6B6B73;
+  color: #6b6b73;
   text-decoration: none;
   font-weight: 600;
   font-size: 14.5px;
@@ -143,7 +145,7 @@ const ToggleItem = styled.button`
   ${(props) =>
     props.$active &&
     css`
-      background: linear-gradient(135deg, #FF6000 0%, #FF8A3D 100%);
+      background: linear-gradient(135deg, #ff6000 0%, #ff8a3d 100%);
       color: #fff;
       box-shadow: 0 14px 34px -14px rgba(23, 44, 90, 0.22);
 
@@ -159,13 +161,15 @@ const IconImg = styled.img`
 
 const Badge = styled.span`
   margin-left: auto;
-  background: linear-gradient(135deg, #FF6000 0%, #FF8A3D 100%);
+  background: linear-gradient(135deg, #ff6000 0%, #ff8a3d 100%);
   color: #fff;
   font-size: 11.5px;
   font-weight: 700;
   padding: 1px 6px;
   border-radius: 20px;
-  box-shadow: 0 6px 16px rgba(255, 96, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  box-shadow:
+    0 6px 16px rgba(255, 96, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
 `;
 
 const Caret = styled.span`
@@ -177,14 +181,13 @@ const Caret = styled.span`
   transition: transform 0.15s;
 `;
 
-
 const subItemStyles = css`
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 9px 12px;
   border-radius: 9px;
-  color: #17171B;
+  color: #17171b;
   text-decoration: none;
   font-size: 14px;
   border: none;
@@ -215,7 +218,7 @@ const SubToggle = styled.button`
 const SubLabel = styled.span`
   flex: 1;
   min-width: 0;
-  color: #6B6B73;
+  color: #6b6b73;
   font-size: 14px;
   font-weight: 700;
 `;
@@ -228,7 +231,6 @@ const SubCount = styled.span`
   opacity: 0.65;
 `;
 
-
 const ProjectTree = styled.div`
   position: relative;
   padding-left: 30px;
@@ -240,7 +242,7 @@ const ProjectTree = styled.div`
     top: 0;
     bottom: 19px;
     width: 1.5px;
-    background: #E6E6EB;
+    background: #e6e6eb;
   }
 `;
 
@@ -254,7 +256,7 @@ const TreeLine = styled.span`
   top: 50%;
   width: 12px;
   height: 1.5px;
-  background: #E6E6EB;
+  background: #e6e6eb;
 `;
 
 const ProjectItem = styled(NavLink)`
@@ -264,7 +266,7 @@ const ProjectItem = styled(NavLink)`
   padding: 9px 12px;
   border-radius: 9px;
   text-decoration: none;
-  color: #17171B;
+  color: #17171b;
 
   &:hover {
     box-shadow: inset 0 0 0 999px rgba(23, 23, 27, 0.045);
@@ -283,7 +285,7 @@ const ProjectLabel = styled.span`
   flex: 1;
   min-width: 0;
   font-size: 13.5px;
-  color: #5A6675;
+  color: #5a6675;
   font-weight: 700;
   font-family: 'IBM Plex Mono', monospace;
 `;

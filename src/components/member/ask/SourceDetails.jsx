@@ -6,7 +6,7 @@ const Wrap = styled.details`
 
 const Summary = styled.summary`
   font-size: 13px;
-  color: #A0A0A8;
+  color: #a0a0a8;
   font-weight: 700;
   cursor: pointer;
   list-style: none;
@@ -17,8 +17,8 @@ const Summary = styled.summary`
 `;
 
 const SourceItem = styled.div`
-  background: #FAFAFB;
-  border: 1px solid #F0F0F2;
+  background: #fafafb;
+  border: 1px solid #f0f0f2;
   border-radius: 11px;
   padding: 12px 14px;
   margin-top: 8px;
@@ -28,12 +28,12 @@ const SourceKr = styled.div`
   font-size: 14px;
   line-height: 1.7;
   font-family: 'IBM Plex Mono', monospace;
-  color: #3A3A42;
+  color: #3a3a42;
 `;
 
 const SourceLine = styled.div`
   font-size: 12px;
-  color: #A0A0A8;
+  color: #a0a0a8;
   margin-top: 7px;
 `;
 
@@ -42,7 +42,9 @@ export default function SourceDetails({ label = 'Show the Korean source', source
 
   return (
     <Wrap>
-      <Summary>{label} · {sources.length} item{sources.length > 1 ? 's' : ''} ▾</Summary>
+      <Summary>
+        {label} · {sources.length} item{sources.length > 1 ? 's' : ''} ▾
+      </Summary>
       {sources.map((s, i) => (
         <SourceItem key={i}>
           <SourceKr>{s.kr}</SourceKr>

@@ -7,7 +7,7 @@ const Box = styled.div`
   flex-direction: column;
   gap: 10px;
   margin-top: 14px;
-  background: #FEF7F0;
+  background: #fef7f0;
   border-radius: 14px;
   padding: 15px 17px;
 `;
@@ -15,7 +15,7 @@ const Box = styled.div`
 const Title = styled.div`
   font-size: 13px;
   font-weight: 700;
-  color: #B4600D;
+  color: #b4600d;
   line-height: 123%;
 `;
 
@@ -23,7 +23,7 @@ const DraftText = styled.div`
   font-size: 14.5px;
   line-height: 1.75;
   font-family: 'IBM Plex Mono', monospace;
-  color: #3A3A42;
+  color: #3a3a42;
   background: #fff;
   border-radius: 10px;
   padding: 15px 14px;
@@ -35,7 +35,7 @@ const ButtonRow = styled.div`
 `;
 
 const ReviewButton = styled.button`
-  background: linear-gradient(135deg, #FF6000 0%, #FF8A3D 100%);
+  background: linear-gradient(135deg, #ff6000 0%, #ff8a3d 100%);
   color: #fff;
   font-size: 14px;
   font-weight: 700;
@@ -43,17 +43,21 @@ const ReviewButton = styled.button`
   border-radius: 10px;
   border: none;
   cursor: pointer;
-  box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.25) inset, 0 6px 16px 0 rgba(255, 96, 0, 0.28);
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.25) inset,
+    0 6px 16px 0 rgba(255, 96, 0, 0.28);
 
   &:hover {
-    box-shadow: inset 0 0 0 999px rgba(255, 255, 255, 0.12), 0 8px 20px rgba(255, 96, 0, 0.32);
+    box-shadow:
+      inset 0 0 0 999px rgba(255, 255, 255, 0.12),
+      0 8px 20px rgba(255, 96, 0, 0.32);
   }
 `;
 
 const SendAsIsButton = styled.button`
   font-size: 14px;
   font-weight: 700;
-  color: #6B6B73;
+  color: #6b6b73;
   background: #fff;
   padding: 10px 15px;
   border-radius: 10px;
@@ -65,7 +69,17 @@ const SendAsIsButton = styled.button`
   }
 `;
 
-export default function DraftReplyBlock({ view, enText, draftKr, ownerNote, sentLabel, onReview, onSendAsIs, onCancelReview, onSend }) {
+export default function DraftReplyBlock({
+  view,
+  enText,
+  draftKr,
+  ownerNote,
+  sentLabel,
+  onReview,
+  onSendAsIs,
+  onCancelReview,
+  onSend,
+}) {
   return (
     <Box>
       <Title>The Korean question is already written for you.</Title>

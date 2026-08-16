@@ -29,7 +29,9 @@ const PromptCard = styled.div`
   gap: 16px;
   background: #fff;
   border-radius: 14px;
-  box-shadow: 0 14px 34px -14px rgba(23, 44, 90, 0.22), 0 3px 8px -2px rgba(23, 44, 90, 0.08);
+  box-shadow:
+    0 14px 34px -14px rgba(23, 44, 90, 0.22),
+    0 3px 8px -2px rgba(23, 44, 90, 0.08);
   padding: 23px 20px;
   flex-wrap: wrap;
 `;
@@ -38,14 +40,14 @@ const PromptText = styled.div`
   flex: 1;
   min-width: 220px;
   font-size: 14px;
-  color: #6B6B73;
+  color: #6b6b73;
   line-height: 1.6;
 `;
 
 const PromptButton = styled.button`
   flex: none;
   white-space: nowrap;
-  background: linear-gradient(135deg, #FF6000 0%, #FF8A3D 100%);
+  background: linear-gradient(135deg, #ff6000 0%, #ff8a3d 100%);
   color: #fff;
   font-size: 13px;
   font-weight: 700;
@@ -53,7 +55,9 @@ const PromptButton = styled.button`
   border-radius: 10px;
   border: none;
   cursor: pointer;
-  box-shadow: 0 14px 34px -14px rgba(23, 44, 90, 0.22), 0 3px 8px -2px rgba(23, 44, 90, 0.08);
+  box-shadow:
+    0 14px 34px -14px rgba(23, 44, 90, 0.22),
+    0 3px 8px -2px rgba(23, 44, 90, 0.08);
 `;
 
 export default function HandbookCompanyView() {
@@ -66,7 +70,11 @@ export default function HandbookCompanyView() {
       <Wrap>
         {companyGroups.map((group) => (
           <div key={group.id}>
-            <RuleGroupHeader name={group.name} meta={group.meta} count={`${group.items.length} items`} />
+            <RuleGroupHeader
+              name={group.name}
+              meta={group.meta}
+              count={`${group.items.length} items`}
+            />
             <CardGroup>
               {group.items.map((item) => (
                 <RuleAccordionCard
@@ -85,7 +93,10 @@ export default function HandbookCompanyView() {
         ))}
 
         <PromptCard>
-          <PromptText>These rules also apply inside every project. Open the project knowledge to see what only holds there.</PromptText>
+          <PromptText>
+            These rules also apply inside every project. Open the project knowledge to see what only
+            holds there.
+          </PromptText>
           <PromptButton onClick={onGoToProject}>Go to project knowledge →</PromptButton>
         </PromptCard>
       </Wrap>

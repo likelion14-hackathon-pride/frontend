@@ -16,7 +16,14 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/owner" element={<div>오너 화면</div>} />
 
-        <Route path="/member/*" element={<MemberProvider><Outlet /></MemberProvider>}>
+        <Route
+          path="/member/*"
+          element={
+            <MemberProvider>
+              <Outlet />
+            </MemberProvider>
+          }
+        >
           <Route index element={<Navigate to="home" replace />} />
           <Route path="home" element={<MemberHomePage />} />
           <Route path="tasks" element={<MemberTasksPage />} />

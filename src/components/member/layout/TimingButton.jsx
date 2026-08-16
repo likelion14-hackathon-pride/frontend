@@ -7,9 +7,9 @@ const Wrapper = styled.div`
   display: flex;
   align-items: center;
   gap: 14px;
-  background-color: #FFFFFFD9;
+  background-color: #ffffffd9;
   border-radius: 16px;
-  box-shadow: 0px 10px 22px 0px #0000001A;
+  box-shadow: 0px 10px 22px 0px #0000001a;
 `;
 
 const Button = styled.button`
@@ -19,14 +19,16 @@ const Button = styled.button`
   padding: 9px 15px;
   border-radius: 16px;
   background: #fff;
-  border: 1px solid #EAEAEE;
-  box-shadow: 0 1px 2px rgba(17, 17, 20, 0.04), 0 6px 18px rgba(17, 17, 20, 0.06);
+  border: 1px solid #eaeaee;
+  box-shadow:
+    0 1px 2px rgba(17, 17, 20, 0.04),
+    0 6px 18px rgba(17, 17, 20, 0.06);
   text-align: left;
   cursor: pointer;
 
   &:hover {
-    border-color: #FFC49B;
-    box-shadow: 0 8px 22px rgba(17, 17, 20, 0.10);
+    border-color: #ffc49b;
+    box-shadow: 0 8px 22px rgba(17, 17, 20, 0.1);
   }
 `;
 
@@ -48,7 +50,7 @@ const Name = styled.span`
   white-space: nowrap;
   font-size: 13px;
   font-weight: 700;
-  color: #17171B;
+  color: #17171b;
   line-height: 149%;
 `;
 
@@ -56,21 +58,21 @@ const StatusText = styled.span`
   white-space: nowrap;
   font-size: 12.5px;
   font-weight: 600;
-  color: #8A8A93;
-  line-height: 123%; 
+  color: #8a8a93;
+  line-height: 123%;
 `;
 
 const TimeText = styled.span`
   white-space: nowrap;
   font-size: 12.5px;
   font-weight: 600;
-  color: #8A8A93;
+  color: #8a8a93;
   font-family: 'IBM Plex Mono', monospace;
 `;
 
 const Divider = styled.div`
   width: 1px;
-  background: #E4E4E9;
+  background: #e4e4e9;
 `;
 
 const ReplyBlock = styled.div`
@@ -84,14 +86,14 @@ const ReplyBlock = styled.div`
 const ReplyLabel = styled.span`
   white-space: nowrap;
   font-size: 11.5px;
-  color: #A0A0A8;
+  color: #a0a0a8;
 `;
 
 const ReplyTime = styled.span`
   white-space: nowrap;
   font-size: 14px;
   font-weight: 800;
-  color: #17171B;
+  color: #17171b;
 `;
 
 const LOCATION_LABELS = {
@@ -114,12 +116,11 @@ const LOCATION_TIMEZONES = {
   tokyo: 'Asia/Tokyo',
 };
 
-
 export default function TimingButton({ onClick }) {
   const { profile } = useMemberNavigation();
   const myLocation = LOCATION_LABELS[profile.locationId] ?? 'Hanoi';
   const myTimeZone = LOCATION_TIMEZONES[profile.locationId] ?? 'Asia/Ho_Chi_Minh';
-  
+
   const seoulTime = useZoneTime('Asia/Seoul');
   const myTime = useZoneTime(myTimeZone);
 
@@ -135,7 +136,9 @@ export default function TimingButton({ onClick }) {
           <Dot $color="#3BA55C" />
           <Name>{profile.name}</Name>
           <StatusText>online</StatusText>
-          <TimeText>{myLocation} {myTime}</TimeText>
+          <TimeText>
+            {myLocation} {myTime}
+          </TimeText>
         </StatusGrid>
 
         <Divider />

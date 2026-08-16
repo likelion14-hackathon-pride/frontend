@@ -12,7 +12,7 @@ const Label = styled.span`
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.96px;
-  color: #B4B4BC;
+  color: #b4b4bc;
   margin-right: 2px;
 `;
 
@@ -33,7 +33,9 @@ export default function ProjectFilterChips({ projects = [], activeId = 'all', on
   return (
     <Row>
       <Label>PROJECT</Label>
-      <Chip $active={activeId === 'all'} onClick={() => onSelect?.('all')}>All</Chip>
+      <Chip $active={activeId === 'all'} onClick={() => onSelect?.('all')}>
+        All
+      </Chip>
       {projects.map((p) => (
         <Chip key={p.id} $active={activeId === p.id} onClick={() => onSelect?.(p.id)}>
           #{p.label}

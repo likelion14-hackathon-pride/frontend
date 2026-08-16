@@ -23,7 +23,7 @@ const SummaryCard = styled.div`
 const SummaryTitle = styled.div`
   font-size: 11.5px;
   font-weight: 700;
-  color: #E35B00;
+  color: #e35b00;
   letter-spacing: 1.035px;
 `;
 
@@ -34,12 +34,12 @@ const Row = styled.div`
   gap: 8px;
   width: 100%;
   font-size: 14px;
-  color: #6B6B73;
+  color: #6b6b73;
   font-weight: 600;
 `;
 
 const HighlightValue = styled.strong`
-  color: #E35B00;
+  color: #e35b00;
 `;
 
 const UserRow = styled.div`
@@ -48,7 +48,7 @@ const UserRow = styled.div`
   gap: 9px;
   padding: 10px;
   border-radius: 12px;
-  background: #F7F7F8;
+  background: #f7f7f8;
   border: none;
   width: 100%;
   text-align: left;
@@ -60,13 +60,13 @@ const Avatar = styled.div`
   height: 28px;
   flex: none;
   border-radius: 50%;
-  background: #E4E4E8;
+  background: #e4e4e8;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 12.5px;
   font-weight: 700;
-  color: #6B6B73;
+  color: #6b6b73;
 `;
 
 const UserText = styled.div`
@@ -78,12 +78,12 @@ const UserText = styled.div`
 const UserName = styled.div`
   font-size: 14px;
   font-weight: 700;
-  color: #17171B;
+  color: #17171b;
 `;
 
 const UserMeta = styled.div`
   font-size: 11.5px;
-  color: #A0A0A8;
+  color: #a0a0a8;
 `;
 
 const LOCATION_LABELS = {
@@ -123,7 +123,9 @@ export default function MemberHomeSummary({ slackMessages, turnedIntoTasks, wait
         <Avatar>{initial}</Avatar>
         <UserText>
           <UserName>{user?.name}</UserName>
-          <UserMeta>{user?.role} · {LOCATION_LABELS[user?.locationId]}</UserMeta>
+          <UserMeta>
+            {user?.role} · {LOCATION_LABELS[user?.locationId]}
+          </UserMeta>
         </UserText>
       </UserRow>
 
@@ -140,7 +142,6 @@ export default function MemberHomeSummary({ slackMessages, turnedIntoTasks, wait
           onRunSetupAgain={() => console.log('setup 다시 실행')}
         />
       )}
-
     </Wrap>
   );
 }

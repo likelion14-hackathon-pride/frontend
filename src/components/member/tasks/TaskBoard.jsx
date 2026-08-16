@@ -5,7 +5,7 @@ const EmptyCard = styled.div`
   max-width: 560px;
   background: #fff;
   border-radius: 18px;
-  box-shadow: 0px 1px 20px 0px #0000002E;
+  box-shadow: 0px 1px 20px 0px #0000002e;
   padding: 24px 26px;
 `;
 
@@ -17,13 +17,13 @@ const EmptyTitle = styled.div`
 
 const EmptyDesc = styled.div`
   font-size: 14.5px;
-  color: #8A8A93;
+  color: #8a8a93;
   line-height: 1.65;
   margin-top: 7px;
 `;
 
 const EmptyButton = styled.button`
-  background: linear-gradient(135deg, #FF6000 0%, #FF8A3D 100%);
+  background: linear-gradient(135deg, #ff6000 0%, #ff8a3d 100%);
   color: #fff;
   font-size: 14px;
   font-weight: 700;
@@ -43,12 +43,22 @@ const Grid = styled.div`
   overflow-x: auto;
 `;
 
-export default function TaskBoard({ columns = [], isEmpty = false, emptyLabel = '', onEmptyReset, onCardClick, onCtaClick }) {
+export default function TaskBoard({
+  columns = [],
+  isEmpty = false,
+  emptyLabel = '',
+  onEmptyReset,
+  onCardClick,
+  onCtaClick,
+}) {
   if (isEmpty) {
     return (
       <EmptyCard>
         <EmptyTitle>No cards in {emptyLabel}</EmptyTitle>
-        <EmptyDesc>Cards belong to the project the message arrived in. Nothing has come in for this one today.</EmptyDesc>
+        <EmptyDesc>
+          Cards belong to the project the message arrived in. Nothing has come in for this one
+          today.
+        </EmptyDesc>
         <EmptyButton onClick={onEmptyReset}>Show all projects</EmptyButton>
       </EmptyCard>
     );

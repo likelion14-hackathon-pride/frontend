@@ -2,10 +2,12 @@ import styled from 'styled-components';
 
 const Card = styled.button`
   flex: none;
-  max-width: 238px; 
-  background: #FF6000;
+  max-width: 238px;
+  background: #ff6000;
   border-radius: 18px;
-  box-shadow: 0 14px 34px -14px rgba(23, 44, 90, 0.22), 0 3px 8px -2px rgba(23, 44, 90, 0.08);
+  box-shadow:
+    0 14px 34px -14px rgba(23, 44, 90, 0.22),
+    0 3px 8px -2px rgba(23, 44, 90, 0.08);
   padding: 18px 20px;
   display: flex;
   flex-direction: column;
@@ -39,7 +41,7 @@ const Dot = styled.span`
 const Label = styled.span`
   font-size: 11px;
   font-weight: 800;
-  line-height: 127%; 
+  line-height: 127%;
   letter-spacing: 0.99px;
   color: rgba(255, 255, 255, 0.9);
 `;
@@ -83,7 +85,13 @@ const ReadLink = styled.span`
   line-height: 123%;
 `;
 
-export default function UnreadInstructionCard({ count = 1, from = '김대표', time = '09:47', message, onClick }) {
+export default function UnreadInstructionCard({
+  count = 1,
+  from = '김대표',
+  time = '09:47',
+  message,
+  onClick,
+}) {
   return (
     <Card onClick={onClick}>
       <LabelRow>
@@ -93,7 +101,9 @@ export default function UnreadInstructionCard({ count = 1, from = '김대표', t
 
       <CountRow>
         <Count>{count}</Count>
-        <From>from {from} · {time}</From>
+        <From>
+          from {from} · {time}
+        </From>
       </CountRow>
 
       <MessagePreview>{message}</MessagePreview>

@@ -5,7 +5,7 @@ const Card = styled.div`
   flex: none;
   background: #fff;
   border-radius: 18px;
-  box-shadow: 0px 1px 20px 0px #0000002E;
+  box-shadow: 0px 1px 20px 0px #0000002e;
   display: flex;
   flex-direction: column;
   height: 240px;
@@ -17,7 +17,7 @@ const Header = styled.div`
   align-items: center;
   gap: 9px;
   padding: 15px 20px;
-  border-bottom: 1px solid #F2F2F4;
+  border-bottom: 1px solid #f2f2f4;
 `;
 
 const HeaderTitle = styled.span`
@@ -56,23 +56,23 @@ const Percent = styled.div`
   font-size: 24px;
   font-weight: 800;
   letter-spacing: -0.5px;
-  color: #17171B;
+  color: #17171b;
 `;
 
 const Fraction = styled.div`
   font-size: 11.5px;
-  color: #A0A0A8;
+  color: #a0a0a8;
   margin-top: 2px;
 `;
 
 const DateRange = styled.div`
   font-size: 12px;
-  color: #B4B4BC;
+  color: #b4b4bc;
 `;
 
 const EmptyText = styled.div`
   font-size: 13px;
-  color: #B4B4BC;
+  color: #b4b4bc;
 `;
 
 export default function SaiResolutionCard({ percent, resolved, total, dateRange }) {
@@ -110,7 +110,9 @@ export default function SaiResolutionCard({ percent, resolved, total, dateRange 
               </svg>
               <CenterText>
                 <Percent>{percent}%</Percent>
-                <Fraction>{resolved} of {total}</Fraction>
+                <Fraction>
+                  {resolved} of {total}
+                </Fraction>
               </CenterText>
             </RingWrap>
 

@@ -2,11 +2,37 @@ import styled from 'styled-components';
 import TaskCard from './TaskCard';
 
 const COLUMN_THEME = {
-  ready: { bg: 'linear-gradient(135deg, #FF6000 0%, #FF8A3D 100%)', color: '#fff', countBg: 'rgba(255, 255, 255, 0.28)', shadow: '0 14px 34px -14px rgba(23, 44, 90, 0.22), 0 3px 8px -2px rgba(23, 44, 90, 0.08)' },
-  inprogress: { bg: '#F7E5D3', color: '#8A4708', countBg: 'rgba(255, 255, 255, 0.62)', shadow: '0 14px 34px -14px rgba(23, 44, 90, 0.22), 0 3px 8px -2px rgba(23, 44, 90, 0.08)' },
-  waiting: { bg: '#FAF0E4', color: '#A85B14', countBg: 'rgba(255, 255, 255, 0.62)', shadow: '0 14px 34px -14px rgba(23, 44, 90, 0.22), 0 3px 8px -2px rgba(23, 44, 90, 0.08)' },
-  answered: { bg: '#FDF7F2', color: '#B4600D', countBg: 'rgba(255, 255, 255, 0.62)', shadow: '0 14px 34px -14px rgba(23, 44, 90, 0.22), 0 3px 8px -2px rgba(23, 44, 90, 0.08)' },
-  done: { bg: '#fff', color: '#6B6B73', countBg: '#F2F2F4', border: '#EAEAEE', shadow: '0 14px 34px -14px rgba(23, 44, 90, 0.22), 0 3px 8px -2px rgba(23, 44, 90, 0.08)' },
+  ready: {
+    bg: 'linear-gradient(135deg, #FF6000 0%, #FF8A3D 100%)',
+    color: '#fff',
+    countBg: 'rgba(255, 255, 255, 0.28)',
+    shadow: '0 14px 34px -14px rgba(23, 44, 90, 0.22), 0 3px 8px -2px rgba(23, 44, 90, 0.08)',
+  },
+  inprogress: {
+    bg: '#F7E5D3',
+    color: '#8A4708',
+    countBg: 'rgba(255, 255, 255, 0.62)',
+    shadow: '0 14px 34px -14px rgba(23, 44, 90, 0.22), 0 3px 8px -2px rgba(23, 44, 90, 0.08)',
+  },
+  waiting: {
+    bg: '#FAF0E4',
+    color: '#A85B14',
+    countBg: 'rgba(255, 255, 255, 0.62)',
+    shadow: '0 14px 34px -14px rgba(23, 44, 90, 0.22), 0 3px 8px -2px rgba(23, 44, 90, 0.08)',
+  },
+  answered: {
+    bg: '#FDF7F2',
+    color: '#B4600D',
+    countBg: 'rgba(255, 255, 255, 0.62)',
+    shadow: '0 14px 34px -14px rgba(23, 44, 90, 0.22), 0 3px 8px -2px rgba(23, 44, 90, 0.08)',
+  },
+  done: {
+    bg: '#fff',
+    color: '#6B6B73',
+    countBg: '#F2F2F4',
+    border: '#EAEAEE',
+    shadow: '0 14px 34px -14px rgba(23, 44, 90, 0.22), 0 3px 8px -2px rgba(23, 44, 90, 0.08)',
+  },
 };
 
 const Column = styled.div`

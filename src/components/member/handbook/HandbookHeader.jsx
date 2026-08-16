@@ -33,17 +33,15 @@ const Title = styled.div`
   font-weight: 700;
   letter-spacing: -1.3px;
   line-height: 1.1;
-  color: #17171B;
+  color: #17171b;
   font-family: Tahoma;
   overflow-wrap: break-word;
 `;
 
-
-
 const Subtitle = styled.div`
   flex: none;
   font-size: 13px;
-  color: #A0A0A8;
+  color: #a0a0a8;
   line-height: 1.5;
   align-self: flex-end;
   padding-bottom: 5px;

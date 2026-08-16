@@ -126,7 +126,7 @@ export default function MemberTasksPage() {
           ...col,
           cards: col.cards.filter((c) => c.tags?.some((t) => t.label === activeProject)),
         }));
-  
+
   const totalFiltered = filteredColumns.reduce((sum, c) => sum + c.cards.length, 0);
 
   function handleCardClick(card, columnId) {
@@ -164,7 +164,11 @@ export default function MemberTasksPage() {
     <MemberShell screenTitle="Tasks">
       <PageContent>
         <TasksGreeting onAskClick={goToAsk} />
-        <ProjectFilterChips projects={PROJECTS} activeId={activeProject} onSelect={setActiveProject} />
+        <ProjectFilterChips
+          projects={PROJECTS}
+          activeId={activeProject}
+          onSelect={setActiveProject}
+        />
         <TaskBoard
           columns={filteredColumns}
           isEmpty={activeProject !== 'all' && totalFiltered === 0}

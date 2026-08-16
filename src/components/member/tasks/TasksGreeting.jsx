@@ -32,18 +32,18 @@ const Title = styled.div`
   font-weight: 700;
   letter-spacing: -1.3px;
   line-height: 1.1;
-  color: #17171B;
+  color: #17171b;
 `;
 
 const Subtitle = styled.div`
   font-size: 14px;
-  color: #8A8A93;
+  color: #8a8a93;
   margin-top: 8px;
   line-height: 1.5;
 `;
 
 const ChannelName = styled.b`
-  color: #17171B;
+  color: #17171b;
 `;
 
 const AskButton = styled.button`
@@ -52,12 +52,14 @@ const AskButton = styled.button`
   align-items: center;
   gap: 12px;
   background: #fff;
-  border: 1px solid #EAEAEE;
+  border: 1px solid #eaeaee;
   border-radius: 16px;
   padding: 16px 20px;
   text-align: left;
   cursor: pointer;
-  box-shadow: 0 14px 34px -14px rgba(23, 44, 90, 0.22), 0 3px 8px -2px rgba(23, 44, 90, 0.08);
+  box-shadow:
+    0 14px 34px -14px rgba(23, 44, 90, 0.22),
+    0 3px 8px -2px rgba(23, 44, 90, 0.08);
 `;
 
 const AskIconBadge = styled.span`
@@ -65,7 +67,7 @@ const AskIconBadge = styled.span`
   height: 22px;
   flex: none;
   border-radius: 7px;
-  background: linear-gradient(135deg, #FF6000 0%, #FF8A3D 100%);
+  background: linear-gradient(135deg, #ff6000 0%, #ff8a3d 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -77,8 +79,8 @@ const AskLabel = styled.span`
   min-width: 0;
   font-size: 15.5px;
   font-weight: 600;
-  color: #A0A0A8;
-  line-height: 125%; 
+  color: #a0a0a8;
+  line-height: 125%;
 `;
 
 const EnterChip = styled.span`
@@ -86,12 +88,12 @@ const EnterChip = styled.span`
   white-space: nowrap;
   font-size: 11.5px;
   font-weight: 700;
-  color: #B4B4BC;
-  font-family: "IBM Plex Mono";
-  border: 1px solid #EAEAEE;
+  color: #b4b4bc;
+  font-family: 'IBM Plex Mono';
+  border: 1px solid #eaeaee;
   padding: 5px 8px;
   border-radius: 7px;
-  background: #F4F4F6;
+  background: #f4f4f6;
 `;
 
 export default function TasksGreeting({
@@ -106,7 +108,9 @@ export default function TasksGreeting({
       <Header>
         <GreetingIcon src={mascot} alt="" />
         <TextBlock>
-          <Title>{taskCount} new tasks, {userName}</Title>
+          <Title>
+            {taskCount} new tasks, {userName}
+          </Title>
           <Subtitle>
             {date} · read from{' '}
             {channels.map((ch, i) => (

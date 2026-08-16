@@ -6,7 +6,7 @@ const Card = styled.div`
   flex: none;
   background: #fff;
   border-radius: 18px;
-  box-shadow: 0px 1px 20px 0px #0000002E;
+  box-shadow: 0px 1px 20px 0px #0000002e;
   display: flex;
   flex-direction: column;
   height: 240px;
@@ -18,7 +18,7 @@ const Header = styled.div`
   align-items: center;
   gap: 9px;
   padding: 15px 20px;
-  border-bottom: 1px solid #F2F2F4;
+  border-bottom: 1px solid #f2f2f4;
 `;
 
 const HeaderTitle = styled.span`
@@ -53,13 +53,13 @@ const Number = styled.span`
 const Delta = styled.span`
   font-size: 12.5px;
   font-weight: 700;
-  color: #3BA55C;
+  color: #3ba55c;
   white-space: nowrap;
 `;
 
 const Description = styled.div`
   font-size: 12px;
-  color: #8A8A93;
+  color: #8a8a93;
   margin-top: 5px;
   line-height: 1.5;
 `;
@@ -104,13 +104,7 @@ function buildPath(points, width = 260, height = 96, padding = 6) {
   return { linePath, areaPath, coords };
 }
 
-export default function HandbookGrowthCard({
-  count,
-  delta,
-  dateRange,
-  points = [],
-  labels = [],
-}) {
+export default function HandbookGrowthCard({ count, delta, dateRange, points = [], labels = [] }) {
   const { linePath, areaPath, coords } = buildPath(points);
 
   return (
@@ -137,7 +131,14 @@ export default function HandbookGrowthCard({
               </linearGradient>
             </defs>
             <path d={areaPath} fill="url(#hbGrow)" />
-            <path d={linePath} fill="none" stroke="#FF6000" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path
+              d={linePath}
+              fill="none"
+              stroke="#FF6000"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
             {coords.map(([x, y], i) => {
               const isLast = i === coords.length - 1;
               return (
@@ -158,7 +159,9 @@ export default function HandbookGrowthCard({
         {labels.length > 0 && (
           <AxisRow>
             {labels.map((label, i) => (
-              <AxisLabel key={label} $active={i === labels.length - 1}>{label}</AxisLabel>
+              <AxisLabel key={label} $active={i === labels.length - 1}>
+                {label}
+              </AxisLabel>
             ))}
           </AxisRow>
         )}

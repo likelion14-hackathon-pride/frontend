@@ -9,8 +9,8 @@ const Bar = styled.header`
 `;
 
 const Title = styled.h1`
-  color: #17171B;
-  font-family: "Plus Jakarta Sans";
+  color: #17171b;
+  font-family: 'Plus Jakarta Sans';
   font-size: 25px;
   font-style: normal;
   font-weight: 700;
@@ -19,13 +19,13 @@ const Title = styled.h1`
 `;
 
 const DateText = styled.span`
-  color: #8A8A93;
-  font-family: "Plus Jakarta Sans";
+  color: #8a8a93;
+  font-family: 'Plus Jakarta Sans';
   font-size: 14.5px;
   font-style: normal;
   font-weight: 400;
   line-height: 129%;
-  margin-top: 6px
+  margin-top: 6px;
 `;
 
 export default function MemberTopBar({ screenTitle, onOpenTiming }) {

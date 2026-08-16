@@ -39,22 +39,29 @@ const Shell = styled.div`
   overflow: hidden;
   border-radius: 24px;
   background:
-  radial-gradient(900px 520px at 78% -8%, rgba(239,147,91,.10) 0%, rgba(239,147,91,0) 62%),
-  radial-gradient(700px 480px at 6% 108%, rgba(235,112,37,.14) 0%, rgba(239,147,91,.06) 46%, rgba(239,147,91,0) 72%),
-  #F7F7F8;
-  box-shadow: 0 2px 6px rgba(0,0,0,.06), 0 30px 80px -34px rgba(0,0,0,.30);
+    radial-gradient(900px 520px at 78% -8%, rgba(239, 147, 91, 0.1) 0%, rgba(239, 147, 91, 0) 62%),
+    radial-gradient(
+      700px 480px at 6% 108%,
+      rgba(235, 112, 37, 0.14) 0%,
+      rgba(239, 147, 91, 0.06) 46%,
+      rgba(239, 147, 91, 0) 72%
+    ),
+    #f7f7f8;
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.06),
+    0 30px 80px -34px rgba(0, 0, 0, 0.3);
 `;
 
-const Sidebar = styled.aside` 
+const Sidebar = styled.aside`
   flex: none;
   width: 260px;
   height: 100%;
   display: flex;
   flex-direction: column;
   padding: 22px 16px;
-  border-right: 1px solid #EFEFF1;
+  border-right: 1px solid #efeff1;
   background: #fff;
-  background-image: linear-gradient(180deg, rgba(255,96,0,.06) 0%, rgba(255,255,255,0) 34%);
+  background-image: linear-gradient(180deg, rgba(255, 96, 0, 0.06) 0%, rgba(255, 255, 255, 0) 34%);
 `;
 
 const Logo = styled.div`
@@ -80,20 +87,25 @@ const WordmarkImg = styled.img`
   object-fit: contain;
 `;
 
-const Nav = styled.nav`  
+const Nav = styled.nav`
   flex: 1;
 `;
 
-const UserCard = styled.div` 
+const UserCard = styled.div`
   margin-top: auto;
 `;
 
-const Main = styled.main`  
+const Main = styled.main`
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(180deg, rgba(255, 96, 0, 0.05) 0%, rgba(255, 138, 61, 0.02) 26%, rgba(255, 255, 255, 0) 60%);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 96, 0, 0.05) 0%,
+    rgba(255, 138, 61, 0.02) 26%,
+    rgba(255, 255, 255, 0) 60%
+  );
 `;
 
 const Content = styled.div`
@@ -130,12 +142,12 @@ export default function MemberShell({ screenTitle, children }) {
             />
           </UserCard>
         </Sidebar>
-  
+
         <Main>
           <MemberTopBar screenTitle={screenTitle} onOpenTiming={() => setIsTzOpen(true)} />
           <Content>{children}</Content>
         </Main>
-  
+
         {isTzOpen && <TimingModal onClose={() => setIsTzOpen(false)} />}
       </Shell>
     </Page>

@@ -1,7 +1,6 @@
 import styled from 'styled-components';
 import { useZoneTime } from '../../../hooks/member/useZoneTime.js';
 
-
 const Overlay = styled.div`
   position: fixed;
   inset: 0;
@@ -19,7 +18,7 @@ const Modal = styled.div`
   max-width: 900px;
   max-height: 100%;
   overflow-y: auto;
-  background: #F7F7F8;
+  background: #f7f7f8;
   border-radius: 22px;
   box-shadow: 0 30px 80px rgba(17, 17, 20, 0.35);
   padding: 26px 28px;
@@ -42,12 +41,12 @@ const Title = styled.h2`
   font-size: 21px;
   font-weight: 800;
   letter-spacing: -0.3px;
-  color: #17171B;
+  color: #17171b;
 `;
 
 const Subtitle = styled.p`
   font-size: 13px;
-  color: #8A8A93;
+  color: #8a8a93;
   font-weight: 400;
   margin-top: 3px;
 `;
@@ -58,17 +57,17 @@ const CloseButton = styled.button`
   height: 32px;
   border-radius: 50%;
   background: #fff;
-  border: 1px solid #EAEAEE;
+  border: 1px solid #eaeaee;
   font-size: 15px;
-  color: #6B6B73;
+  color: #6b6b73;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
 
   &:hover {
-    border-color: #D8D8DE;
-    color: #17171B;
+    border-color: #d8d8de;
+    color: #17171b;
   }
 `;
 
@@ -82,7 +81,9 @@ const Body = styled.div`
 const TimeCard = styled.div`
   background: #fff;
   border-radius: 18px;
-  box-shadow: 0 1px 20px 0 rgba(0, 0, 0, 0.18), 0 1px 0 0 rgba(255, 96, 0, 0.04);
+  box-shadow:
+    0 1px 20px 0 rgba(0, 0, 0, 0.18),
+    0 1px 0 0 rgba(255, 96, 0, 0.04);
   padding: 24px 26px;
   align-items: flex-start;
   align-self: stretch;
@@ -97,7 +98,7 @@ const TimeRow = styled.div`
 const TimeLabel = styled.div`
   font-size: 12px;
   font-weight: 700;
-  color: #A0A0A8;
+  color: #a0a0a8;
   letter-spacing: 0.07em;
 `;
 
@@ -112,7 +113,7 @@ const TimeValue = styled.div`
 const VerticalDivider = styled.div`
   width: 1px;
   height: 44px;
-  background: #EFEFF1;
+  background: #efeff1;
 `;
 
 const NoteBox = styled.div`
@@ -120,7 +121,7 @@ const NoteBox = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  background: #F7F7F8;
+  background: #f7f7f8;
   border-radius: 12px;
   padding: 14px 16px;
 `;
@@ -128,14 +129,13 @@ const NoteBox = styled.div`
 const NoteTitle = styled.div`
   font-size: 15.5px;
   font-weight: 700;
-  color: #17171B;
+  color: #17171b;
 `;
-
 
 const NoteDesc = styled.div`
   font-size: 14.5px;
   font-weight: 400;
-  color: #6B6B73;
+  color: #6b6b73;
   line-height: 23.2px;
   margin-top: 5px;
 `;
@@ -150,7 +150,9 @@ const Grid = styled.div`
 const ListCard = styled.div`
   background: #fff;
   border-radius: 18px;
-  box-shadow: 0 1px 20px 0 rgba(0, 0, 0, 0.18), 0 1px 0 0 rgba(255, 96, 0, 0.04);
+  box-shadow:
+    0 1px 20px 0 rgba(0, 0, 0, 0.18),
+    0 1px 0 0 rgba(255, 96, 0, 0.04);
   padding: 22px 24px;
 `;
 
@@ -161,12 +163,12 @@ const ListCardTitle = styled.div`
 
 const ListCardSubtitle = styled.div`
   font-size: 13px;
-  color: #A0A0A8;
+  color: #a0a0a8;
   margin-top: 4px;
 `;
 
 const ListItem = styled.div`
-  border-top: 1px solid #F2F2F4;
+  border-top: 1px solid #f2f2f4;
   padding: 14px 0;
 `;
 
@@ -178,7 +180,7 @@ const ListItemTitle = styled.div`
 
 const ListItemSrc = styled.div`
   font-size: 12px;
-  color: #A0A0A8;
+  color: #a0a0a8;
   font-weight: 400;
   margin-top: 5px;
 `;
@@ -191,8 +193,10 @@ const TaskButton = styled.button`
   padding: 12px;
   border-radius: 11px;
   margin-top: 14px;
-  background: linear-gradient(135deg, #FF6000 0%, #FF8A3D 100%);
-  box-shadow: 0 6px 16px 0 rgba(255, 96, 0, 0.28), 0 1px 0 0 rgba(255, 255, 255, 0.25) inset;
+  background: linear-gradient(135deg, #ff6000 0%, #ff8a3d 100%);
+  box-shadow:
+    0 6px 16px 0 rgba(255, 96, 0, 0.28),
+    0 1px 0 0 rgba(255, 255, 255, 0.25) inset;
   cursor: pointer;
   border: none;
 `;

@@ -46,7 +46,7 @@ const Title = styled.h2`
 
 const Subtitle = styled.p`
   font-size: 13px;
-  color: #8A8A93;
+  color: #8a8a93;
   margin-top: 3px;
 `;
 
@@ -55,17 +55,17 @@ const CloseButton = styled.button`
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: #F7F7F8;
+  background: #f7f7f8;
   border: none;
   font-size: 15px;
-  color: #6B6B73;
+  color: #6b6b73;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
 
   &:hover {
-    color: #17171B;
+    color: #17171b;
   }
 `;
 
@@ -79,15 +79,15 @@ const Label = styled.div`
   font-size: 11.5px;
   font-weight: 700;
   letter-spacing: 0.07em;
-  color: #A0A0A8;
+  color: #a0a0a8;
 `;
 
 const NameInput = styled.input`
   font-size: 15px;
   font-weight: 700;
-  color: #17171B;
-  background: #F7F7F8;
-  border: 1px solid #EFEFF1;
+  color: #17171b;
+  background: #f7f7f8;
+  border: 1px solid #efeff1;
   border-radius: 12px;
   padding: 12px 14px;
   outline: none;
@@ -127,29 +127,29 @@ const ChipMeta = styled.span`
   font-size: 11.5px;
   font-weight: 700;
   color: ${(props) => (props.$active ? '#E07A3A' : '#A0A0A8')};
-  font-family: "IBM Plex Mono";
+  font-family: 'IBM Plex Mono';
 `;
 
 const AddChip = styled.button`
   width: 36px;
   height: 36px;
   border-radius: 12px;
-  border: 1px dashed #DADAE0;
+  border: 1px dashed #dadae0;
   background: transparent;
-  color: #B4B4BC;
+  color: #b4b4bc;
   font-size: 13.5px;
   font-weight: 700;
   cursor: pointer;
 
   &:hover {
-    border-color: #B4B4BC;
-    color: #8A8A93;
+    border-color: #b4b4bc;
+    color: #8a8a93;
   }
 `;
 
 const OverlapNote = styled.div`
   font-size: 12px;
-  color: #A0A0A8;
+  color: #a0a0a8;
   line-height: 1.5;
 `;
 
@@ -162,8 +162,8 @@ const RunSetupButton = styled.button`
   flex: none;
   font-size: 13px;
   font-weight: 700;
-  color: #6B6B73;
-  background: #F7F7F8;
+  color: #6b6b73;
+  background: #f7f7f8;
   border: none;
   padding: 12px 16px;
   border-radius: 12px;
@@ -179,7 +179,7 @@ const SaveButton = styled.button`
   font-size: 13.5px;
   font-weight: 700;
   color: #fff;
-  background: #17171B;
+  background: #17171b;
   border: none;
   padding: 12px 16px;
   border-radius: 12px;
@@ -240,10 +240,14 @@ export default function ProfileSettingModal({
           <Label>WHERE YOU WORK</Label>
           <ChipGrid>
             {LOCATIONS.map((loc) => (
-                <Chip key={loc.id} $active={locationId === loc.id} onClick={() => setLocationId(loc.id)}>
-                    {loc.label}
+              <Chip
+                key={loc.id}
+                $active={locationId === loc.id}
+                onClick={() => setLocationId(loc.id)}
+              >
+                {loc.label}
                 <ChipMeta $active={locationId === loc.id}>{loc.utc}</ChipMeta>
-                </Chip>
+              </Chip>
             ))}
             <AddChip onClick={() => {}}>+</AddChip>
           </ChipGrid>

@@ -5,14 +5,22 @@ import plusIcon from '../../../assets/icons/plus.svg';
 
 const CheckIcon = () => (
   <svg width="9" height="9" viewBox="0 0 10 10" fill="none">
-    <path d="M2 5.2l2 2L8 3" stroke="#fff" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
+    <path
+      d="M2 5.2l2 2L8 3"
+      stroke="#fff"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 );
 
 const Board = styled.div`
   background: #fff;
   border-radius: 18px;
-  box-shadow: 0 14px 34px -14px rgba(23, 44, 90, 0.22), 0 3px 8px -2px rgba(23, 44, 90, 0.08);
+  box-shadow:
+    0 14px 34px -14px rgba(23, 44, 90, 0.22),
+    0 3px 8px -2px rgba(23, 44, 90, 0.08);
   overflow: hidden;
 `;
 
@@ -21,7 +29,7 @@ const Header = styled.div`
   align-items: center;
   gap: 9px;
   padding: 17px 20px;
-  border-bottom: 1px solid #F2F2F4;
+  border-bottom: 1px solid #f2f2f4;
 `;
 
 const HeaderTitle = styled.span`
@@ -36,8 +44,8 @@ const CountBadge = styled.span`
   white-space: nowrap;
   font-size: 12px;
   font-weight: 700;
-  color: #6B6B73;
-  background: #F7F7F8;
+  color: #6b6b73;
+  background: #f7f7f8;
   padding: 5px 10px;
   border-radius: 20px;
   line-height: 128%;
@@ -122,9 +130,9 @@ const AddPlaceholder = styled.button`
   min-width: 0;
   text-align: left;
   font-size: 14px;
-  color: #B4B4BC;
-  background: #FAFAFB;
-  border: 0.67px dashed #E2E2E7;
+  color: #b4b4bc;
+  background: #fafafb;
+  border: 0.67px dashed #e2e2e7;
   padding: 11px 14px;
   border-radius: 12px;
   cursor: pointer;
@@ -138,20 +146,20 @@ const AddInput = styled.input`
   flex: 1;
   min-width: 0;
   font-size: 14px;
-  color: #17171B;
+  color: #17171b;
   background: #fff;
-  border: 1px solid #FFC49B;
+  border: 1px solid #ffc49b;
   padding: 11px 14px;
   border-radius: 12px;
   outline: none;
-  
+
   &:focus {
-    border-color: #FF8A3D;
+    border-color: #ff8a3d;
     box-shadow: 0 0 0 3px rgba(255, 138, 61, 0.15);
   }
 
   &::placeholder {
-    color: #B4B4BC;
+    color: #b4b4bc;
   }
 `;
 
@@ -161,7 +169,7 @@ const AddCircle = styled.button`
   flex: none;
   border-radius: 50%;
   border: none;
-  background: linear-gradient(135deg, #FF6000 0%, #FF8A3D 100%);
+  background: linear-gradient(135deg, #ff6000 0%, #ff8a3d 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -202,9 +210,7 @@ export default function TodoBoard({ initialTasks = [] }) {
   function handleToggle(id) {
     setTasks((prev) =>
       prev.map((t) =>
-        t.id === id
-          ? { ...t, isDone: !t.isDone, completedAt: !t.isDone ? Date.now() : null }
-          : t
+        t.id === id ? { ...t, isDone: !t.isDone, completedAt: !t.isDone ? Date.now() : null } : t
       )
     );
   }
@@ -212,10 +218,7 @@ export default function TodoBoard({ initialTasks = [] }) {
   function handleSubmitTask() {
     const title = draft.trim();
     if (!title) return;
-    setTasks((prev) => [
-      { id: Date.now(), title, isDone: false, completedAt: null },
-      ...prev,
-    ]);
+    setTasks((prev) => [{ id: Date.now(), title, isDone: false, completedAt: null }, ...prev]);
     setDraft('');
     setIsAdding(false);
   }

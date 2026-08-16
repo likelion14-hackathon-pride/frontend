@@ -8,13 +8,15 @@ const UserBubble = styled.div`
   align-self: flex-end;
   max-width: 82%;
   background: #fff;
-  border: 1px solid #EDEDF0;
-  color: #17171B;
+  border: 1px solid #ededf0;
+  color: #17171b;
   font-size: 16px;
   line-height: 1.6;
   padding: 12px 16px;
   border-radius: 18px;
-  box-shadow: 0 8px 20px -10px rgba(17, 17, 20, 0.10), 0 1px 2px 0 rgba(17, 17, 20, 0.04);
+  box-shadow:
+    0 8px 20px -10px rgba(17, 17, 20, 0.1),
+    0 1px 2px 0 rgba(17, 17, 20, 0.04);
 `;
 
 const AiRow = styled.div`
@@ -37,7 +39,7 @@ const AiContent = styled.div`
 const AiBody = styled.div`
   font-size: 16.5px;
   line-height: 1.75;
-  color: #17171B;
+  color: #17171b;
 `;
 
 export default function ChatBubble({ message }) {
@@ -62,7 +64,9 @@ export default function ChatBubble({ message }) {
             view={draftView}
             enText={message.enSummary}
             draftKr={message.draftKr}
-            ownerNote={message.ownerNote ?? 'Owner offline · a reply lands next working morning in Seoul'}
+            ownerNote={
+              message.ownerNote ?? 'Owner offline · a reply lands next working morning in Seoul'
+            }
             sentLabel={message.sentLabel}
             onReview={() => setDraftView('reviewing')}
             onSendAsIs={() => setDraftView('sent')}

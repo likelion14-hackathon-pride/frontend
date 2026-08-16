@@ -22,8 +22,8 @@ const CornerIcon = styled.span`
     top: -9px;
     width: 16px;
     height: 16px;
-    border-left: 1px solid #DCDCE2;
-    border-bottom: 1px solid #DCDCE2;
+    border-left: 1px solid #dcdce2;
+    border-bottom: 1px solid #dcdce2;
     border-radius: 0 0 0 5px;
   }
 `;
@@ -33,7 +33,7 @@ const Dot = styled.span`
   width: 9px;
   height: 9px;
   border-radius: 3px;
-  background: #FF6000;
+  background: #ff6000;
 `;
 
 const Name = styled.span`
@@ -42,29 +42,29 @@ const Name = styled.span`
   font-size: 20px;
   font-weight: 800;
   letter-spacing: -0.3px;
-  color: #17171B;
-  line-height: 127%; 
+  color: #17171b;
+  line-height: 127%;
 `;
 
 const Meta = styled.span`
   flex: none;
   white-space: nowrap;
   font-size: 13.5px;
-  color: #A0A0A8;
+  color: #a0a0a8;
 `;
 
 const Line = styled.span`
   flex: 1;
   min-width: 12px;
   height: 1px;
-  background: #E6E6EB;
+  background: #e6e6eb;
 `;
 
 const Count = styled.span`
   flex: none;
   white-space: nowrap;
   font-size: 12px;
-  color: #C0C0C8;
+  color: #c0c0c8;
   font-weight: 600;
   font-family: 'IBM Plex Mono', monospace;
 `;

@@ -54,21 +54,20 @@ const DUMMY_PROJECT_ITEMS = {
       defaultOpen: true,
     },
   ],
-  'admin-web': [
-    { id: 3, title: 'Admin logs go to Sentry', sourceTag: 'CONTRIBUTING.md' },
-  ],
+  'admin-web': [{ id: 3, title: 'Admin logs go to Sentry', sourceTag: 'CONTRIBUTING.md' }],
 };
 
 export default function MemberHandbookPage() {
   const navigate = useNavigate();
-  
+
   return (
     <MemberShell screenTitle="Handbook">
       <Outlet
         context={{
           companyGroups: DUMMY_COMPANY_GROUPS,
           projectItemsById: DUMMY_PROJECT_ITEMS,
-          onGoToProject: () => navigate(`/member/handbook/project/${Object.keys(DUMMY_PROJECT_ITEMS)[0]}`),
+          onGoToProject: () =>
+            navigate(`/member/handbook/project/${Object.keys(DUMMY_PROJECT_ITEMS)[0]}`),
         }}
       />
     </MemberShell>

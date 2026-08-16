@@ -23,7 +23,6 @@ const Icon = styled.img`
   transform: rotate(-8deg);
 `;
 
-
 const Title = styled.div`
   font-size: 34px;
   font-weight: 700;
@@ -31,12 +30,12 @@ const Title = styled.div`
   font-family: Tahoma;
   line-height: 1.15;
   text-align: center;
-  color: #17171B;
+  color: #17171b;
 `;
 
 const Subtitle = styled.div`
   font-size: 14.5px;
-  color: #8A8A93;
+  color: #8a8a93;
   margin-top: 9px;
   line-height: 1.6;
   text-align: center;
@@ -53,16 +52,16 @@ const SuggestionRow = styled.div`
 const SuggestionChip = styled.button`
   font-size: 13.5px;
   font-weight: 600;
-  color: #3C3C44;
+  color: #3c3c44;
   background: #fff;
-  border: 0.667px solid #EAEAEE;
+  border: 0.667px solid #eaeaee;
   padding: 9px 14px;
   border-radius: 20px;
   box-shadow: 0 1px 2px rgba(17, 17, 20, 0.04);
   cursor: pointer;
 
   &:hover {
-    border-color: #FFC49B;
+    border-color: #ffc49b;
     box-shadow: 0 6px 16px rgba(17, 17, 20, 0.08);
   }
 `;
@@ -73,7 +72,11 @@ const DEFAULT_SUGGESTIONS = [
   'Where do error logs go?',
 ];
 
-export default function AskEmptyState({ userName = 'Minh', suggestions = DEFAULT_SUGGESTIONS, onSuggestionClick }) {
+export default function AskEmptyState({
+  userName = 'Minh',
+  suggestions = DEFAULT_SUGGESTIONS,
+  onSuggestionClick,
+}) {
   return (
     <Wrap>
       <Icon src={mascot} alt="" />

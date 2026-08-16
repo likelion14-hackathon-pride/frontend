@@ -11,7 +11,7 @@ const Label = styled.span`
   white-space: nowrap;
   font-size: 12.5px;
   font-weight: 700;
-  color: #A0A0A8;
+  color: #a0a0a8;
 `;
 
 const ChipList = styled.div`
@@ -31,7 +31,9 @@ const Chip = styled.button`
   cursor: pointer;
 
   &:hover {
-    box-shadow: inset 0 0 0 999px rgba(23, 23, 27, 0.05), 0 3px 10px rgba(17, 17, 20, 0.08);
+    box-shadow:
+      inset 0 0 0 999px rgba(23, 23, 27, 0.05),
+      0 3px 10px rgba(17, 17, 20, 0.08);
   }
 `;
 

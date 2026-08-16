@@ -35,7 +35,6 @@ export function MemberProvider({ children }) {
   return <MemberContext.Provider value={value}>{children}</MemberContext.Provider>;
 }
 
-
 export function useMemberNavigation() {
   const ctx = useContext(MemberContext);
   if (!ctx) throw new Error('useMemberNavigation must be used within MemberProvider');

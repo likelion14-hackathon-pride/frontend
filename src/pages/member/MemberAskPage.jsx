@@ -44,7 +44,10 @@ const EXAMPLE_MESSAGES_BY_SCOPE = {
       role: 'ai',
       body: 'Payment failure logs are collected in Sentry, project payment-api. Open an issue first, then a PR that references it.',
       sources: [
-        { kr: '결제 실패 로그는 Sentry에서 확인합니다 (payment-api).', line: 'payment-api/README.md, line 12' },
+        {
+          kr: '결제 실패 로그는 Sentry에서 확인합니다 (payment-api).',
+          line: 'payment-api/README.md, line 12',
+        },
         { kr: '이슈를 먼저 생성한 뒤 관련 PR을 연결합니다.', line: 'CONTRIBUTING.md, line 8' },
       ],
     },
@@ -55,8 +58,10 @@ const EXAMPLE_MESSAGES_BY_SCOPE = {
       role: 'ai',
       body: "Nothing is established in admin-web. A rule like this exists in payment-api, but I will not use another project's rule as grounds for an answer here.",
       sources: [],
-      enSummary: 'Should the admin-web logs be sent to Sentry the same way as payment-api? Nothing is established for this project, so I am checking before I decide.',
-      draftKr: '대표님, admin-web에서도 에러 로그를 payment-api와 동일하게 Sentry로 보내면 될까요? admin-web 쪽은 정해진 내용이 없어 확인드립니다.',
+      enSummary:
+        'Should the admin-web logs be sent to Sentry the same way as payment-api? Nothing is established for this project, so I am checking before I decide.',
+      draftKr:
+        '대표님, admin-web에서도 에러 로그를 payment-api와 동일하게 Sentry로 보내면 될까요? admin-web 쪽은 정해진 내용이 없어 확인드립니다.',
     },
   ],
 };
@@ -64,7 +69,7 @@ const EXAMPLE_MESSAGES_BY_SCOPE = {
 export default function MemberAskPage() {
   const [scope, setScope] = useState('payment-api');
   const [messagesByScope, setMessagesByScope] = useState(EXAMPLE_MESSAGES_BY_SCOPE);
-const { pendingQuestion, clearPendingQuestion } = useMemberNavigation();
+  const { pendingQuestion, clearPendingQuestion } = useMemberNavigation();
 
   const messages = messagesByScope[scope] ?? [];
 
@@ -81,7 +86,6 @@ const { pendingQuestion, clearPendingQuestion } = useMemberNavigation();
       clearPendingQuestion();
     }
   }, [pendingQuestion]);
-
 
   function handleSuggestionClick(question) {
     handleSend(question);

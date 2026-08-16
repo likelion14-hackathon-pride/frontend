@@ -3,7 +3,9 @@ import styled from 'styled-components';
 const Card = styled.details`
   background: #fff;
   border-radius: 18px;
-  box-shadow: 0 14px 34px -14px rgba(23, 44, 90, 0.22), 0 3px 8px -2px rgba(23, 44, 90, 0.08);
+  box-shadow:
+    0 14px 34px -14px rgba(23, 44, 90, 0.22),
+    0 3px 8px -2px rgba(23, 44, 90, 0.08);
   padding: 14px 24px;
 `;
 
@@ -33,21 +35,21 @@ const Title = styled.div`
 const SourceTag = styled.div`
   flex: none;
   font-size: 12px;
-  color: #B4B4BC;
+  color: #b4b4bc;
   font-weight: 600;
   white-space: nowrap;
 `;
 
 const Desc = styled.div`
   font-size: 15.5px;
-  color: #3A3A42;
+  color: #3a3a42;
   line-height: 1.6;
   margin-top: 10px;
 `;
 
 const QuoteBox = styled.div`
   margin-top: 12px;
-  background: #FAFAFB;
+  background: #fafafb;
   border-radius: 11px;
   padding: 14px 16px;
 `;
@@ -56,7 +58,7 @@ const QuoteText = styled.div`
   font-size: 14.5px;
   line-height: 1.75;
   font-family: 'IBM Plex Mono', monospace;
-  color: #3A3A42;
+  color: #3a3a42;
 `;
 
 const SourceLink = styled.a`
@@ -64,20 +66,28 @@ const SourceLink = styled.a`
   align-items: center;
   gap: 6px;
   font-size: 12px;
-  color: #8A8A93;
+  color: #8a8a93;
   margin-top: 10px;
   font-weight: 600;
   text-decoration: none;
-  border-bottom: 1px solid #E0E0E6;
+  border-bottom: 1px solid #e0e0e6;
   padding-bottom: 2px;
 
   &:hover {
-    color: #C96A14;
-    border-bottom-color: #F0C39A;
+    color: #c96a14;
+    border-bottom-color: #f0c39a;
   }
 `;
 
-export default function RuleAccordionCard({ title, sourceTag, desc, quote, sourceLine, sourceHref, defaultOpen }) {
+export default function RuleAccordionCard({
+  title,
+  sourceTag,
+  desc,
+  quote,
+  sourceLine,
+  sourceHref,
+  defaultOpen,
+}) {
   return (
     <Card open={defaultOpen}>
       <Summary>
@@ -95,7 +105,16 @@ export default function RuleAccordionCard({ title, sourceTag, desc, quote, sourc
           {sourceLine && (
             <SourceLink href={sourceHref} target="_blank" rel="noreferrer">
               <span>{sourceLine}</span>
-              <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="10"
+                height="10"
+                viewBox="0 0 12 12"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <path d="M4 2h6v6M10 2 3.5 8.5" />
                 <path d="M8.5 9.5v1h-7v-7h1" />
               </svg>

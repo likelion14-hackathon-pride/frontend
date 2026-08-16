@@ -9,7 +9,7 @@ const Card = styled.div`
   min-height: 0;
   background: #fff;
   border-radius: 18px;
-  box-shadow: 0px 1px 20px 0px #0000002E;
+  box-shadow: 0px 1px 20px 0px #0000002e;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -20,7 +20,7 @@ const Header = styled.div`
   align-items: center;
   gap: 9px;
   padding: 15px 20px;
-  border-bottom: 1px solid #F2F2F4;
+  border-bottom: 1px solid #f2f2f4;
 `;
 
 const HeaderTitle = styled.span`
@@ -35,8 +35,8 @@ const CountBadge = styled.span`
   white-space: nowrap;
   font-size: 12px;
   font-weight: 700;
-  color: #6B6B73;
-  background: #F7F7F8;
+  color: #6b6b73;
+  background: #f7f7f8;
   padding: 5px 10px;
   border-radius: 20px;
 `;
@@ -57,7 +57,7 @@ const NavButton = styled.button`
   gap: 11px;
   padding: 14px;
   text-align: left;
-  border: 0.5px solid rgba(0, 0, 0, 0.10);
+  border: 0.5px solid rgba(0, 0, 0, 0.1);
   background: transparent;
   border-radius: 12px;
   cursor: pointer;
@@ -74,7 +74,7 @@ const NavLabel = styled.span`
   min-width: 0;
   font-size: 14.5px;
   font-weight: 700;
-  color: #17171B;
+  color: #17171b;
   line-height: 129%;
 `;
 
@@ -82,13 +82,13 @@ const NavCount = styled.span`
   flex: none;
   font-size: 12px;
   font-weight: 700;
-  color: #8A8A93;
+  color: #8a8a93;
 `;
 
 const NavArrow = styled.span`
   flex: none;
   font-size: 13px;
-  color: #C0C0C8;
+  color: #c0c0c8;
 `;
 
 const SubList = styled.div`
@@ -112,7 +112,7 @@ const SubButton = styled.button`
   transition: 0.15s;
 
   &:hover {
-    background: #FAFAFB;
+    background: #fafafb;
   }
 `;
 
@@ -122,8 +122,8 @@ const TreeLine = styled.span`
   top: 0;
   bottom: 50%;
   width: 12px;
-  border-left: 1.33px solid #E6E6EB;
-  border-bottom: 1.33px solid #E6E6EB;
+  border-left: 1.33px solid #e6e6eb;
+  border-bottom: 1.33px solid #e6e6eb;
   border-radius: 0 0 0 8px;
 `;
 
@@ -147,14 +147,14 @@ const SubLabel = styled.span`
 const SubMeta = styled.span`
   flex: none;
   font-size: 12px;
-  color: #A0A0A8;
+  color: #a0a0a8;
 `;
 
 const SubCount = styled.span`
   flex: none;
   font-size: 12px;
   font-weight: 700;
-  color: #B4B4BC;
+  color: #b4b4bc;
   min-width: 14px;
   text-align: right;
 `;

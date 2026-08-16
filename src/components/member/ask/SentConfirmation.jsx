@@ -5,7 +5,7 @@ const Box = styled.div`
   align-items: center;
   gap: 9px;
   background: #fff;
-  border: 1px solid #E4F0E7;
+  border: 1px solid #e4f0e7;
   border-radius: 12px;
   padding: 13px 15px;
 `;
@@ -15,7 +15,7 @@ const CheckIcon = styled.span`
   height: 19px;
   flex: none;
   border-radius: 6px;
-  background: #3BA55C;
+  background: #3ba55c;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -26,20 +26,20 @@ const Label = styled.span`
   min-width: 0;
   font-size: 13.5px;
   font-weight: 700;
-  color: #2E7D46;
+  color: #2e7d46;
 `;
 
 const CloseButton = styled.button`
   flex: none;
   font-size: 12.5px;
   font-weight: 700;
-  color: #8A8A93;
+  color: #8a8a93;
   cursor: pointer;
   background: transparent;
   border: none;
 
   &:hover {
-    color: #17171B;
+    color: #17171b;
   }
 `;
 

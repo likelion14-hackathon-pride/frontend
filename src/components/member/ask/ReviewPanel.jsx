@@ -6,13 +6,14 @@ const Panel = styled.div`
   flex-direction: column;
   gap: 10px;
   background: #fff;
-  border: 0.66px solid #FFD9BC;
+  border: 0.66px solid #ffd9bc;
   border-radius: 12px;
   opacity: 0.915;
   padding: 14px 15px;
-  box-shadow: 0 16px 34px -16px rgba(255, 96, 0, 0.20), 0 3px 8px -2px rgba(0, 0, 0, 0.05);
+  box-shadow:
+    0 16px 34px -16px rgba(255, 96, 0, 0.2),
+    0 3px 8px -2px rgba(0, 0, 0, 0.05);
 `;
-
 
 const HeaderLabel = styled.span`
   flex: 1;
@@ -20,7 +21,7 @@ const HeaderLabel = styled.span`
   font-size: 11.5px;
   font-weight: 700;
   line-height: 128%;
-  color: #B4600D;
+  color: #b4600d;
   letter-spacing: 0.805px;
 `;
 
@@ -28,8 +29,8 @@ const EnBox = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
-  background: #FAFAFB;
-  border: 1px solid #EFEFF1;
+  background: #fafafb;
+  border: 1px solid #efeff1;
   border-radius: 10px;
   padding: 12px 13px;
 `;
@@ -38,13 +39,13 @@ const EnLabel = styled.div`
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.07em;
-  color: #B4B4BC;
+  color: #b4b4bc;
 `;
 
 const EnText = styled.div`
   font-size: 14.5px;
   line-height: 1.65;
-  color: #17171B;
+  color: #17171b;
 `;
 
 const AddedRow = styled.div`
@@ -52,7 +53,7 @@ const AddedRow = styled.div`
   align-items: flex-start;
   gap: 8px;
   padding-top: 9px;
-  border-top: 1px dashed #E6E6EB;
+  border-top: 1px dashed #e6e6eb;
 `;
 
 const AddedTag = styled.span`
@@ -61,8 +62,8 @@ const AddedTag = styled.span`
   font-size: 10.5px;
   font-weight: 800;
   letter-spacing: 0.05em;
-  color: #B4600D;
-  background: #FDF1E4;
+  color: #b4600d;
+  background: #fdf1e4;
   padding: 3px 7px;
   border-radius: 5px;
 `;
@@ -72,20 +73,20 @@ const AddedText = styled.span`
   min-width: 0;
   font-size: 14.5px;
   line-height: 1.6;
-  color: #17171B;
+  color: #17171b;
 `;
 
 const RemoveButton = styled.button`
   flex: none;
   font-size: 13px;
-  color: #C0C0C8;
+  color: #c0c0c8;
   cursor: pointer;
   background: transparent;
   border: none;
   padding: 0 2px;
 
   &:hover {
-    color: #17171B;
+    color: #17171b;
   }
 `;
 
@@ -99,9 +100,9 @@ const AddInput = styled.input`
   flex: 1;
   min-width: 0;
   font-size: 13.5px;
-  color: #17171B;
+  color: #17171b;
   background: #fff;
-  border: 1px solid #EDEDF0;
+  border: 1px solid #ededf0;
   border-radius: 9px;
   padding: 9px 11px;
   outline: none;
@@ -113,7 +114,7 @@ const AddButton = styled.button`
   font-weight: 700;
   color: #fff;
   opacity: 0.35;
-  background: #17171B;
+  background: #17171b;
   padding: 9px 14px;
   border-radius: 9px;
   border: none;
@@ -141,23 +142,23 @@ const KrLabel = styled.span`
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.07em;
-  color: #C97A22;
+  color: #c97a22;
 `;
 
 const KrByline = styled.span`
   flex: none;
   font-size: 11.5px;
   font-weight: 700;
-  color: #B4B4BC;
+  color: #b4b4bc;
 `;
 
 const KrText = styled.div`
   font-size: 14.5px;
   line-height: 1.8;
   font-family: 'IBM Plex Mono', monospace;
-  color: #26262C;
-  background: #FAFAFB;
-  border: 1px solid #EFEFF1;
+  color: #26262c;
+  background: #fafafb;
+  border: 1px solid #efeff1;
   border-radius: 10px;
   padding: 16px 13px;
   white-space: pre-line;
@@ -169,8 +170,8 @@ const AddedNote = styled.div`
   gap: 8px;
   margin-top: 6px;
   font-size: 12.5px;
-  background: #FFF8F1;
-  border: 1px dashed #FFD9BC;
+  background: #fff8f1;
+  border: 1px dashed #ffd9bc;
   border-radius: 9px;
   padding: 9px 11px;
 `;
@@ -180,19 +181,19 @@ const AddedNoteDot = styled.span`
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #FF8A3D;
+  background: #ff8a3d;
 `;
 
 const AddedNoteText = styled.span`
   flex: 1;
   min-width: 0;
-  color: #8A4708;
+  color: #8a4708;
   line-height: 1.5;
 `;
 
 const Hint = styled.div`
   font-size: 12px;
-  color: #A0A0A8;
+  color: #a0a0a8;
   line-height: 1.6;
 `;
 
@@ -201,22 +202,22 @@ const FooterRow = styled.div`
   align-items: center;
   gap: 8px;
   padding-top: 11px;
-  border-top: 1px solid #F2F2F4;
+  border-top: 1px solid #f2f2f4;
 `;
 
 const OwnerNote = styled.span`
   flex: 1;
   min-width: 0;
   font-size: 12px;
-  color: #B4B4BC;
+  color: #b4b4bc;
 `;
 
 const CancelButton = styled.button`
   flex: none;
   font-size: 13px;
   font-weight: 700;
-  color: #8A8A93;
-  background: #F7F7F8;
+  color: #8a8a93;
+  background: #f7f7f8;
   padding: 8px 13px;
   border-radius: 9px;
   border: none;
@@ -236,7 +237,7 @@ const SendButton = styled.button`
   border-radius: 9px;
   border: none;
   cursor: pointer;
-  background: linear-gradient(135deg, #FF6000 0%, #FF8A3D 100%);
+  background: linear-gradient(135deg, #ff6000 0%, #ff8a3d 100%);
   box-shadow: 0 6px 16px rgba(255, 96, 0, 0.28);
 
   &:hover {
@@ -281,7 +282,9 @@ export default function ReviewPanel({ enText, krText, hint, ownerNote, onCancel,
             onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
             placeholder="Add something in your own words…"
           />
-          <AddButton onClick={handleAdd} disabled={!draft.trim()}>Add</AddButton>
+          <AddButton onClick={handleAdd} disabled={!draft.trim()}>
+            Add
+          </AddButton>
         </AddInputRow>
       </EnBox>
 
@@ -294,7 +297,9 @@ export default function ReviewPanel({ enText, krText, hint, ownerNote, onCancel,
       {addedItems.map((_, i) => (
         <AddedNote key={i}>
           <AddedNoteDot />
-          <AddedNoteText>Your added line goes out as its own Korean sentence — SAI writes it when you send.</AddedNoteText>
+          <AddedNoteText>
+            Your added line goes out as its own Korean sentence — SAI writes it when you send.
+          </AddedNoteText>
         </AddedNote>
       ))}
 

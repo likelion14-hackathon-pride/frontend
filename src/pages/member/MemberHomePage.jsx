@@ -28,7 +28,7 @@ const GreetingText = styled.div`
   font-weight: 700;
   letter-spacing: -1.3px;
   line-height: 1.1;
-  color: #17171B;
+  color: #17171b;
 `;
 
 const GreetingIcon = styled.img`
@@ -43,7 +43,7 @@ const TopRow = styled.div`
   display: flex;
   align-items: stretch;
   gap: 20px;
-  flex-wrap: wrap; 
+  flex-wrap: wrap;
 `;
 
 const MainGrid = styled.div`
@@ -84,7 +84,9 @@ export default function MemberHomePage() {
             from="김대표"
             time="09:47"
             message="결제 쪽 이거 좀 봐주세요"
-            onClick={() => {/* TODO: 메시지 상세로 이동 */}}
+            onClick={() => {
+              /* TODO: 메시지 상세로 이동 */
+            }}
           />
         </TopRow>
 
@@ -100,12 +102,7 @@ export default function MemberHomePage() {
 
           <RightColumn>
             <CardRow>
-              <SaiResolutionCard
-                percent={85}
-                resolved={17}
-                total={20}
-                dateRange="Aug 1 – Aug 6"
-              />
+              <SaiResolutionCard percent={85} resolved={17} total={20} dateRange="Aug 1 – Aug 6" />
               <HandbookGrowthCard
                 count={12}
                 delta="+6 this month"

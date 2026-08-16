@@ -20,7 +20,7 @@ const Overlay = styled.div`
   max-width: 90vw;
   display: flex;
   flex-direction: column;
-  background: #F7F7F8;
+  background: #f7f7f8;
   box-shadow: -12px 0 40px rgba(17, 17, 20, 0.12);
   transition: width 0.18s ease;
 `;
@@ -31,7 +31,7 @@ const Header = styled.div`
   align-items: center;
   gap: 10px;
   padding: 16px 20px;
-  border-bottom: 1px solid #F2F2F4;
+  border-bottom: 1px solid #f2f2f4;
   background: #fff;
 `;
 
@@ -46,15 +46,15 @@ const WidenButton = styled.button`
   flex: none;
   font-size: 14px;
   font-weight: 700;
-  color: #8A8A93;
-  border: 1px solid #EAEAEE;
+  color: #8a8a93;
+  border: 1px solid #eaeaee;
   background: #fff;
   padding: 6px 11px;
   border-radius: 9px;
   cursor: pointer;
 
   &:hover {
-    border-color: #D8D8DE;
+    border-color: #d8d8de;
   }
 `;
 
@@ -62,14 +62,14 @@ const CloseButton = styled.button`
   flex: none;
   font-size: 16px;
   font-weight: 700;
-  color: #8A8A93;
+  color: #8a8a93;
   background: none;
   border: none;
   padding: 4px 8px;
   cursor: pointer;
 
   &:hover {
-    color: #17171B;
+    color: #17171b;
   }
 `;
 
@@ -97,7 +97,7 @@ const NeutralTitle = styled.div`
 
 const NeutralDesc = styled.div`
   font-size: 14.5px;
-  color: #8A8A93;
+  color: #8a8a93;
   line-height: 1.7;
   margin-top: 7px;
 `;
@@ -105,7 +105,9 @@ const NeutralDesc = styled.div`
 const MessageCard = styled.div`
   background: #fff;
   border-radius: 18px;
-  box-shadow: 0px 1px 20px 0px #0000002E, 0 1px 0 rgba(255, 96, 0, 0.04);
+  box-shadow:
+    0px 1px 20px 0px #0000002e,
+    0 1px 0 rgba(255, 96, 0, 0.04);
   padding: 20px 22px;
 `;
 
@@ -127,7 +129,7 @@ const Kicker = styled.span`
   min-width: 0;
   font-size: 12px;
   font-weight: 700;
-  color: #A0A0A8;
+  color: #a0a0a8;
   letter-spacing: 0.08em;
 `;
 
@@ -141,7 +143,7 @@ const MessageEn = styled.div`
 
 const MessageBody = styled.div`
   font-size: 14px;
-  color: #8A8A93;
+  color: #8a8a93;
   margin-top: 9px;
   font-family: 'IBM Plex Mono', monospace;
   line-height: 1.6;
@@ -150,7 +152,9 @@ const MessageBody = styled.div`
 const EntryCard = styled.div`
   background: #fff;
   border-radius: 18px;
-  box-shadow: 0px 1px 20px 0px #0000002E, 0 1px 0 rgba(255, 96, 0, 0.04);
+  box-shadow:
+    0px 1px 20px 0px #0000002e,
+    0 1px 0 rgba(255, 96, 0, 0.04);
   padding: 18px 20px;
 `;
 
@@ -167,7 +171,7 @@ const EntryProject = styled.span`
   flex: 1;
   min-width: 0;
   font-size: 12px;
-  color: #A0A0A8;
+  color: #a0a0a8;
 `;
 
 const EntryTitle = styled.div`
@@ -182,18 +186,20 @@ const EntryAction = styled.button`
   margin-top: 12px;
   font-size: 14px;
   font-weight: 700;
-  color: #6B6B73;
+  color: #6b6b73;
   background: #fff;
-  border: 1px solid #EAEAEE;
+  border: 1px solid #eaeaee;
   padding: 11px;
   border-radius: 11px;
   cursor: pointer;
 `;
 
 const MainCard = styled.div`
-  background: #FF6000;
+  background: #ff6000;
   border-radius: 18px;
-  box-shadow: 0 14px 34px -14px rgba(23, 44, 90, 0.22), 0 3px 8px -2px rgba(23, 44, 90, 0.08);
+  box-shadow:
+    0 14px 34px -14px rgba(23, 44, 90, 0.22),
+    0 3px 8px -2px rgba(23, 44, 90, 0.08);
 `;
 
 const MainCardTop = styled.div`
@@ -279,7 +285,7 @@ const DueBox = styled.div`
 const DueLabel = styled.div`
   font-size: 11.5px;
   font-weight: 700;
-  color: #C97A22;
+  color: #c97a22;
   letter-spacing: 0.06em;
 `;
 
@@ -287,14 +293,16 @@ const DueValue = styled.div`
   font-size: 14.5px;
   font-weight: 700;
   margin-top: 4px;
-  color: #B4600D;
+  color: #b4600d;
   white-space: nowrap;
 `;
 
 const StepsCard = styled.div`
   background: #fff;
   border-radius: 18px;
-  box-shadow: 0px 1px 20px 0px #0000002E, 0 1px 0 rgba(255, 96, 0, 0.04);
+  box-shadow:
+    0px 1px 20px 0px #0000002e,
+    0 1px 0 rgba(255, 96, 0, 0.04);
   padding: 18px 20px;
 `;
 
@@ -309,7 +317,7 @@ const IconBadge = styled.span`
   width: 26px;
   height: 26px;
   border-radius: 9px;
-  background: #FFF1E6;
+  background: #fff1e6;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -327,8 +335,8 @@ const SearchableTag = styled.span`
   white-space: nowrap;
   font-size: 11.5px;
   font-weight: 700;
-  color: #C97A22;
-  background: #FDF1E4;
+  color: #c97a22;
+  background: #fdf1e4;
   padding: 3px 8px;
   border-radius: 6px;
 `;
@@ -346,15 +354,15 @@ const StepRow = styled.button`
   align-items: flex-start;
   gap: 11px;
   text-align: left;
-  background: #FAFAFB;
-  border: 1px solid #EFEFF1;
+  background: #fafafb;
+  border: 1px solid #efeff1;
   padding: 12px 14px;
   border-radius: 11px;
   cursor: pointer;
   transition: 0.15s;
 
   &:hover {
-    border-color: #FFC49B;
+    border-color: #ffc49b;
     background: #fff;
     box-shadow: 0 6px 16px rgba(17, 17, 20, 0.07);
   }
@@ -365,7 +373,7 @@ const StepDot = styled.span`
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #FF8A3D;
+  background: #ff8a3d;
   margin-top: 8px;
 `;
 
@@ -379,13 +387,13 @@ const StepTitle = styled.span`
   display: block;
   font-size: 14.5px;
   font-weight: 600;
-  color: #17171B;
+  color: #17171b;
 `;
 
 const StepSrc = styled.span`
   display: block;
   font-size: 12px;
-  color: #A0A0A8;
+  color: #a0a0a8;
   margin-top: 5px;
   font-family: 'IBM Plex Mono', monospace;
 `;
@@ -394,13 +402,15 @@ const StepArrow = styled.span`
   flex: none;
   align-self: center;
   font-size: 13px;
-  color: #C8C8D0;
+  color: #c8c8d0;
 `;
 
 const AskCard = styled.div`
   background: #fff;
   border-radius: 18px;
-  box-shadow: 0px 1px 20px 0px #0000002E, 0 1px 0 rgba(255, 96, 0, 0.04);
+  box-shadow:
+    0px 1px 20px 0px #0000002e,
+    0 1px 0 rgba(255, 96, 0, 0.04);
   padding: 18px 20px;
 `;
 
@@ -428,15 +438,15 @@ const AskInput = styled.input`
   flex: 1;
   min-width: 0;
   font-size: 14px;
-  color: #17171B;
-  background: #FAFAFB;
-  border: 1px solid #EFEFF1;
+  color: #17171b;
+  background: #fafafb;
+  border: 1px solid #efeff1;
   padding: 11px 14px;
   border-radius: 11px;
   outline: none;
 
   &:focus {
-    border-color: #FF6000;
+    border-color: #ff6000;
     box-shadow: 0 0 0 3px rgba(255, 96, 0, 0.12);
   }
 `;
@@ -444,7 +454,7 @@ const AskInput = styled.input`
 const AskButton = styled.button`
   flex: none;
   white-space: nowrap;
-  background: #17171B;
+  background: #17171b;
   color: #fff;
   font-size: 14px;
   font-weight: 700;
@@ -473,7 +483,7 @@ const ResolvedIcon = styled.div`
   height: 26px;
   flex: none;
   border-radius: 9px;
-  background: linear-gradient(135deg, #FF6000 0%, #FF8A3D 100%);
+  background: linear-gradient(135deg, #ff6000 0%, #ff8a3d 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -487,7 +497,7 @@ const ResolvedTitle = styled.div`
 
 const ResolvedDesc = styled.div`
   font-size: 14px;
-  color: #6B6B73;
+  color: #6b6b73;
   line-height: 1.65;
   margin-top: 5px;
 `;
@@ -495,7 +505,7 @@ const ResolvedDesc = styled.div`
 const StillCard = styled.div`
   background: #fff;
   border-radius: 18px;
-  box-shadow: 0px 1px 20px 0px #0000002E;
+  box-shadow: 0px 1px 20px 0px #0000002e;
   padding: 18px 20px;
 `;
 
@@ -510,11 +520,11 @@ const StillBadge = styled.span`
   width: 26px;
   height: 26px;
   border-radius: 9px;
-  background: #F1EEFE;
+  background: #f1eefe;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #7B5BD6;
+  color: #7b5bd6;
   font-size: 12.5px;
   font-weight: 800;
 `;
@@ -528,7 +538,7 @@ const StillTitle = styled.span`
 
 const StillDesc = styled.div`
   font-size: 13px;
-  color: #8A8A93;
+  color: #8a8a93;
   line-height: 1.65;
   margin-top: 7px;
 `;
@@ -544,15 +554,15 @@ const StillInput = styled.input`
   flex: 1;
   min-width: 0;
   font-size: 14px;
-  color: #17171B;
-  background: #FAFAFB;
-  border: 1px solid #EFEFF1;
+  color: #17171b;
+  background: #fafafb;
+  border: 1px solid #efeff1;
   padding: 11px 14px;
   border-radius: 11px;
   outline: none;
 
   &:focus {
-    border-color: #FF6000;
+    border-color: #ff6000;
     box-shadow: 0 0 0 3px rgba(255, 96, 0, 0.12);
   }
 `;
@@ -560,7 +570,7 @@ const StillInput = styled.input`
 const StillButton = styled.button`
   flex: none;
   white-space: nowrap;
-  background: linear-gradient(135deg, #FF6000 0%, #FF8A3D 100%);
+  background: linear-gradient(135deg, #ff6000 0%, #ff8a3d 100%);
   color: #fff;
   font-size: 14px;
   font-weight: 700;
@@ -574,21 +584,21 @@ const StillButton = styled.button`
 const StatusCard = styled.div`
   background: #fff;
   border-radius: 18px;
-  box-shadow: 0px 1px 20px 0px #0000002E;
+  box-shadow: 0px 1px 20px 0px #0000002e;
   padding: 16px 18px;
 `;
 
 const StatusLabel = styled.div`
   font-size: 12px;
   font-weight: 700;
-  color: #B4B4BC;
+  color: #b4b4bc;
   letter-spacing: 0.09em;
 `;
 
 const StatusButton = styled.button`
   width: 100%;
   margin-top: 11px;
-  background: linear-gradient(135deg, #FF6000 0%, #FF8A3D 100%);
+  background: linear-gradient(135deg, #ff6000 0%, #ff8a3d 100%);
   color: #fff;
   font-size: 14.5px;
   font-weight: 700;
@@ -596,12 +606,14 @@ const StatusButton = styled.button`
   border-radius: 11px;
   border: none;
   cursor: pointer;
-  box-shadow: 0 6px 16px rgba(255, 96, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  box-shadow:
+    0 6px 16px rgba(255, 96, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
 `;
 
 const StatusHint = styled.div`
   font-size: 12.5px;
-  color: #A0A0A8;
+  color: #a0a0a8;
   line-height: 1.6;
   margin-top: 9px;
 `;
@@ -617,7 +629,7 @@ const DoneCheck = styled.span`
   height: 22px;
   flex: none;
   border-radius: 7px;
-  background: #3BA55C;
+  background: #3ba55c;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -635,8 +647,8 @@ const DoneButton = styled.button`
   white-space: nowrap;
   font-size: 13px;
   font-weight: 700;
-  color: #6B6B73;
-  border: 1px solid #EAEAEE;
+  color: #6b6b73;
+  border: 1px solid #eaeaee;
   padding: 8px 13px;
   border-radius: 10px;
   background: none;
@@ -788,7 +800,10 @@ export default function TaskDetailPanel({ task, isWide, onToggleWide, onClose, o
                 <StillBadge>한</StillBadge>
                 <StillTitle>Still not clear? Write it in your language.</StillTitle>
               </StillHeader>
-              <StillDesc>Type it in English — SAI turns it into a Korean message for 김대표 and opens it in Ask SAI.</StillDesc>
+              <StillDesc>
+                Type it in English — SAI turns it into a Korean message for 김대표 and opens it in
+                Ask SAI.
+              </StillDesc>
               <StillInputRow>
                 <StillInput
                   value={stillDraft}
@@ -806,7 +821,14 @@ export default function TaskDetailPanel({ task, isWide, onToggleWide, onClose, o
           <StatusCard>
             <DoneRow>
               <DoneCheck>
-                <svg width="11" height="11" viewBox="0 0 10 10" fill="none" stroke="#fff" strokeWidth="1.9">
+                <svg
+                  width="11"
+                  height="11"
+                  viewBox="0 0 10 10"
+                  fill="none"
+                  stroke="#fff"
+                  strokeWidth="1.9"
+                >
                   <path d="M2 5.2l2 2L8 3" />
                 </svg>
               </DoneCheck>

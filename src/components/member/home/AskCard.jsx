@@ -9,11 +9,13 @@ const Card = styled.div`
   gap: 14px;
   flex: 1;
   min-width: 0;
-  border: 0.1px dotted #FF8A3D;
+  border: 0.1px dotted #ff8a3d;
   border-radius: 18px;
-  box-shadow: 0 14px 34px -14px rgba(23, 44, 90, 0.22), 0 3px 8px -2px rgba(23, 44, 90, 0.08);
+  box-shadow:
+    0 14px 34px -14px rgba(23, 44, 90, 0.22),
+    0 3px 8px -2px rgba(23, 44, 90, 0.08);
   padding: 18px 20px;
-  background-color: #FF8A3D33;
+  background-color: #ff8a3d33;
 `;
 
 const MainButton = styled.button`
@@ -33,14 +35,15 @@ const IconBadge = styled.span`
   height: 32px;
   flex: 0 0 auto;
   border-radius: 11px;
-  background: linear-gradient(135deg, #FF6000 0%, #FF8A3D 100%);
+  background: linear-gradient(135deg, #ff6000 0%, #ff8a3d 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 16px;
   color: #fff;
-  box-shadow: 0 14px 34px -14px rgba(23, 44, 90, 0.22), 0 3px 8px -2px rgba(23, 44, 90, 0.08);
-
+  box-shadow:
+    0 14px 34px -14px rgba(23, 44, 90, 0.22),
+    0 3px 8px -2px rgba(23, 44, 90, 0.08);
 `;
 
 const TextBlock = styled.span`
@@ -53,7 +56,7 @@ const Title = styled.span`
   display: block;
   font-size: 16.5px;
   font-weight: 700;
-  color: #17171B;
+  color: #17171b;
 `;
 
 const Subtitle = styled.span`
@@ -74,7 +77,9 @@ const SearchButton = styled.button`
   border-radius: 14px;
   padding: 12px 14px;
   text-align: left;
-  box-shadow: 0 14px 34px -14px rgba(23, 44, 90, 0.22), 0 3px 8px -2px rgba(23, 44, 90, 0.08);
+  box-shadow:
+    0 14px 34px -14px rgba(23, 44, 90, 0.22),
+    0 3px 8px -2px rgba(23, 44, 90, 0.08);
   cursor: pointer;
 
   &:hover {
@@ -86,7 +91,7 @@ const SearchPlaceholder = styled.span`
   flex: 1;
   min-width: 0;
   font-size: 14.5px;
-  color: #A8A8B0;
+  color: #a8a8b0;
 `;
 
 const EnterChip = styled.span`
@@ -94,8 +99,8 @@ const EnterChip = styled.span`
   white-space: nowrap;
   font-size: 11.5px;
   font-weight: 700;
-  color: #8A8A93;
-  background: #F4F4F6;
+  color: #8a8a93;
+  background: #f4f4f6;
   padding: 4px 6.74px 5px 8px;
   border-radius: 7px;
   font-family: 'IBM Plex Mono', monospace;
@@ -110,7 +115,7 @@ const ChipRow = styled.div`
 const Chip = styled.button`
   font-size: 13.5px;
   font-weight: 600;
-  color: #7A3B12;
+  color: #7a3b12;
   background: rgba(255, 255, 255, 0.34);
   border: 1px solid rgba(255, 255, 255, 0.55);
   padding: 8px 13px;
@@ -135,19 +140,25 @@ export default function AskCard() {
         </IconBadge>
         <TextBlock>
           <Title>Ask instead of waiting</Title>
-          <Subtitle>SAI knows your team's rules — it turns the ask into a clear next step for you</Subtitle>
+          <Subtitle>
+            SAI knows your team's rules — it turns the ask into a clear next step for you
+          </Subtitle>
         </TextBlock>
       </MainButton>
 
       <SearchButton onClick={goToAsk}>
         <img src={searchIcon} alt="" width={16} height={16} />
-        <SearchPlaceholder>Search your team's rules — "Do I need tests for this?"</SearchPlaceholder>
+        <SearchPlaceholder>
+          Search your team's rules — "Do I need tests for this?"
+        </SearchPlaceholder>
         <EnterChip>Enter ↵</EnterChip>
       </SearchButton>
 
       <ChipRow>
         {QUICK_QUESTIONS.map((q) => (
-          <Chip key={q} onClick={goToAsk}>{q}</Chip>
+          <Chip key={q} onClick={goToAsk}>
+            {q}
+          </Chip>
         ))}
       </ChipRow>
     </Card>
