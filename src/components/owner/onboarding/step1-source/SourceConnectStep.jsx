@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import Mascot from '../Mascot';
 import SourceCard from './SourceCard';
 import SlackConnectModal from './SlackConnectModal';
+import GithubConnectModal from './GithubConnectModal';
 import { colors } from '../theme';
 import githubIcon from '../../../../assets/owner/github.svg';
 import slackIcon from '../../../../assets/owner/slack.svg';
@@ -217,6 +218,7 @@ const CONNECT_DELAY_MS = 900;
 function SourceConnectStep({ connectedSources, onToggleSource, onCreateDraft }) {
   const [connectingKeys, setConnectingKeys] = useState(new Set());
   const [slackModalOpen, setSlackModalOpen] = useState(false);
+  const [githubModalOpen, setGithubModalOpen] = useState(false);
   const connectedCount = connectedSources.size;
 
   const handleConnect = (key) => {
@@ -242,12 +244,21 @@ function SourceConnectStep({ connectedSources, onToggleSource, onCreateDraft }) 
       setSlackModalOpen(true);
       return;
     }
+    if (key === 'github' && !connectedSources.has(key)) {
+      setGithubModalOpen(true);
+      return;
+    }
     handleConnect(key);
   };
 
   const handleSlackConnected = () => {
     setSlackModalOpen(false);
     onToggleSource('slack');
+  };
+
+  const handleGithubConnected = () => {
+    setGithubModalOpen(false);
+    onToggleSource('github');
   };
 
   return (
@@ -310,6 +321,10 @@ function SourceConnectStep({ connectedSources, onToggleSource, onCreateDraft }) 
 
       {slackModalOpen && (
         <SlackConnectModal onClose={() => setSlackModalOpen(false)} onConnected={handleSlackConnected} />
+      )}
+
+      {githubModalOpen && (
+        <GithubConnectModal onClose={() => setGithubModalOpen(false)} onConnected={handleGithubConnected} />
       )}
     </>
   );
