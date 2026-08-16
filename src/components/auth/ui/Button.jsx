@@ -22,4 +22,9 @@ export const StartButton = styled.button`
   &:hover {
     box-shadow: 0 10px 26px 0 rgba(255, 96, 0, 0.36);
   }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
 `;

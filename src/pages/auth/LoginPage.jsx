@@ -1,5 +1,8 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
+
+import * as authApi from '../../apis/auth';
+import { toApiError } from '../../apis/errors';
 import AuthLayout from '../../components/auth/ui/AuthLayout';
 import ModeToggle from '../../components/auth/ui/ModeToggle';
 import RoleSelect from '../../components/auth/ui/RoleSelect';
@@ -10,19 +13,44 @@ import OwnerSignupForm from '../../components/auth/OwnerSignupForm';
 import MemberSignupForm from '../../components/auth/MemberSignupForm';
 import MemberSetupForm from '../../components/auth/MemberSetupForm';
 import { translations } from '../../components/auth/translations';
+import { useAuth } from '../../context/AuthContext';
 
 import mailIcon from '../../assets/icons/mail.svg';
 import lockIcon from '../../assets/icons/lock.svg';
 
+const Notice = styled.div`
+  box-sizing: border-box;
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: 12px;
+  font-family: Pretendard, 'Plus Jakarta Sans', sans-serif;
+  font-size: 12.5px;
+  line-height: 1.6;
+  border: 1px solid
+    ${({ $tone }) => ($tone === 'error' ? '#F6CACD' : $tone === 'info' ? '#DDE2EA' : '#F5E2AE')};
+  background: ${({ $tone }) =>
+    $tone === 'error' ? '#FEF2F3' : $tone === 'info' ? '#F7F8FA' : '#FFF8E3'};
+  color: ${({ $tone }) => ($tone === 'error' ? '#96131C' : $tone === 'info' ? '#525A66' : '#7A5A05')};
+`;
+
+const FieldError = styled.p`
+  margin: -2px 0 0;
+  font-family: Pretendard, 'Plus Jakarta Sans', sans-serif;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #d62a34;
+`;
+
 export default function LoginPage() {
-  const navigate = useNavigate();
+  const { login, signupOwner, signupMemberAccount, completeAuth, sessionNotice, clearSessionNotice } =
+    useAuth();
+
   const [lang, setLang] = useState('ko');
   const t = translations[lang];
 
   const [mode, setMode] = useState('signup');
   const [role, setRole] = useState('owner');
 
-  // 팀원 가입 2단계(1: 기본 정보, 2: 회원 설정)
   const [memberStep, setMemberStep] = useState(1);
 
   const [name, setName] = useState('');
@@ -31,66 +59,125 @@ export default function LoginPage() {
   const [companyName, setCompanyName] = useState('');
   const [inviteCode, setInviteCode] = useState('');
 
-  // 팀원 2단계(회원 설정) 전용 필드
   const [workLocation, setWorkLocation] = useState('');
   const [jobRole, setJobRole] = useState('');
+
+  const [submitting, setSubmitting] = useState(false);
+  // 서버 에러는 봉투의 field 를 보고 칸 밑에 붙이거나(폼 오류) 위쪽 배너로 띄운다.
+  const [formError, setFormError] = useState(null); // { field, message }
+
+  const fieldError = (fieldName) =>
+    formError?.field === fieldName ? formError.message : null;
+  const bannerError = formError && !formError.field ? formError.message : null;
+
+  const showError = (caught) => {
+    const error = toApiError(caught);
+    setFormError({ field: error.field, message: error.message });
+  };
+
+  const localError = (message) => setFormError({ field: null, message });
 
   const handleModeChange = (nextMode) => {
     setMode(nextMode);
     setMemberStep(1);
+    setFormError(null);
   };
 
   const handleRoleChange = (nextRole) => {
     setRole(nextRole);
     setMemberStep(1);
+    setFormError(null);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (submitting) return;
+    setFormError(null);
+    clearSessionNotice();
+
     if (mode === 'login') {
       if (!email || !password) {
-        alert(t.errorLoginRequired);
+        localError(t.errorLoginRequired);
         return;
       }
-      // 로그인 API 호출 → 응답에 담긴 역할(오너/팀원 여부)로 이동 경로 분기
-      // 오너 이메일인지 판별하는 로직은 백엔드에서 처리하고, 응답의 role 값을 그대로 사용
-      // const { role: loggedInRole, ...profile } = await loginApi({ email, password });
-      const loggedInRole = 'member'; // TODO: 실제 로그인 API 응답 값으로 교체
-      navigate(loggedInRole === 'owner' ? '/owner' : '/member');
+      setSubmitting(true);
+      try {
+        await login({ email, password });
+      } catch (caught) {
+        showError(caught);
+      } finally {
+        setSubmitting(false);
+      }
       return;
     }
 
     if (role === 'owner') {
       if (!name || !email || !password || !companyName) {
-        alert(t.errorRequired);
+        localError(t.errorRequired);
         return;
       }
-      // 오너 회원가입 API 호출
-      navigate('/owner/onboarding');
+      setSubmitting(true);
+      try {
+        await signupOwner({ email, password, displayName: name, companyName });
+      } catch (caught) {
+        showError(caught);
+      } finally {
+        setSubmitting(false);
+      }
       return;
     }
 
-    // 팀원 가입 1단계: 기본 정보 입력 후 다음 단계로 이동
+    // 팀원 가입 1단계: 여기서는 서버를 부르지 않는다. 값만 확인하고 다음으로.
     if (memberStep === 1) {
       if (!name || !email || !password || !inviteCode) {
-        alert(t.errorRequired);
+        localError(t.errorRequired);
         return;
       }
       setMemberStep(2);
       return;
     }
 
-    // 팀원 가입 2단계: 회원 설정 후 최종 가입
+    // 팀원 가입 2단계: 계정을 만들고, 근무 위치·역할을 PATCH /api/me 로 저장한 뒤 입장.
     if (!workLocation || !jobRole) {
-      alert(t.errorSetupRequired);
+      localError(t.errorSetupRequired);
       return;
     }
-    // 팀원 회원가입 API 호출
-    navigate('/member', {
-      state: { profile: { name, locationId: workLocation, role: jobRole } },
-    });
+
+    setSubmitting(true);
+    try {
+      await signupMemberAccount({
+        email,
+        password,
+        displayName: name,
+        companyCode: inviteCode,
+      });
+    } catch (caught) {
+      // 회사 코드나 이메일 문제면 1단계 칸으로 돌려보낸다.
+      const error = toApiError(caught);
+      setFormError({ field: error.field, message: error.message });
+      if (['companyCode', 'email', 'password'].includes(error.field)) setMemberStep(1);
+      setSubmitting(false);
+      return;
+    }
+
+    try {
+      await authApi.updateMe({ location: workLocation, role: jobRole });
+    } catch (caught) {
+      // 계정은 이미 만들어졌다. 설정만 실패했으므로 알리고 그대로 진행한다.
+      // 홈의 설정 모달에서 다시 고칠 수 있다.
+      showError(caught);
+    }
+
+    try {
+      await completeAuth();
+    } catch (caught) {
+      showError(caught);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const submitLabel = (() => {
+    if (submitting) return '처리 중…';
     if (mode === 'login') return t.submitLogin;
     if (role === 'owner') return t.submitOwner;
     return memberStep === 1 ? t.submitMember : t.submitSetup;
@@ -106,6 +193,10 @@ export default function LoginPage() {
       lang={lang}
       onLangChange={setLang}
     >
+      {/* 세션이 끊겨 되돌아온 경우 그 이유를 반드시 보여 준다. */}
+      {sessionNotice && <Notice $tone={sessionNotice.tone}>{sessionNotice.text}</Notice>}
+      {bannerError && <Notice $tone="error">{bannerError}</Notice>}
+
       <ModeToggle
         value={mode}
         onChange={handleModeChange}
@@ -127,31 +218,40 @@ export default function LoginPage() {
       )}
 
       {mode === 'signup' && role === 'owner' && (
-        <OwnerSignupForm
-          name={name}
-          setName={setName}
-          email={email}
-          setEmail={setEmail}
-          password={password}
-          setPassword={setPassword}
-          companyName={companyName}
-          setCompanyName={setCompanyName}
-          t={t}
-        />
+        <>
+          <OwnerSignupForm
+            name={name}
+            setName={setName}
+            email={email}
+            setEmail={setEmail}
+            password={password}
+            setPassword={setPassword}
+            companyName={companyName}
+            setCompanyName={setCompanyName}
+            t={t}
+          />
+          {fieldError('email') && <FieldError>{fieldError('email')}</FieldError>}
+          {fieldError('password') && <FieldError>{fieldError('password')}</FieldError>}
+        </>
       )}
 
       {mode === 'signup' && role === 'member' && memberStep === 1 && (
-        <MemberSignupForm
-          name={name}
-          setName={setName}
-          email={email}
-          setEmail={setEmail}
-          password={password}
-          setPassword={setPassword}
-          inviteCode={inviteCode}
-          setInviteCode={setInviteCode}
-          t={t}
-        />
+        <>
+          <MemberSignupForm
+            name={name}
+            setName={setName}
+            email={email}
+            setEmail={setEmail}
+            password={password}
+            setPassword={setPassword}
+            inviteCode={inviteCode}
+            setInviteCode={setInviteCode}
+            t={t}
+          />
+          {fieldError('email') && <FieldError>{fieldError('email')}</FieldError>}
+          {fieldError('password') && <FieldError>{fieldError('password')}</FieldError>}
+          {fieldError('companyCode') && <FieldError>{fieldError('companyCode')}</FieldError>}
+        </>
       )}
 
       {mode === 'signup' && role === 'member' && memberStep === 2 && (
@@ -187,7 +287,9 @@ export default function LoginPage() {
         </>
       )}
 
-      <StartButton onClick={handleSubmit}>{submitLabel}</StartButton>
+      <StartButton onClick={handleSubmit} disabled={submitting}>
+        {submitLabel}
+      </StartButton>
     </AuthLayout>
   );
 }
