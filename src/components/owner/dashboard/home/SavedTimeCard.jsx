@@ -76,14 +76,26 @@ function SavedTimeCard({ value, delta }) {
 
       <GraphWrap>
         <GraphBox>
-          <svg width="286" height="53" viewBox="0 0 286 53" fill="none" style={{ position: 'absolute', top: 0, left: 0 }}>
+          <svg
+            width="286"
+            height="53"
+            viewBox="0 0 286 53"
+            fill="none"
+            style={{ position: 'absolute', top: 0, left: 0 }}
+          >
             <path
               d="M0 26.5L57.1667 20.7L114.333 15.7L171.5 10.8L228.667 9.1L285.833 0V52.2H0V26.5Z"
               fill="#8FD3A8"
               fillOpacity="0.16"
             />
           </svg>
-          <svg width="286" height="29" viewBox="0 0 286 29" fill="none" style={{ position: 'absolute', top: 0, left: 0 }}>
+          <svg
+            width="286"
+            height="29"
+            viewBox="0 0 286 29"
+            fill="none"
+            style={{ position: 'absolute', top: 0, left: 0 }}
+          >
             <path
               d="M0 27.5001L57.1667 21.7001L114.333 16.7001L171.5 11.8001L228.667 10.1001L285.833 1.00012"
               stroke="#4CB77A"

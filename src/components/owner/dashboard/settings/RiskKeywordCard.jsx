@@ -168,7 +168,11 @@ function RiskKeywordCard({ keywords, onAddKeyword, onRemoveKeyword }) {
               <LevelBadge $bg={meta.bg} $color={meta.color}>
                 {meta.label}
               </LevelBadge>
-              <RemoveButton type="button" onClick={() => onRemoveKeyword(keyword.id)} aria-label={`${keyword.label} 삭제`}>
+              <RemoveButton
+                type="button"
+                onClick={() => onRemoveKeyword(keyword.id)}
+                aria-label={`${keyword.label} 삭제`}
+              >
                 ✕
               </RemoveButton>
             </KeywordChip>

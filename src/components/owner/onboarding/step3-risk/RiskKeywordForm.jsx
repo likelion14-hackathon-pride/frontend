@@ -348,7 +348,9 @@ function RiskKeywordForm({ onAddKeyword, showSuggestions = true }) {
                 <SuggestLabel>추천</SuggestLabel>
               </SuggestLabelWrap>
               <SuggestHintWrap>
-                <SuggestHint>다른 팀이 자주 등록하는 단어입니다 · 누르면 바로 추가됩니다</SuggestHint>
+                <SuggestHint>
+                  다른 팀이 자주 등록하는 단어입니다 · 누르면 바로 추가됩니다
+                </SuggestHint>
               </SuggestHintWrap>
             </SuggestRow>
             <ChipRow>

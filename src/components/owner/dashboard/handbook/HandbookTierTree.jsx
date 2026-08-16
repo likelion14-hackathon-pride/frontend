@@ -187,7 +187,9 @@ const ItemButton = styled.button`
 
   border: 0.667px solid ${({ $active }) => ($active ? '#C9DAFB' : '#EFEFF1')};
   background: ${({ $active }) => ($active ? '#F5F8FF' : '#FFFFFF')};
-  box-shadow: 0 3px 8px -2px rgba(23, 44, 90, 0.08), 0 14px 34px -14px rgba(23, 44, 90, 0.22);
+  box-shadow:
+    0 3px 8px -2px rgba(23, 44, 90, 0.08),
+    0 14px 34px -14px rgba(23, 44, 90, 0.22);
 
   &:hover {
     background: ${({ $active }) => ($active ? '#F5F8FF' : '#FAFAFB')};
@@ -299,7 +301,9 @@ function HandbookTierTree({ activeTier, items, selectedItemId, onSelect, project
             </BandIconBox>
             <BandTextStack>
               <BandTitle>프로젝트 지식</BandTitle>
-              <BandDescription>프로젝트마다 다른 하위 계층. 다른 프로젝트의 규칙은 근거로 쓰이지 않습니다</BandDescription>
+              <BandDescription>
+                프로젝트마다 다른 하위 계층. 다른 프로젝트의 규칙은 근거로 쓰이지 않습니다
+              </BandDescription>
             </BandTextStack>
             <BandCount>{projectItems.length}개 항목</BandCount>
           </Band>

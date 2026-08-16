@@ -41,6 +41,7 @@ const Grid = styled.div`
   gap: 12px;
   align-items: start;
   overflow-x: auto;
+  padding: 4px 4px 30px;
 `;
 
 export default function TaskBoard({

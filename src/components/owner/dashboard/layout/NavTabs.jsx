@@ -59,7 +59,12 @@ function NavTabs({ activeTab, onChange }) {
   return (
     <Track>
       {OWNER_TABS.map((tab) => (
-        <Tab key={tab.key} type="button" $active={activeTab === tab.key} onClick={() => onChange(tab.key)}>
+        <Tab
+          key={tab.key}
+          type="button"
+          $active={activeTab === tab.key}
+          onClick={() => onChange(tab.key)}
+        >
           {tab.label}
         </Tab>
       ))}

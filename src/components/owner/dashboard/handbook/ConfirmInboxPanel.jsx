@@ -238,7 +238,9 @@ function ConfirmInboxPanel({ items, onConfirm, onConfirmAll, onClose }) {
     <Panel>
       <HeadRow>
         <WaitingTag>확인 대기</WaitingTag>
-        <Description>소스에서 추출됐지만 대표 확인을 거치지 않은 항목입니다. 확인하면 핸드북 목록에 나타납니다.</Description>
+        <Description>
+          소스에서 추출됐지만 대표 확인을 거치지 않은 항목입니다. 확인하면 핸드북 목록에 나타납니다.
+        </Description>
         <AllConfirmButton type="button" onClick={onConfirmAll} disabled={items.length === 0}>
           전체 확인
         </AllConfirmButton>
@@ -262,7 +264,9 @@ function ConfirmInboxPanel({ items, onConfirm, onConfirmAll, onClose }) {
                   {getGroupLabel(item.groupKey)} · {item.sourceLabel}
                 </SourceText>
               </TextGroup>
-              <StatusBadge $variant={item.status}>{item.status === 'empty' ? '빈칸' : '미확인'}</StatusBadge>
+              <StatusBadge $variant={item.status}>
+                {item.status === 'empty' ? '빈칸' : '미확인'}
+              </StatusBadge>
               <ConfirmButton type="button" onClick={() => onConfirm(item.id)}>
                 확인
               </ConfirmButton>

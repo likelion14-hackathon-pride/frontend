@@ -1,8 +1,28 @@
 export const COMPANY_GROUPS = [
-  { key: 'company-values', label: 'COMPANY', description: '가치 · 미션 · 커뮤니케이션 · 핸드북 운영', dotColor: '#1D4ED8' },
-  { key: 'people-group', label: 'PEOPLE GROUP', description: '인사 · 채용 · 다양성 · 보상 · 학습', dotColor: '#1D4ED8' },
-  { key: 'product-eng', label: 'PRODUCT / ENGINEERING', description: '제품 원칙 · 개발 운영 · 고객지원 · 오픈소스', dotColor: '#1D4ED8' },
-  { key: 'security', label: 'SECURITY', description: '보안 표준 · 제품 보안 · 보안 운영 · 위협 관리', dotColor: '#1D4ED8' },
+  {
+    key: 'company-values',
+    label: 'COMPANY',
+    description: '가치 · 미션 · 커뮤니케이션 · 핸드북 운영',
+    dotColor: '#1D4ED8',
+  },
+  {
+    key: 'people-group',
+    label: 'PEOPLE GROUP',
+    description: '인사 · 채용 · 다양성 · 보상 · 학습',
+    dotColor: '#1D4ED8',
+  },
+  {
+    key: 'product-eng',
+    label: 'PRODUCT / ENGINEERING',
+    description: '제품 원칙 · 개발 운영 · 고객지원 · 오픈소스',
+    dotColor: '#1D4ED8',
+  },
+  {
+    key: 'security',
+    label: 'SECURITY',
+    description: '보안 표준 · 제품 보안 · 보안 운영 · 위협 관리',
+    dotColor: '#1D4ED8',
+  },
 ];
 
 export const CATEGORY_OPTIONS = [

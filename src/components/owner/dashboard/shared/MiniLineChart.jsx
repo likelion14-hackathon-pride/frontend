@@ -1,4 +1,10 @@
-function MiniLineChart({ values, width = 140, height = 36, color = '#2563eb', fill = 'rgba(37, 99, 235, 0.14)' }) {
+function MiniLineChart({
+  values,
+  width = 140,
+  height = 36,
+  color = '#2563eb',
+  fill = 'rgba(37, 99, 235, 0.14)',
+}) {
   const max = Math.max(...values, 1);
   const min = Math.min(...values, 0);
   const range = max - min || 1;
@@ -16,8 +22,19 @@ function MiniLineChart({ values, width = 140, height = 36, color = '#2563eb', fi
   return (
     <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} fill="none">
       <path d={areaPath} fill={fill} />
-      <path d={linePath} stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx={points[points.length - 1][0]} cy={points[points.length - 1][1]} r={3} fill={color} />
+      <path
+        d={linePath}
+        stroke={color}
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle
+        cx={points[points.length - 1][0]}
+        cy={points[points.length - 1][1]}
+        r={3}
+        fill={color}
+      />
     </svg>
   );
 }

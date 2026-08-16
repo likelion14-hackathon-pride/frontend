@@ -54,7 +54,14 @@ const Footnote = styled.span`
   line-height: 127%;
 `;
 
-function QuestionStatCards({ waitingCount, waitingFootnote, approvalCount, approvalFootnote, weeklySaved, weeklySavedFootnote }) {
+function QuestionStatCards({
+  waitingCount,
+  waitingFootnote,
+  approvalCount,
+  approvalFootnote,
+  weeklySaved,
+  weeklySavedFootnote,
+}) {
   return (
     <Grid>
       <Card>

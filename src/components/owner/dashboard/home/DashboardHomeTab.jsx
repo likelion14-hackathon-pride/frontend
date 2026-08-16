@@ -65,9 +65,7 @@ function DashboardHomeTab({ ownerName = '김대표' }) {
         <Heading>안녕하세요, {ownerName}님</Heading>
         <Subheading>
           이번 주 질문 {STAT_SUMMARY.totalQuestions}건 중{' '}
-          <SubheadingStrong>
-            {STAT_SUMMARY.aiAnsweredCount}건은 SAI가 답했습니다
-          </SubheadingStrong>
+          <SubheadingStrong>{STAT_SUMMARY.aiAnsweredCount}건은 SAI가 답했습니다</SubheadingStrong>
         </Subheading>
       </HeaderTextGroup>
 

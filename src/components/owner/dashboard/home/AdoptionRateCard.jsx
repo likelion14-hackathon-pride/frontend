@@ -82,7 +82,14 @@ function AdoptionRateCard({ value, delta, aiCount, ownerCount }) {
   return (
     <StatCardShell title="SAI 해결">
       <GraphContainer>
-        <DonutGauge value={value} size={130} stroke={11.818} trackColor="#EFEFF1" progressColor="#2563EB" rounded>
+        <DonutGauge
+          value={value}
+          size={130}
+          stroke={11.818}
+          trackColor="#EFEFF1"
+          progressColor="#2563EB"
+          rounded
+        >
           <CenterLabel>
             <ValueText>{value}%</ValueText>
             <DeltaText>{delta}</DeltaText>
