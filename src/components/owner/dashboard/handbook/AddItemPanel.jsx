@@ -3,46 +3,85 @@ import styled from 'styled-components';
 import { CATEGORY_OPTIONS } from './handbookTabData';
 
 const Panel = styled.div`
+  box-sizing: border-box;
   display: flex;
+  width: 100%;
+  padding: 16.667px 8.667px 17px 16.667px;
   flex-direction: column;
-  gap: 14px;
-  padding: 18px;
-  border-radius: 18px;
-  border: 1px solid #dbe4fc;
-  background: #f5f8ff;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 12px;
+  flex-shrink: 0;
+  border-radius: 16px;
+  border: 0.667px solid #efeff1;
+  background: #fafafb;
 `;
 
 const HeadRow = styled.div`
   display: flex;
+  width: 100%;
   align-items: center;
-  justify-content: space-between;
+  gap: 12px;
+  flex-shrink: 0;
 `;
 
 const Badge = styled.span`
-  padding: 4px 10px;
-  border-radius: 999px;
+  display: inline-flex;
+  flex-shrink: 0;
+  padding: 5.667px 15.74px 5.333px 11px;
+  align-items: center;
+  border-radius: 8px;
   background: #17171b;
   color: #fff;
-  font-family: Pretendard;
+  font-family: 'Plus Jakarta Sans';
   font-size: 10.5px;
+  font-style: normal;
   font-weight: 700;
+  line-height: 121%;
+  white-space: nowrap;
+`;
+
+const HeadDescription = styled.span`
+  flex: 1 0 0;
+  min-width: 0;
+  color: #a0a0a8;
+  font-family: 'Plus Jakarta Sans';
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 127%;
 `;
 
 const CloseButton = styled.button`
-  width: 22px;
-  height: 22px;
-  border-radius: 999px;
-  border: 1px solid #dbe4fc;
+  display: flex;
+  width: 26px;
+  height: 26px;
+  padding: 1.667px 6.667px;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  border-radius: 8px;
+  border: 0.667px solid #e6e6eb;
   background: #fff;
-  color: #6b6b73;
   cursor: pointer;
+  color: #a0a0a8;
+  text-align: center;
+  font-family: 'Plus Jakarta Sans';
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 13px;
 `;
 
 const SectionLabel = styled.span`
-  font-family: Pretendard;
-  font-size: 10.5px;
-  font-weight: 700;
   color: #a0a0a8;
+  font-family: 'IBM Plex Mono';
+  font-size: 10.5px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
 `;
 
 const ChipRow = styled.div`
@@ -53,39 +92,69 @@ const ChipRow = styled.div`
 `;
 
 const Chip = styled.button`
-  padding: 7px 14px;
-  border-radius: 999px;
-  border: 1px solid ${({ $active }) => ($active ? 'transparent' : '#dbe4fc')};
-  background: ${({ $active }) => ($active ? '#2563eb' : '#ffffff')};
-  color: ${({ $active }) => ($active ? '#ffffff' : '#17171b')};
+  box-sizing: border-box;
+  display: flex;
+  height: 30px;
+  padding: 7.667px 12.667px;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  border-radius: 9px;
   cursor: pointer;
-  white-space: pre-line;
+  white-space: nowrap;
   text-align: center;
-  font-family: Pretendard;
-  font-size: 11.5px;
+  font-family: 'Plus Jakarta Sans';
+  font-size: 11px;
+  font-style: normal;
   font-weight: 700;
-  line-height: 1.3;
+  line-height: 127%;
+
+  border: 0.667px solid ${({ $active }) => ($active ? '#2563EB' : '#E6E6EB')};
+  background: ${({ $active }) => ($active ? '#2563EB' : '#FFFFFF')};
+  color: ${({ $active }) => ($active ? '#FFFFFF' : '#6B6B73')};
 `;
 
-const AddProjectChip = styled(Chip)`
-  border-style: dashed;
-  background: #ffffff;
+const AddProjectChip = styled.button`
+  box-sizing: border-box;
+  display: flex;
+  width: 107.292px;
+  height: 30px;
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  border-radius: 9px;
+  border: 0.667px dashed #c9cad2;
+  background: #fff;
+  cursor: pointer;
+`;
+
+const AddProjectLabel = styled.span`
+  width: 81.958px;
   color: #6b6b73;
+  text-align: center;
+  font-family: 'Plus Jakarta Sans';
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 127%;
 `;
 
 const NewProjectInputRow = styled.div`
   display: flex;
+  width: 100%;
   align-items: center;
   gap: 8px;
 `;
 
 const NewProjectInput = styled.input`
   flex: 1 0 0;
-  height: 34px;
+  height: 30px;
   padding: 0 12px;
-  border-radius: 10px;
-  border: 1px solid #dbe4fc;
-  font-family: Pretendard;
+  border-radius: 9px;
+  border: 0.667px solid #e6e6eb;
+  background: #fff;
+  font-family: 'Plus Jakarta Sans';
   font-size: 12px;
   outline: none;
 
@@ -95,12 +164,12 @@ const NewProjectInput = styled.input`
 `;
 
 const SmallButton = styled.button`
-  height: 34px;
+  height: 30px;
   padding: 0 14px;
-  border-radius: 10px;
+  border-radius: 9px;
   border: none;
   cursor: pointer;
-  font-family: Pretendard;
+  font-family: 'Plus Jakarta Sans';
   font-size: 11.5px;
   font-weight: 700;
   background: ${({ $primary }) => ($primary ? '#2563eb' : '#f0f0f2')};
@@ -109,11 +178,13 @@ const SmallButton = styled.button`
 
 const RuleTextarea = styled.textarea`
   resize: none;
-  min-height: 56px;
+  min-height: 90px;
+  width: 100%;
   padding: 12px 14px;
   border-radius: 12px;
-  border: 1px solid #dbe4fc;
-  font-family: Pretendard;
+  border: 0.667px solid #e6e6eb;
+  background: #fff;
+  font-family: 'Plus Jakarta Sans';
   font-size: 12.5px;
   color: #17171b;
   outline: none;
@@ -128,28 +199,37 @@ const RuleTextarea = styled.textarea`
 `;
 
 const HintText = styled.span`
-  font-family: Pretendard;
+  font-family: 'Plus Jakarta Sans';
   font-size: 10.5px;
   color: #a0a0a8;
 `;
 
 const FooterRow = styled.div`
   display: flex;
+  width: 100%;
   align-items: center;
   justify-content: space-between;
 `;
 
 const SaveButton = styled.button`
+  display: flex;
+  min-width: 110.146px;
   height: 36px;
-  padding: 0 20px;
+  padding: 10px 18px;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
   border: none;
-  border-radius: 999px;
-  background: ${({ disabled }) => (disabled ? '#dbe4fc' : '#2563eb')};
-  color: #ffffff;
+  border-radius: 11px;
   cursor: ${({ disabled }) => (disabled ? 'default' : 'pointer')};
-  font-family: Pretendard;
-  font-size: 12.5px;
+  background: ${({ disabled }) => (disabled ? '#E6E6EB' : '#2563EB')};
+  color: ${({ disabled }) => (disabled ? '#B4B4BC' : '#FFFFFF')};
+  text-align: center;
+  font-family: 'Plus Jakarta Sans';
+  font-size: 12px;
+  font-style: normal;
   font-weight: 700;
+  line-height: 128%;
 `;
 
 function AddItemPanel({ projects, onAddProject, onSave, onClose }) {
@@ -183,17 +263,15 @@ function AddItemPanel({ projects, onAddProject, onSave, onClose }) {
     <Panel>
       <HeadRow>
         <Badge>대표 직접 작성</Badge>
+        <HeadDescription>질문을 기다리지 않고 규칙을 바로 등록합니다. 저장 즉시 확인됨 상태가 됩니다.</HeadDescription>
         <CloseButton type="button" onClick={onClose} aria-label="닫기">
           ✕
         </CloseButton>
       </HeadRow>
 
-      <div>
+      <div style={{ width: '100%' }}>
         <SectionLabel>카테고리</SectionLabel>
         <ChipRow style={{ marginTop: 8 }}>
-          <Chip type="button" $active={tier === 'company'} onClick={() => setTier('company')}>
-            회사 규칙
-          </Chip>
           {CATEGORY_OPTIONS.map((cat) => (
             <Chip
               key={cat.key}
@@ -210,7 +288,7 @@ function AddItemPanel({ projects, onAddProject, onSave, onClose }) {
         </ChipRow>
       </div>
 
-      <div>
+      <div style={{ width: '100%' }}>
         <SectionLabel>프로젝트 지식</SectionLabel>
         <ChipRow style={{ marginTop: 8 }}>
           {projects.map((project) => (
@@ -228,7 +306,10 @@ function AddItemPanel({ projects, onAddProject, onSave, onClose }) {
           ))}
           {!showNewProjectInput && (
             <AddProjectChip type="button" onClick={() => setShowNewProjectInput(true)}>
-              + 프로젝트 추가
+              <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
+                <path d="M4.5 1.125V7.875M1.125 4.5H7.875" stroke="#6B6B73" strokeWidth="1.5" />
+              </svg>
+              <AddProjectLabel>프로젝트 추가</AddProjectLabel>
             </AddProjectChip>
           )}
         </ChipRow>
@@ -251,19 +332,18 @@ function AddItemPanel({ projects, onAddProject, onSave, onClose }) {
         )}
       </div>
 
-      <div>
+      <div style={{ width: '100%' }}>
         <SectionLabel>한 줄 규칙</SectionLabel>
         <RuleTextarea
-          style={{ marginTop: 8, width: '100%' }}
+          style={{ marginTop: 8 }}
           value={ruleText}
           placeholder="예: 연차는 사전 승인 없이도 사용"
           onChange={(e) => setRuleText(e.target.value)}
         />
-        <HintText>원문 그대로 — 대표님 말투로 적어주세요. SAI가 영어 요약을 자동으로 붙입니다.</HintText>
       </div>
 
       <FooterRow>
-        <HintText>저장 즉시 &quot;대표 직접 작성&quot;으로 기록됩니다</HintText>
+        <HintText>출처는 &quot;대표 직접 작성&quot;으로 기록됩니다</HintText>
         <SaveButton type="button" disabled={!canSave} onClick={handleSave}>
           핸드북에 저장
         </SaveButton>

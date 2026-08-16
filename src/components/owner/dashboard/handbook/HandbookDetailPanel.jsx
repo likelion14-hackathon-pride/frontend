@@ -3,95 +3,125 @@ import styled from 'styled-components';
 import { getGroupLabel } from './handbookTabData';
 
 const Panel = styled.div`
+  box-sizing: border-box;
   display: flex;
+  width: 100%;
+  padding: 22.667px;
   flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
   gap: 16px;
-  padding: 20px;
-  border-radius: 18px;
-  border: 1px solid #efeff1;
-  background: #ffffff;
-  min-height: 220px;
+  flex-shrink: 0;
+  border-radius: 22px;
+  border: 0.667px solid #efeff1;
+  background: #fff;
+  box-shadow:
+    0 3px 8px -2px rgba(23, 44, 90, 0.08),
+    0 14px 34px -14px rgba(23, 44, 90, 0.22);
+  min-height: 260px;
 `;
 
 const TagRow = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
 `;
 
-const TierTag = styled.span`
-  padding: 4px 10px;
-  border-radius: 8px;
-  background: ${({ $tier }) => ($tier === 'company' ? '#17171b' : '#2563eb')};
+const TierPill = styled.span`
+  display: flex;
+  height: 21.333px;
+  padding: 4px 11.781px 4.333px 9px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 7px;
+  background: #17171b;
   color: #fff;
-  font-family: Pretendard;
-  font-size: 10.5px;
+  font-family: 'Plus Jakarta Sans';
+  font-size: 10px;
+  font-style: normal;
   font-weight: 700;
+  line-height: 127%;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
 `;
 
-const GroupTag = styled.span`
-  padding: 4px 10px;
-  border-radius: 8px;
-  background: #f0f0f2;
-  color: #6b6b73;
-  font-family: Pretendard;
-  font-size: 10.5px;
-  font-weight: 700;
+const GroupText = styled.span`
+  color: #3c3c44;
+  font-family: 'IBM Plex Mono';
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 133%;
+  white-space: nowrap;
 `;
 
-const Day0Tag = styled.span`
-  padding: 4px 10px;
-  border-radius: 8px;
-  background: #eaf1fe;
-  color: #1d4ed8;
-  font-family: Pretendard;
-  font-size: 10.5px;
-  font-weight: 700;
+const Day0Text = styled.span`
+  color: #a0a0a8;
+  font-family: 'IBM Plex Mono';
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 133%;
+  white-space: nowrap;
 `;
 
 const TitleText = styled.h3`
   margin: 0;
-  font-family: Pretendard;
-  font-size: 19px;
-  font-weight: 800;
   color: #17171b;
-  letter-spacing: -0.4px;
+  font-family: 'Plus Jakarta Sans';
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 26px;
+  letter-spacing: -0.5px;
 `;
 
 const Box = styled.div`
+  box-sizing: border-box;
   display: flex;
+  width: 100%;
+  padding: 16.667px 8.667px 14.26px 16.667px;
   flex-direction: column;
-  gap: 6px;
-  padding: 14px 16px;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 10.333px;
+  flex-shrink: 0;
   border-radius: 14px;
-  background: ${({ $tone }) => ($tone === 'en' ? '#f5f8ff' : '#f7f8fc')};
-  border: 1px solid ${({ $tone }) => ($tone === 'en' ? '#dbe4fc' : '#f0f0f2')};
+  background: #fafafb;
+  border: ${({ $dashed }) => ($dashed ? '0.667px dashed #E6E6EB' : '0.667px solid #EFEFF1')};
 `;
 
 const BoxLabel = styled.span`
-  font-family: 'IBM Plex Mono';
+  color: ${({ $tone }) => ($tone === 'en' ? '#2563EB' : '#A0A0A8')};
+  font-family: 'Plus Jakarta Sans';
   font-size: 10px;
+  font-style: normal;
   font-weight: 700;
-  letter-spacing: 0.4px;
-  color: ${({ $tone }) => ($tone === 'en' ? '#1d4ed8' : '#a0a0a8')};
+  line-height: 127%;
+  letter-spacing: 0.8px;
 `;
 
 const BoxText = styled.p`
   margin: 0;
-  font-family: Pretendard;
-  font-size: 13px;
-  line-height: 1.5;
-  color: #17171b;
+  color: ${({ $tone }) => ($tone === 'en' ? '#3A3A42' : '#6B6B73')};
+  font-family: 'Plus Jakarta Sans';
+  font-size: 13.5px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 21.6px;
 `;
 
 const EditTextarea = styled.textarea`
   resize: none;
   min-height: 60px;
+  width: 100%;
   padding: 10px 12px;
   border-radius: 10px;
   border: 1px solid #dbe4fc;
-  font-family: Pretendard;
-  font-size: 13px;
+  font-family: 'Plus Jakarta Sans';
+  font-size: 14px;
   outline: none;
 
   &:focus {
@@ -102,45 +132,60 @@ const EditTextarea = styled.textarea`
 const ButtonRow = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 8px;
+  flex-shrink: 0;
   margin-top: auto;
 `;
 
-const ActionGroup = styled.div`
+const OpenSourceButton = styled.button`
   display: flex;
-  gap: 8px;
-`;
-
-const GhostButton = styled.button`
-  height: 34px;
-  padding: 0 16px;
-  border-radius: 999px;
-  border: 1px solid #efeff1;
-  background: #ffffff;
-  color: #17171b;
-  cursor: pointer;
-  font-family: Pretendard;
-  font-size: 12px;
-  font-weight: 700;
-`;
-
-const PrimaryButton = styled.button`
-  height: 34px;
-  padding: 0 16px;
-  border-radius: 999px;
+  height: 36.667px;
+  padding: 10px 16px;
+  justify-content: center;
+  align-items: center;
   border: none;
+  border-radius: 11px;
   background: #17171b;
-  color: #ffffff;
   cursor: pointer;
-  font-family: Pretendard;
-  font-size: 12px;
+  color: #fff;
+  text-align: center;
+  font-family: 'Plus Jakarta Sans';
+  font-size: 12.5px;
+  font-style: normal;
   font-weight: 700;
+  line-height: 123%;
+  white-space: nowrap;
+`;
+
+const EditButton = styled.button`
+  display: flex;
+  height: 36.667px;
+  padding: 10px 16px;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  border-radius: 11px;
+  background: #f4f4f6;
+  cursor: pointer;
+  color: #3c3c44;
+  text-align: center;
+  font-family: 'Plus Jakarta Sans';
+  font-size: 12.5px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 123%;
+  white-space: nowrap;
 `;
 
 const TimestampText = styled.span`
-  font-family: Pretendard;
-  font-size: 10.5px;
+  margin-left: auto;
   color: #a0a0a8;
+  font-family: 'Plus Jakarta Sans';
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 127%;
+  white-space: nowrap;
 `;
 
 const EmptyPanel = styled.div`
@@ -149,9 +194,10 @@ const EmptyPanel = styled.div`
   align-items: center;
   justify-content: center;
   color: #a0a0a8;
-  font-family: Pretendard;
+  font-family: 'Plus Jakarta Sans';
   font-size: 12.5px;
   text-align: center;
+  width: 100%;
 `;
 
 function HandbookDetailPanel({ item, onSave }) {
@@ -179,9 +225,9 @@ function HandbookDetailPanel({ item, onSave }) {
   return (
     <Panel>
       <TagRow>
-        <TierTag $tier={item.tier}>{item.tier === 'company' ? '회사 규칙' : '프로젝트 지식'}</TierTag>
-        <GroupTag>{getGroupLabel(item.groupKey)}</GroupTag>
-        {item.day0 && <Day0Tag>Day 0 기본 규칙</Day0Tag>}
+        <TierPill>{item.tier === 'company' ? '회사 규칙' : '프로젝트 지식'}</TierPill>
+        <GroupText>{getGroupLabel(item.groupKey)}</GroupText>
+        {item.day0 && <Day0Text>Day 0 기본 규칙</Day0Text>}
       </TagRow>
 
       {editing ? (
@@ -191,37 +237,30 @@ function HandbookDetailPanel({ item, onSave }) {
       )}
 
       {item.enText && (
-        <Box $tone="en">
+        <Box $dashed={false}>
           <BoxLabel $tone="en">EN · 팀원 표시 언어</BoxLabel>
-          <BoxText>{item.enText}</BoxText>
+          <BoxText $tone="en">{item.enText}</BoxText>
         </Box>
       )}
 
       {item.koSource && (
-        <Box>
+        <Box $dashed>
           <BoxLabel>KO · 출처 원문</BoxLabel>
           <BoxText>{item.koSource}</BoxText>
         </Box>
       )}
 
       <ButtonRow>
-        <ActionGroup>
-          <GhostButton type="button">원문 열기</GhostButton>
-          {editing ? (
-            <>
-              <PrimaryButton type="button" onClick={handleSave}>
-                수정 후 저장
-              </PrimaryButton>
-              <GhostButton type="button" onClick={() => setEditing(false)}>
-                되돌리기
-              </GhostButton>
-            </>
-          ) : (
-            <GhostButton type="button" onClick={startEdit}>
-              수정
-            </GhostButton>
-          )}
-        </ActionGroup>
+        <OpenSourceButton type="button">원문 열기</OpenSourceButton>
+        {editing ? (
+          <EditButton type="button" onClick={handleSave}>
+            수정 후 저장
+          </EditButton>
+        ) : (
+          <EditButton type="button" onClick={startEdit}>
+            수정
+          </EditButton>
+        )}
         <TimestampText>{item.lastConfirmed ? `최근 확인 ${item.lastConfirmed}` : '확인 이력 없음'}</TimestampText>
       </ButtonRow>
     </Panel>

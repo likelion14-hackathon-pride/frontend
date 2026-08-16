@@ -9,55 +9,44 @@ import { INITIAL_HANDBOOK_ITEMS, INITIAL_PROJECTS } from './handbookTabData';
 
 const TabContent = styled.div`
   display: flex;
+  width: 100%;
   flex-direction: column;
-  gap: 16px;
-  align-self: stretch;
-`;
-
-const Heading = styled.h1`
-  margin: 0;
-  font-family: Pretendard;
-  font-size: 26px;
-  font-weight: 800;
-  color: #17171b;
-  letter-spacing: -0.6px;
-`;
-
-const Subheading = styled.p`
-  margin: 6px 0 0;
-  font-family: Pretendard;
-  font-size: 13px;
-  color: #6b6b73;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 18px;
 `;
 
 const Body = styled.div`
   display: flex;
+  width: 100%;
   align-items: flex-start;
-  gap: 18px;
-  align-self: stretch;
+  gap: 16px;
 `;
 
 const LeftColumn = styled.div`
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  align-items: flex-start;
+  gap: 12px;
   flex: 1 0 0;
   min-width: 0;
+  padding: 14.667px 14.667px 22.667px 14.667px;
+  border-radius: 22px;
+  border: 0.667px solid #efeff1;
+  background: #fff;
+  box-shadow:
+    0 3px 8px -2px rgba(23, 44, 90, 0.08),
+    0 14px 34px -14px rgba(23, 44, 90, 0.22);
 `;
 
 const RightColumn = styled.div`
   display: flex;
   flex-direction: column;
-  width: 340px;
+  width: 554.615px;
   flex-shrink: 0;
   position: sticky;
   top: 16px;
-`;
-
-const TreeScroll = styled.div`
-  max-height: 560px;
-  overflow-y: auto;
-  padding-right: 4px;
 `;
 
 function HandbookTab() {
@@ -66,9 +55,9 @@ function HandbookTab() {
   const [activeTier, setActiveTier] = useState('all');
   const [selectedItemId, setSelectedItemId] = useState(INITIAL_HANDBOOK_ITEMS[0]?.id ?? null);
   const [addPanelOpen, setAddPanelOpen] = useState(false);
+  const [archiveOpen, setArchiveOpen] = useState(false);
 
   const waitingItems = items.filter((item) => item.status !== 'confirmed');
-  const confirmedCount = items.length - waitingItems.length;
   const selectedItem = items.find((item) => item.id === selectedItemId) ?? null;
 
   const handleConfirm = (id) => {
@@ -110,18 +99,13 @@ function HandbookTab() {
 
   return (
     <TabContent>
-      <div>
-        <Heading>핸드북</Heading>
-        <Subheading>확인된 항목만 보관함에 쌓입니다. 확인 전 항목은 대시보드에서 언제든 확인할 수 있습니다</Subheading>
-      </div>
-
       <HandbookHeaderControls
         activeTier={activeTier}
         onTierChange={setActiveTier}
         waitingCount={waitingItems.length}
-        confirmedCount={confirmedCount}
-        addPanelOpen={addPanelOpen}
-        onToggleAddPanel={() => setAddPanelOpen((prev) => !prev)}
+        archiveOpen={archiveOpen}
+        onToggleArchive={() => setArchiveOpen((prev) => !prev)}
+        onOpenAddPanel={() => setAddPanelOpen(true)}
       />
 
       {addPanelOpen && (
@@ -133,21 +117,24 @@ function HandbookTab() {
         />
       )}
 
-      {waitingItems.length > 0 && (
-        <ConfirmInboxPanel items={waitingItems} onConfirm={handleConfirm} onConfirmAll={handleConfirmAll} />
+      {archiveOpen && (
+        <ConfirmInboxPanel
+          items={waitingItems}
+          onConfirm={handleConfirm}
+          onConfirmAll={handleConfirmAll}
+          onClose={() => setArchiveOpen(false)}
+        />
       )}
 
       <Body>
         <LeftColumn>
-          <TreeScroll>
-            <HandbookTierTree
-              activeTier={activeTier}
-              items={items}
-              selectedItemId={selectedItemId}
-              onSelect={setSelectedItemId}
-              projects={projects}
-            />
-          </TreeScroll>
+          <HandbookTierTree
+            activeTier={activeTier}
+            items={items}
+            selectedItemId={selectedItemId}
+            onSelect={setSelectedItemId}
+            projects={projects}
+          />
         </LeftColumn>
         <RightColumn>
           <HandbookDetailPanel item={selectedItem} onSave={handleUpdateItemText} />
