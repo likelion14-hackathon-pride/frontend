@@ -121,7 +121,7 @@ const Content = styled.div`
 
 export default function MemberShell({ screenTitle, children }) {
   const [isTzOpen, setIsTzOpen] = useState(false);
-  const { profile } = useMemberNavigation();
+  const { profile, goToTasks } = useMemberNavigation();
 
   return (
     <Page>
@@ -149,7 +149,15 @@ export default function MemberShell({ screenTitle, children }) {
           <Content>{children}</Content>
         </Main>
 
-        {isTzOpen && <TimingModal onClose={() => setIsTzOpen(false)} />}
+        {isTzOpen && (
+          <TimingModal
+            onClose={() => setIsTzOpen(false)}
+            onGoTaskCard={() => {
+              setIsTzOpen(false);
+              goToTasks();
+            }}
+          />
+        )}
       </Shell>
     </Page>
   );

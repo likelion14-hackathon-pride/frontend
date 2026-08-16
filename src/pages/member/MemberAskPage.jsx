@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import MemberShell from '../../components/member/layout/MemberShell';
 import AskEmptyState from '../../components/member/ask/AskEmptyState';
@@ -69,20 +69,38 @@ const EXAMPLE_MESSAGES_BY_SCOPE = {
 export default function MemberAskPage() {
   const [scope, setScope] = useState('payment-api');
   const [messagesByScope, setMessagesByScope] = useState(EXAMPLE_MESSAGES_BY_SCOPE);
-  const { pendingQuestion, clearPendingQuestion } = useMemberNavigation();
+  const { pendingQuestion, pendingQuestionTaskId, clearPendingQuestion } = useMemberNavigation();
+  const handledQuestionRef = useRef(null);
 
   const messages = messagesByScope[scope] ?? [];
 
-  function handleSend(text) {
+  function handleSend(text, relatedTaskId) {
     setMessagesByScope((prev) => ({
       ...prev,
       [scope]: [...(prev[scope] ?? []), { role: 'user', body: text }],
     }));
+
+    // task의 "Ask SAI"에서 온 질문은 핸드북에 없다고 가정하고 한국어 초안으로 응답 (프로토타입 목업)
+    if (relatedTaskId) {
+      const aiReply = {
+        role: 'ai',
+        body: "This isn't covered in the handbook yet. Here's a Korean draft to send to 김대표.",
+        sources: [],
+        enSummary: text,
+        draftKr: `대표님, "${text}"에 대해 확인 부탁드립니다.`,
+        relatedTaskId,
+      };
+      setMessagesByScope((prev) => ({
+        ...prev,
+        [scope]: [...(prev[scope] ?? []), aiReply],
+      }));
+    }
   }
 
   useEffect(() => {
-    if (pendingQuestion) {
-      handleSend(pendingQuestion);
+    if (pendingQuestion && handledQuestionRef.current !== pendingQuestion) {
+      handledQuestionRef.current = pendingQuestion;
+      handleSend(pendingQuestion, pendingQuestionTaskId);
       clearPendingQuestion();
     }
   }, [pendingQuestion]);

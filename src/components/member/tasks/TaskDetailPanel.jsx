@@ -172,51 +172,6 @@ const MessageBody = styled.div`
   line-height: 1.6;
 `;
 
-const EntryCard = styled.div`
-  background: #fff;
-  border-radius: 18px;
-  box-shadow:
-    0px 1px 20px 0px #0000002e,
-    0 1px 0 rgba(255, 96, 0, 0.04);
-  padding: 18px 20px;
-`;
-
-const EntryTag = styled.span`
-  font-size: 11px;
-  font-weight: 700;
-  color: ${(props) => (props.$theme === 'positive' ? '#4B7950' : '#B67E38')};
-  background: ${(props) => (props.$theme === 'positive' ? '#E6F0E6' : '#F9F1E5')};
-  padding: 3px 8px;
-  border-radius: 5px;
-`;
-
-const EntryProject = styled.span`
-  flex: 1;
-  min-width: 0;
-  font-size: 12px;
-  color: #a0a0a8;
-`;
-
-const EntryTitle = styled.div`
-  font-size: 15px;
-  font-weight: 700;
-  margin-top: 10px;
-  line-height: 1.45;
-`;
-
-const EntryAction = styled.button`
-  width: 100%;
-  margin-top: 12px;
-  font-size: 14px;
-  font-weight: 700;
-  color: #6b6b73;
-  background: #fff;
-  border: 1px solid #eaeaee;
-  padding: 11px;
-  border-radius: 11px;
-  cursor: pointer;
-`;
-
 const MainCard = styled.div`
   background: #ff6000;
   border-radius: 18px;
@@ -609,11 +564,12 @@ export default function TaskDetailPanel({ task, isWide, onToggleWide, onClose, o
 
   if (!task) return null;
 
-  const ctaLabel = CTA_LABEL[task.columnId];
+  const columnId = task.columnId;
+  const ctaLabel = CTA_LABEL[columnId];
 
   function handleAskSend() {
     if (!askDraft.trim()) return;
-    goToAskWithQuestion(askDraft.trim());
+    goToAskWithQuestion(askDraft.trim(), task.id);
   }
 
   return (
@@ -635,136 +591,176 @@ export default function TaskDetailPanel({ task, isWide, onToggleWide, onClose, o
           </NeutralCard>
         )}
 
-        {task.type === 'message' && (
+        {task.isDone ? (
           <>
-            <MessageCard>
-              <KickerRow>
-                <KickerDot $color={task.kickerColor ?? '#8A8A93'} />
-                <Kicker>{task.kicker}</Kicker>
-              </KickerRow>
-              <MessageEn>{task.en}</MessageEn>
-              <MessageBody>{task.body}</MessageBody>
-            </MessageCard>
-
-            <EntryCard>
-              <KickerRow>
-                <EntryTag $theme={task.entryTagTheme ?? 'neutral'}>{task.entryTag}</EntryTag>
-                <EntryProject>{task.entryProject}</EntryProject>
-              </KickerRow>
-              <EntryTitle>{task.entryTitle}</EntryTitle>
-              <EntryAction onClick={task.onToHandbook}>{task.entryAction} →</EntryAction>
-            </EntryCard>
-          </>
-        )}
-
-        {task.type === 'main' && (
-          <>
-            <MainCard>
-              <MainCardTop>
-                <MainCardDot />
-                <MainCardKicker>WHAT YOU NEED TO DO</MainCardKicker>
-                <MainCardWhen>{task.when}</MainCardWhen>
-              </MainCardTop>
-              <MainCardBody>
-                <Purpose>{task.purpose}</Purpose>
-                <MetaRow>
-                  <DeliverableBox>
-                    <MetaLabel>DELIVERABLE</MetaLabel>
-                    <DeliverableValue>{task.output}</DeliverableValue>
-                  </DeliverableBox>
-                  <DueBox>
-                    <DueLabel>DUE</DueLabel>
-                    <DueValue>{task.deadline}</DueValue>
-                  </DueBox>
-                </MetaRow>
-              </MainCardBody>
-            </MainCard>
-
-            {task.steps?.length > 0 && (
-              <StepsCard>
-                <StepsHeader>
-                  <IconBadge>
-                    <img src={bookIcon} alt="" width={15} height={15} />
-                  </IconBadge>
-                  <StepsTitle>Handbook rules for this task</StepsTitle>
-                  <SearchableTag>searchable</SearchableTag>
-                </StepsHeader>
-
-                <StepList>
-                  {task.steps.map((st, i) => (
-                    <StepRow key={i} onClick={st.onClick}>
-                      <StepDot />
-                      <StepTextBlock>
-                        <StepTitle>{st.title}</StepTitle>
-                        <StepSrc>{st.src}</StepSrc>
-                      </StepTextBlock>
-                      <StepArrow>→</StepArrow>
-                    </StepRow>
-                  ))}
-                </StepList>
-              </StepsCard>
+            {task.type === 'message' && (
+              <MessageCard>
+                <KickerRow>
+                  <KickerDot $color={task.kickerColor ?? '#8A8A93'} />
+                  <Kicker>{task.kicker}</Kicker>
+                </KickerRow>
+                <MessageEn>{task.en}</MessageEn>
+                <MessageBody>{task.body}</MessageBody>
+              </MessageCard>
             )}
 
-            <AskCard>
-              {task.resolved && (
-                <ResolvedBanner>
-                  <ResolvedIcon>
-                    <img src={chatBubbleIcon} alt="" width={13} height={13} />
-                  </ResolvedIcon>
-                  <div>
-                    <ResolvedTitle>Nice — you are clear to start.</ResolvedTitle>
-                    <ResolvedDesc>Ask any time — I will handle the Korean.</ResolvedDesc>
-                  </div>
-                </ResolvedBanner>
-              )}
+            {task.type === 'main' && (
+              <MainCard>
+                <MainCardTop>
+                  <MainCardDot />
+                  <MainCardKicker>WHAT YOU NEED TO DO</MainCardKicker>
+                  <MainCardWhen>{task.when}</MainCardWhen>
+                </MainCardTop>
+                <MainCardBody>
+                  <Purpose>{task.purpose}</Purpose>
+                  <MetaRow>
+                    <DeliverableBox>
+                      <MetaLabel>DELIVERABLE</MetaLabel>
+                      <DeliverableValue>{task.output}</DeliverableValue>
+                    </DeliverableBox>
+                    <DueBox>
+                      <DueLabel>DUE</DueLabel>
+                      <DueValue>{task.deadline}</DueValue>
+                    </DueBox>
+                  </MetaRow>
+                </MainCardBody>
+              </MainCard>
+            )}
 
-              <AskHeader>
-                <IconBadge>
-                  <img src={chatBubbleIcon} alt="" width={15} height={15} />
-                </IconBadge>
-                <AskTitle>Unclear? Ask SAI first.</AskTitle>
-              </AskHeader>
-
-              <AskInputRow>
-                <AskInput
-                  value={askDraft}
-                  onChange={(e) => setAskDraft(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleAskSend()}
-                  placeholder="Ask something else…"
-                />
-                <AskButton onClick={handleAskSend}>Ask</AskButton>
-              </AskInputRow>
-            </AskCard>
-          </>
-        )}
-
-        {task.isDone ? (
-          <StatusCard>
-            <DoneRow>
-              <DoneCheck>
-                <svg
-                  width="11"
-                  height="11"
-                  viewBox="0 0 10 10"
-                  fill="none"
-                  stroke="#fff"
-                  strokeWidth="1.9"
-                >
-                  <path d="M2 5.2l2 2L8 3" />
-                </svg>
-              </DoneCheck>
-              <DoneLabel>Done</DoneLabel>
-              <DoneButton onClick={onMoveAction}>{task.undoLabel ?? 'Undo'}</DoneButton>
-            </DoneRow>
-          </StatusCard>
-        ) : (
-          ctaLabel && (
             <StatusCard>
-              <StatusLabel>TASK STATUS</StatusLabel>
-              <StatusButton onClick={onMoveAction}>{ctaLabel}</StatusButton>
-              {task.moveHint && <StatusHint>{task.moveHint}</StatusHint>}
+              <DoneRow>
+                <DoneCheck>
+                  <svg
+                    width="11"
+                    height="11"
+                    viewBox="0 0 10 10"
+                    fill="none"
+                    stroke="#fff"
+                    strokeWidth="1.9"
+                  >
+                    <path d="M2 5.2l2 2L8 3" />
+                  </svg>
+                </DoneCheck>
+                <DoneLabel>Done</DoneLabel>
+                <DoneButton onClick={onMoveAction}>{task.undoLabel ?? 'Reopen'}</DoneButton>
+              </DoneRow>
             </StatusCard>
-          )
+          </>
+        ) : (
+          <>
+            {task.type === 'message' && (
+              <MessageCard>
+                <KickerRow>
+                  <KickerDot $color={task.kickerColor ?? '#8A8A93'} />
+                  <Kicker>{task.kicker}</Kicker>
+                </KickerRow>
+                <MessageEn>{task.en}</MessageEn>
+                <MessageBody>{task.body}</MessageBody>
+              </MessageCard>
+            )}
+
+            {task.type === 'main' && (
+              <>
+                <MainCard>
+                  <MainCardTop>
+                    <MainCardDot />
+                    <MainCardKicker>WHAT YOU NEED TO DO</MainCardKicker>
+                    <MainCardWhen>{task.when}</MainCardWhen>
+                  </MainCardTop>
+                  <MainCardBody>
+                    <Purpose>{task.purpose}</Purpose>
+                    <MetaRow>
+                      <DeliverableBox>
+                        <MetaLabel>DELIVERABLE</MetaLabel>
+                        <DeliverableValue>{task.output}</DeliverableValue>
+                      </DeliverableBox>
+                      <DueBox>
+                        <DueLabel>DUE</DueLabel>
+                        <DueValue>{task.deadline}</DueValue>
+                      </DueBox>
+                    </MetaRow>
+                  </MainCardBody>
+                </MainCard>
+
+                {columnId === 'inprogress' && task.steps?.length > 0 && (
+                  <StepsCard>
+                    <StepsHeader>
+                      <IconBadge>
+                        <img src={bookIcon} alt="" width={15} height={15} />
+                      </IconBadge>
+                      <StepsTitle>Handbook rules for this task</StepsTitle>
+                      <SearchableTag>searchable</SearchableTag>
+                    </StepsHeader>
+
+                    <StepList>
+                      {task.steps.map((st, i) => (
+                        <StepRow key={i} onClick={st.onClick}>
+                          <StepDot />
+                          <StepTextBlock>
+                            <StepTitle>{st.title}</StepTitle>
+                            <StepSrc>{st.src}</StepSrc>
+                          </StepTextBlock>
+                          <StepArrow>→</StepArrow>
+                        </StepRow>
+                      ))}
+                    </StepList>
+                  </StepsCard>
+                )}
+
+                {columnId === 'inprogress' && (
+                  <AskCard>
+                    {task.resolved && (
+                      <ResolvedBanner>
+                        <ResolvedIcon>
+                          <img src={chatBubbleIcon} alt="" width={13} height={13} />
+                        </ResolvedIcon>
+                        <div>
+                          <ResolvedTitle>Nice — you are clear to start.</ResolvedTitle>
+                          <ResolvedDesc>Ask any time — I will handle the Korean.</ResolvedDesc>
+                        </div>
+                      </ResolvedBanner>
+                    )}
+
+                    <AskHeader>
+                      <IconBadge>
+                        <img src={chatBubbleIcon} alt="" width={15} height={15} />
+                      </IconBadge>
+                      <AskTitle>Unclear? Ask SAI first.</AskTitle>
+                    </AskHeader>
+
+                    <AskInputRow>
+                      <AskInput
+                        value={askDraft}
+                        onChange={(e) => setAskDraft(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleAskSend()}
+                        placeholder="Ask something else…"
+                      />
+                      <AskButton onClick={handleAskSend}>Ask</AskButton>
+                    </AskInputRow>
+                  </AskCard>
+                )}
+
+                {columnId === 'waiting' && (
+                  <MessageCard>
+                    <KickerRow>
+                      <KickerDot $color={task.kickerColor ?? '#FF8A3D'} />
+                      <Kicker>{task.kicker}</Kicker>
+                    </KickerRow>
+                    <MessageEn>{task.en}</MessageEn>
+                    <MessageBody>{task.body}</MessageBody>
+                  </MessageCard>
+                )}
+              </>
+            )}
+
+            {ctaLabel && (
+              <StatusCard>
+                <StatusLabel>TASK STATUS</StatusLabel>
+                <StatusButton onClick={onMoveAction}>{ctaLabel}</StatusButton>
+                {task.moveHint && <StatusHint>{task.moveHint}</StatusHint>}
+              </StatusCard>
+            )}
+          </>
         )}
       </Body>
     </Overlay>

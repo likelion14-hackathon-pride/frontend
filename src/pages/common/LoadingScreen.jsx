@@ -51,9 +51,14 @@ const Wrapper = styled.div`
   display: grid;
   place-items: center;
   background:
-    radial-gradient(60% 46% at 30% 78%, rgba(255,96,0,.30), rgba(255,138,61,.14) 46%, rgba(255,138,61,0) 74%),
-    radial-gradient(72% 56% at 92% 12%, rgba(255,138,61,.26), rgba(255,138,61,0) 70%),
-    linear-gradient(152deg, #FFEDE0, #FFF6EF 46%, #FFE3CE);
+    radial-gradient(
+      60% 46% at 30% 78%,
+      rgba(255, 96, 0, 0.3),
+      rgba(255, 138, 61, 0.14) 46%,
+      rgba(255, 138, 61, 0) 74%
+    ),
+    radial-gradient(72% 56% at 92% 12%, rgba(255, 138, 61, 0.26), rgba(255, 138, 61, 0) 70%),
+    linear-gradient(152deg, #ffede0, #fff6ef 46%, #ffe3ce);
 `;
 
 const Inner = styled.div`
