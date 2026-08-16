@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import styled from 'styled-components';
 
+import { MAX_ESCALATION_ADDITIONS } from '../../../apis/constants';
+
 const Panel = styled.div`
   display: flex;
   flex-direction: column;
@@ -197,6 +199,31 @@ const Hint = styled.div`
   line-height: 1.6;
 `;
 
+const ChannelRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const ChannelLabel = styled.span`
+  flex: none;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #b4b4bc;
+`;
+
+const ChannelSelect = styled.select`
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  color: #17171b;
+  background: #fff;
+  border: 1px solid #ededf0;
+  border-radius: 9px;
+  padding: 9px 11px;
+  outline: none;
+`;
+
 const FooterRow = styled.div`
   display: flex;
   align-items: center;
@@ -245,12 +272,24 @@ const SendButton = styled.button`
   }
 `;
 
-export default function ReviewPanel({ enText, krText, hint, ownerNote, onCancel, onSend }) {
+export default function ReviewPanel({
+  enText,
+  krText,
+  hint,
+  channels = [],
+  pending = false,
+  onCancel,
+  onSend,
+}) {
   const [addedItems, setAddedItems] = useState([]);
   const [draft, setDraft] = useState('');
+  const [itemId, setItemId] = useState(() => channels[0]?.id ?? null);
+
+  // 백엔드가 받는 덧붙임 줄은 최대 5줄이다(qna/serializers.py:MAX_ADDITIONS).
+  const atLimit = addedItems.length >= MAX_ESCALATION_ADDITIONS;
 
   function handleAdd() {
-    if (!draft.trim()) return;
+    if (!draft.trim() || atLimit) return;
     setAddedItems((prev) => [...prev, draft.trim()]);
     setDraft('');
   }
@@ -280,9 +319,12 @@ export default function ReviewPanel({ enText, krText, hint, ownerNote, onCancel,
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
-            placeholder="Add something in your own words…"
+            placeholder={
+              atLimit ? `최대 ${MAX_ESCALATION_ADDITIONS}줄까지 덧붙일 수 있습니다` : 'Add something in your own words…'
+            }
+            disabled={atLimit}
           />
-          <AddButton onClick={handleAdd} disabled={!draft.trim()}>
+          <AddButton onClick={handleAdd} disabled={!draft.trim() || atLimit}>
             Add
           </AddButton>
         </AddInputRow>
@@ -305,10 +347,28 @@ export default function ReviewPanel({ enText, krText, hint, ownerNote, onCancel,
 
       {hint && <Hint>{hint}</Hint>}
 
+      <ChannelRow>
+        <ChannelLabel>보낼 채널</ChannelLabel>
+        <ChannelSelect
+          value={itemId ?? ''}
+          onChange={(event) => setItemId(Number(event.target.value))}
+        >
+          {channels.map((channel) => (
+            <option key={channel.id} value={channel.id}>
+              {channel.label}
+            </option>
+          ))}
+        </ChannelSelect>
+      </ChannelRow>
+
       <FooterRow>
-        <OwnerNote>{ownerNote}</OwnerNote>
-        <CancelButton onClick={onCancel}>Cancel</CancelButton>
-        <SendButton onClick={() => onSend(addedItems)}>Send in Slack</SendButton>
+        <OwnerNote>보내면 대표님 슬랙 채널에 한국어로 올라갑니다.</OwnerNote>
+        <CancelButton onClick={onCancel} disabled={pending}>
+          Cancel
+        </CancelButton>
+        <SendButton onClick={() => onSend(addedItems, itemId)} disabled={pending || !itemId}>
+          {pending ? '보내는 중…' : 'Send in Slack'}
+        </SendButton>
       </FooterRow>
     </Panel>
   );

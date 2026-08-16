@@ -1,5 +1,8 @@
 import styled from 'styled-components';
+
+import { WORK_STATE, WORK_STATE_LABEL, lookup } from '../../../apis/constants';
 import { useZoneTime } from '../../../hooks/member/useZoneTime.js';
+import { formatDateTime } from '../../../utils/time';
 import { useMemberNavigation } from '../../../context/member/MemberContext';
 
 const Wrapper = styled.div`
@@ -34,7 +37,7 @@ const Button = styled.button`
 
 const StatusGrid = styled.div`
   display: grid;
-  grid-template-columns: 6px 52px 52px auto;
+  grid-template-columns: 6px auto auto auto;
   align-items: center;
   gap: 5px 8px;
 `;
@@ -96,56 +99,61 @@ const ReplyTime = styled.span`
   color: #17171b;
 `;
 
-const LOCATION_LABELS = {
-  hanoi: 'Hanoi',
-  hcm: 'Ho Chi Minh',
-  bangkok: 'Bangkok',
-  jakarta: 'Jakarta',
-  manila: 'Manila',
-  seoul: 'Seoul',
-  tokyo: 'Tokyo',
+// state 는 근무시간 기준이지 접속 여부가 아니다(cards/views.py TimingView 설명).
+const STATE_DOT = {
+  [WORK_STATE.WORKING]: '#3BA55C',
+  [WORK_STATE.OFF_HOURS]: '#D1C9C9',
+  [WORK_STATE.UNKNOWN]: '#D1C9C9',
+  DEFAULT: '#D1C9C9',
 };
 
-const LOCATION_TIMEZONES = {
-  hanoi: 'Asia/Ho_Chi_Minh',
-  hcm: 'Asia/Ho_Chi_Minh',
-  bangkok: 'Asia/Bangkok',
-  jakarta: 'Asia/Jakarta',
-  manila: 'Asia/Manila',
-  seoul: 'Asia/Seoul',
-  tokyo: 'Asia/Tokyo',
-};
+function cityOf(timezone) {
+  if (!timezone) return '';
+  return timezone.split('/').pop().replace(/_/g, ' ');
+}
+
+function PersonRow({ person, fallbackName }) {
+  const time = useZoneTime(person?.timezone);
+  return (
+    <>
+      <Dot $color={lookup(STATE_DOT, person?.state)} />
+      <Name>{person?.name || fallbackName}</Name>
+      <StatusText>{lookup(WORK_STATE_LABEL, person?.state)}</StatusText>
+      <TimeText>
+        {cityOf(person?.timezone)} {time}
+      </TimeText>
+    </>
+  );
+}
 
 export default function TimingButton({ onClick }) {
-  const { profile } = useMemberNavigation();
-  const myLocation = LOCATION_LABELS[profile.locationId] ?? 'Hanoi';
-  const myTimeZone = LOCATION_TIMEZONES[profile.locationId] ?? 'Asia/Ho_Chi_Minh';
+  const { timing, timingLoading, timingError, profile } = useMemberNavigation();
 
-  const seoulTime = useZoneTime('Asia/Seoul');
-  const myTime = useZoneTime(myTimeZone);
+  const you = timing?.you ?? { name: profile.name, timezone: profile.timezone, state: null };
+  const owner = timing?.owner ?? null;
+
+  const replyText = (() => {
+    if (timingError) return '확인 불가';
+    if (!timing) return timingLoading ? '…' : '—';
+    return formatDateTime(timing.replyExpected?.at, {
+      fallback: '—',
+      timeZone: profile.timezone,
+    });
+  })();
 
   return (
     <Wrapper>
       <Button onClick={onClick} title="Timing">
         <StatusGrid>
-          <Dot $color="#D1C9C9" />
-          <Name>김대표</Name>
-          <StatusText>offline</StatusText>
-          <TimeText>Seoul {seoulTime}</TimeText>
-
-          <Dot $color="#3BA55C" />
-          <Name>{profile.name}</Name>
-          <StatusText>online</StatusText>
-          <TimeText>
-            {myLocation} {myTime}
-          </TimeText>
+          <PersonRow person={owner} fallbackName="대표" />
+          <PersonRow person={you} fallbackName={profile.name || 'You'} />
         </StatusGrid>
 
         <Divider />
 
         <ReplyBlock>
           <ReplyLabel>Reply expected</ReplyLabel>
-          <ReplyTime>Tomorrow 11:00</ReplyTime>
+          <ReplyTime>{replyText}</ReplyTime>
         </ReplyBlock>
       </Button>
     </Wrapper>

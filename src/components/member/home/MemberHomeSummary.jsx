@@ -1,7 +1,9 @@
 import styled from 'styled-components';
-import ProfileSettingModal from './ProfileSettingModal';
 import { useState } from 'react';
+
+import ProfileSettingModal from './ProfileSettingModal';
 import { useMemberNavigation } from '../../../context/member/MemberContext';
+import { zoneOffsetLabel } from '../../../utils/time';
 
 const Wrap = styled.div`
   display: flex;
@@ -86,20 +88,15 @@ const UserMeta = styled.div`
   color: #a0a0a8;
 `;
 
-const LOCATION_LABELS = {
-  hanoi: 'Hanoi (UTC+7)',
-  hcm: 'Ho Chi Minh (UTC+7)',
-  bangkok: 'Bangkok (UTC+7)',
-  jakarta: 'Jakarta (UTC+7)',
-  manila: 'Manila (UTC+8)',
-  seoul: 'Seoul (UTC+9)',
-  tokyo: 'Tokyo (UTC+9)',
-};
+// 값이 아직 안 왔을 때는 0 이 아니라 자리표시자를 보여 준다.
+// 0 을 먼저 그리면 "오늘 아무것도 없다"는 사실과 "아직 못 받았다"가 구분되지 않는다.
+const show = (value) => (value == null ? '–' : value);
 
 export default function MemberHomeSummary({ slackMessages, turnedIntoTasks, waitingAnswer, user }) {
   const [isSettingOpen, setIsSettingOpen] = useState(false);
   const initial = user?.name?.[0]?.toUpperCase() ?? '?';
-  const { setProfile } = useMemberNavigation();
+  const { profile } = useMemberNavigation();
+  const zoneLabel = zoneOffsetLabel(user?.timezone ?? profile.timezone);
 
   return (
     <Wrap>
@@ -107,41 +104,30 @@ export default function MemberHomeSummary({ slackMessages, turnedIntoTasks, wait
         <SummaryTitle>SAI READ FOR YOU TODAY</SummaryTitle>
         <Row>
           <span>Slack messages</span>
-          <strong>{slackMessages}</strong>
+          <strong>{show(slackMessages)}</strong>
         </Row>
         <Row>
           <span>Turned into tasks</span>
-          <strong>{turnedIntoTasks}</strong>
+          <strong>{show(turnedIntoTasks)}</strong>
         </Row>
         <Row>
           <span>Waiting the answered</span>
-          <HighlightValue>{waitingAnswer}</HighlightValue>
+          <HighlightValue>{show(waitingAnswer)}</HighlightValue>
         </Row>
       </SummaryCard>
 
       <UserRow as="button" onClick={() => setIsSettingOpen(true)}>
         <Avatar>{initial}</Avatar>
         <UserText>
-          <UserName>{user?.name}</UserName>
+          <UserName>{user?.name || '이름 없음'}</UserName>
           <UserMeta>
-            {user?.role} · {LOCATION_LABELS[user?.locationId]}
+            {user?.roleLabel ?? '—'} · {user?.locationLabel ?? '—'}
+            {zoneLabel ? ` (${zoneLabel})` : ''}
           </UserMeta>
         </UserText>
       </UserRow>
 
-      {isSettingOpen && (
-        <ProfileSettingModal
-          initialName={user?.name}
-          initialLocationId={user?.locationId}
-          initialRole={user?.role}
-          onClose={() => setIsSettingOpen(false)}
-          onSave={(data) => {
-            setProfile((prev) => ({ ...prev, ...data }));
-            setIsSettingOpen(false);
-          }}
-          onRunSetupAgain={() => console.log('setup 다시 실행')}
-        />
-      )}
+      {isSettingOpen && <ProfileSettingModal onClose={() => setIsSettingOpen(false)} />}
     </Wrap>
   );
 }

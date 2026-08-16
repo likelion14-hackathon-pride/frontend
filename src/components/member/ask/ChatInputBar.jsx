@@ -58,7 +58,13 @@ const FooterText = styled.div`
   text-align: center;
 `;
 
-export default function ChatInputBar({ scopeLabel = 'payment-api', value, onChange, onSend }) {
+export default function ChatInputBar({
+  scopeLabel = 'Company-wide',
+  value,
+  onChange,
+  onSend,
+  disabled = false,
+}) {
   const [internalValue, setInternalValue] = useState('');
   const isControlled = value !== undefined;
   const inputValue = isControlled ? value : internalValue;
@@ -69,7 +75,7 @@ export default function ChatInputBar({ scopeLabel = 'payment-api', value, onChan
   }
 
   function handleSend() {
-    if (!inputValue.trim()) return;
+    if (disabled || !inputValue.trim()) return;
     onSend?.(inputValue);
     if (!isControlled) setInternalValue('');
   }
@@ -86,9 +92,10 @@ export default function ChatInputBar({ scopeLabel = 'payment-api', value, onChan
             value={inputValue}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
+            disabled={disabled}
             placeholder="Ask SAI anything about this team"
           />
-          <SendButton onClick={handleSend} disabled={!inputValue.trim()}>
+          <SendButton onClick={handleSend} disabled={disabled || !inputValue.trim()}>
             ↑
           </SendButton>
         </InputRow>
