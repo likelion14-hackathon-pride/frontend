@@ -9,6 +9,7 @@ import MemberHandbookPage from './pages/member/MemberHandbookPage';
 import HandbookCompanyView from './components/member/handbook/HandbookCompanyView';
 import HandbookProjectView from './components/member/handbook/HandbookProjectView';
 import OwnerOnboardingPage from './pages/owner/OwnerOnboardingPage';
+import OwnerDashboardPage from './pages/owner/OwnerDashboardPage';
 
 function App() {
   return (
@@ -16,7 +17,9 @@ function App() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/owner/onboarding" element={<OwnerOnboardingPage />} />
+        <Route path="/owner" element={<OwnerDashboardPage />} />
         {/* 실제 화면 완성되면 교체 */}
+        <Route path="/member" element={<div>팀원 화면</div>} />
         <Route path="/owner" element={<div>오너 화면</div>} />
 
         <Route
