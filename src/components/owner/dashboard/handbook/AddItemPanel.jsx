@@ -1,6 +1,13 @@
 import { useState } from 'react';
 import styled from 'styled-components';
-import { CATEGORY_OPTIONS } from './handbookTabData';
+
+import { COMPANY_GROUPS } from './handbookTabData';
+
+// 회사 전반 규칙 카테고리. 값은 CompanyScope.AreaKey 그대로다.
+const CATEGORY_OPTIONS = COMPANY_GROUPS.map((group) => ({
+  key: group.key,
+  label: group.label,
+}));
 
 const Panel = styled.div`
   box-sizing: border-box;
@@ -232,7 +239,7 @@ const SaveButton = styled.button`
   line-height: 128%;
 `;
 
-function AddItemPanel({ projects, onAddProject, onSave, onClose }) {
+function AddItemPanel({ projects, pending = false, onAddProject, onSave, onClose }) {
   const [tier, setTier] = useState('company');
   const [categoryKey, setCategoryKey] = useState(CATEGORY_OPTIONS[0].key);
   const [projectKey, setProjectKey] = useState(projects[0]?.key ?? '');
@@ -241,20 +248,23 @@ function AddItemPanel({ projects, onAddProject, onSave, onClose }) {
   const [ruleText, setRuleText] = useState('');
 
   const groupKey = tier === 'company' ? categoryKey : projectKey;
-  const canSave = ruleText.trim().length > 0 && groupKey;
+  const canSave = ruleText.trim().length > 0 && groupKey != null && groupKey !== '';
 
-  const handleAddProject = () => {
+  // 프로젝트 지식공간은 서버가 만들고 id 를 돌려준다. 프론트가 키를 지어내지 않는다.
+  const handleAddProject = async () => {
     const name = newProjectName.trim();
     if (!name) return;
-    const key = name.toLowerCase().replace(/\s+/g, '-');
-    onAddProject(key, name);
-    setProjectKey(key);
+    const createdId = await onAddProject(null, name);
+    if (createdId != null) {
+      setProjectKey(createdId);
+      setTier('project');
+    }
     setNewProjectName('');
     setShowNewProjectInput(false);
   };
 
   const handleSave = () => {
-    if (!canSave) return;
+    if (!canSave || pending) return;
     onSave({ tier, groupKey, text: ruleText.trim() });
     setRuleText('');
   };
@@ -346,8 +356,8 @@ function AddItemPanel({ projects, onAddProject, onSave, onClose }) {
 
       <FooterRow>
         <HintText>출처는 &quot;대표 직접 작성&quot;으로 기록됩니다</HintText>
-        <SaveButton type="button" disabled={!canSave} onClick={handleSave}>
-          핸드북에 저장
+        <SaveButton type="button" disabled={!canSave || pending} onClick={handleSave}>
+          {pending ? '저장 중…' : '핸드북에 저장'}
         </SaveButton>
       </FooterRow>
     </Panel>

@@ -1,13 +1,11 @@
 import styled from 'styled-components';
+
+import { JOB_ROLE_LABEL, ROLE, lookup } from '../../../../apis/constants';
+import { useZoneTime } from '../../../../hooks/member/useZoneTime';
 import NavTabs from './NavTabs';
 import symbol from '../../../../assets/owner/symbol.svg';
 import wordmark from '../../../../assets/owner/wordmark.svg';
 import bellIcon from '../../../../assets/owner/bell.svg';
-
-const PRESENCE = [
-  { key: 'owner', name: '김대표', status: '오프라인', online: false, city: 'Seoul', time: '21:40' },
-  { key: 'minh', name: 'Minh', status: '온라인', online: true, city: 'Hanoi', time: '19:40' },
-];
 
 const Bar = styled.header`
   box-sizing: border-box;
@@ -169,9 +167,39 @@ const Avatar = styled.div`
   font-style: normal;
   font-weight: 700;
   line-height: 128%;
+  border: none;
+  cursor: pointer;
 `;
 
-function DashboardHeader({ activeTab, onTabChange, userInitial = '김' }) {
+function cityOf(timezone) {
+  if (!timezone) return '';
+  return timezone.split('/').pop().replace(/_/g, ' ');
+}
+
+// 구성원 목록에서 앞의 두 명만 보여 준다. 현재 접속 여부는 서버가 알려 주지 않으므로
+// '온라인/오프라인' 대신 각자의 현재 시각과 담당 역할을 보여 준다.
+function PresencePerson({ member }) {
+  const timezone = member?.user?.timezone;
+  const time = useZoneTime(timezone);
+
+  return (
+    <PresenceRow>
+      <NameGroup>
+        <Dot $online={member?.role === ROLE.OWNER} />
+        <PersonName>{member?.user?.name || '이름 없음'}</PersonName>
+        <PersonStatus>{lookup(JOB_ROLE_LABEL, member?.user?.role)}</PersonStatus>
+      </NameGroup>
+      <TimeText>
+        {cityOf(timezone)} {time}
+      </TimeText>
+    </PresenceRow>
+  );
+}
+
+function DashboardHeader({ activeTab, onTabChange, members = [], userName, onLogout }) {
+  const userInitial = userName?.trim()?.charAt(0)?.toUpperCase() ?? '?';
+  const shown = members.slice(0, 2);
+
   return (
     <Bar>
       <LogoContainer>
@@ -186,18 +214,15 @@ function DashboardHeader({ activeTab, onTabChange, userInitial = '김' }) {
       <RightGroup>
         <TimezonePanel>
           <PresenceList>
-            {PRESENCE.map((person) => (
-              <PresenceRow key={person.key}>
+            {shown.length === 0 ? (
+              <PresenceRow>
                 <NameGroup>
-                  <Dot $online={person.online} />
-                  <PersonName>{person.name}</PersonName>
-                  <PersonStatus>{person.status}</PersonStatus>
+                  <PersonStatus>구성원 정보를 불러오는 중…</PersonStatus>
                 </NameGroup>
-                <TimeText>
-                  {person.city} {person.time}
-                </TimeText>
               </PresenceRow>
-            ))}
+            ) : (
+              shown.map((member) => <PresencePerson key={member.id} member={member} />)
+            )}
           </PresenceList>
         </TimezonePanel>
 
@@ -205,7 +230,9 @@ function DashboardHeader({ activeTab, onTabChange, userInitial = '김' }) {
           <BellIcon src={bellIcon} alt="" />
         </BellButton>
 
-        <Avatar>{userInitial}</Avatar>
+        <Avatar as="button" type="button" onClick={onLogout} title="로그아웃">
+          {userInitial}
+        </Avatar>
       </RightGroup>
     </Bar>
   );

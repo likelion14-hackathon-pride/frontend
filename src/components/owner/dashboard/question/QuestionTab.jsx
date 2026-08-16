@@ -1,9 +1,15 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import styled from 'styled-components';
+
+import * as handbookApi from '../../../../apis/handbook';
+import * as qnaApi from '../../../../apis/qna';
+import { SCOPE_KIND } from '../../../../apis/constants';
+import { ErrorState, InlineError, LoadingState } from '../../../common/AsyncStates';
+import { useAsync, useMutation } from '../../../../hooks/useAsync';
 import QuestionStatCards from './QuestionStatCards';
 import QuestionList from './QuestionList';
 import QuestionApprovalPanel from './QuestionApprovalPanel';
-import { INITIAL_QUESTIONS, QUESTION_STATS } from './questionData';
+import { toQuestionRow, UI_STATUS } from './questionData';
 
 const TabContent = styled.div`
   display: flex;
@@ -52,77 +58,119 @@ const SplitRow = styled.div`
   gap: 16px;
 `;
 
-function QuestionTab() {
-  const [questions, setQuestions] = useState(INITIAL_QUESTIONS);
-  const [selectedId, setSelectedId] = useState(
-    INITIAL_QUESTIONS[2]?.id ?? INITIAL_QUESTIONS[0]?.id ?? null
+function QuestionTab({ companyId }) {
+  const [selectedId, setSelectedId] = useState(null);
+
+  const listQuery = useAsync(
+    () => qnaApi.fetchAllEscalations(companyId),
+    [companyId],
+    { enabled: Boolean(companyId) }
   );
-  const [savedCount, setSavedCount] = useState(0);
+  const scopesQuery = useAsync(
+    () => handbookApi.fetchScopes(companyId),
+    [companyId],
+    { enabled: Boolean(companyId) }
+  );
 
-  const selectedQuestion = questions.find((q) => q.id === selectedId) ?? null;
+  const rows = useMemo(
+    () => (listQuery.data ?? []).map(toQuestionRow),
+    [listQuery.data]
+  );
 
-  const updateQuestion = (id, patch) => {
-    setQuestions((prev) => prev.map((q) => (q.id === id ? { ...q, ...patch } : q)));
+  const activeId = selectedId ?? rows[0]?.id ?? null;
+
+  // 상세는 proposal(승인하면 어떤 규칙이 어디에 저장될지)을 함께 준다.
+  const detailQuery = useAsync(
+    () => qnaApi.fetchEscalation(companyId, activeId),
+    [companyId, activeId],
+    { enabled: Boolean(companyId && activeId) }
+  );
+
+  const checkAnswer = useMutation((id) => qnaApi.checkEscalationAnswer(companyId, id));
+  const approve = useMutation(({ id, edits }) => qnaApi.approveEscalation(companyId, id, edits));
+  const dismiss = useMutation((id) => qnaApi.dismissEscalation(companyId, id));
+
+  const reload = () => {
+    listQuery.reload();
+    detailQuery.reload();
   };
 
-  const handleSendReply = (id, replyText) => {
-    updateQuestion(id, {
-      status: 'pending_approval',
-      ownerReply: replyText,
-      relativeTime: '방금',
-      suggestion: {
-        tag: '프로젝트',
-        title: replyText,
-        en: '',
-        source: '방금 작성',
-      },
-    });
-  };
+  const waitingCount = rows.filter((row) => row.status === UI_STATUS.WAITING).length;
+  const approvalCount = rows.filter((row) => row.status === UI_STATUS.PENDING_APPROVAL).length;
+  const savedCount = rows.filter((row) => row.status === UI_STATUS.SAVED).length;
 
-  const handleApprove = (id) => {
-    updateQuestion(id, { status: 'saved' });
-    setSavedCount((prev) => prev + 1);
-  };
+  const oldestWaiting = rows
+    .filter((row) => row.status === UI_STATUS.WAITING)
+    .reduce((oldest, row) => (!oldest || row.createdAt < oldest.createdAt ? row : oldest), null);
 
-  const handleDiscard = (id) => updateQuestion(id, { status: 'discarded' });
-  const handleUndo = (id) => updateQuestion(id, { status: 'pending_approval' });
-  const handleEditSuggestion = (id, title) => {
-    setQuestions((prev) =>
-      prev.map((q) => (q.id === id ? { ...q, suggestion: { ...q.suggestion, title } } : q))
+  const scopes = (scopesQuery.data?.items ?? []).filter(
+    (scope) => scope.kind === SCOPE_KIND.COMPANY || scope.kind === SCOPE_KIND.PROJECT
+  );
+
+  const selectedRow = rows.find((row) => row.id === activeId) ?? null;
+  const detail = detailQuery.data?.id === activeId ? detailQuery.data : null;
+
+  if (listQuery.loading && !listQuery.data) {
+    return (
+      <TabContent>
+        <LoadingState label="질문을 불러오는 중…" />
+      </TabContent>
     );
-  };
+  }
 
-  const waitingCount = questions.filter((q) => q.status === 'waiting').length;
-  const approvalCount = questions.filter((q) => q.status === 'pending_approval').length;
+  if (listQuery.error && !listQuery.data) {
+    return (
+      <TabContent>
+        <ErrorState error={listQuery.error} onRetry={listQuery.reload} />
+      </TabContent>
+    );
+  }
 
   return (
     <TabContent>
       <HeaderTextGroup>
         <Heading>질문</Heading>
         <Subheading>
-          AI가 답하지 못한 질문은 대표님 답변을 거쳐 핸드북 항목이 됩니다. 저장 단위는 질문-답변
-          1쌍당 항목 1개입니다
+          AI가 답하지 못한 질문은 대표님 답변을 거쳐 핸드북 항목이 됩니다. 답변은 슬랙 스레드에서
+          가져옵니다. 저장 단위는 질문-답변 1쌍당 항목 1개입니다
         </Subheading>
       </HeaderTextGroup>
 
+      <InlineError error={checkAnswer.error || approve.error || dismiss.error} />
+
       <QuestionStatCards
         waitingCount={waitingCount}
-        waitingFootnote={QUESTION_STATS.waitingFootnote}
+        waitingFootnote={
+          oldestWaiting ? `가장 오래된 질문 ${oldestWaiting.relativeTime}` : '대기 중인 질문 없음'
+        }
         approvalCount={approvalCount}
-        approvalFootnote={QUESTION_STATS.approvalFootnote}
-        weeklySaved={QUESTION_STATS.weeklySaved + savedCount}
-        weeklySavedFootnote={QUESTION_STATS.weeklySavedFootnote}
+        approvalFootnote="답변에서 만들어진 항목 제안"
+        weeklySaved={savedCount}
+        weeklySavedFootnote="질문-답변 1쌍당 항목 1개"
       />
 
       <SplitRow>
-        <QuestionList questions={questions} selectedId={selectedId} onSelect={setSelectedId} />
+        <QuestionList questions={rows} selectedId={activeId} onSelect={setSelectedId} />
         <QuestionApprovalPanel
-          question={selectedQuestion}
-          onSendReply={handleSendReply}
-          onApprove={handleApprove}
-          onDiscard={handleDiscard}
-          onUndo={handleUndo}
-          onEditSuggestion={handleEditSuggestion}
+          question={selectedRow}
+          detail={detail}
+          detailLoading={detailQuery.loading}
+          detailError={detailQuery.error}
+          onRetryDetail={detailQuery.reload}
+          scopes={scopes}
+          pending={checkAnswer.pending || approve.pending || dismiss.pending}
+          onCheckAnswer={async () => {
+            const result = await checkAnswer.mutate(activeId);
+            if (result.ok) reload();
+          }}
+          onApprove={async (edits) => {
+            const result = await approve.mutate({ id: activeId, edits });
+            if (result.ok) reload();
+          }}
+          onDismiss={async () => {
+            const result = await dismiss.mutate(activeId);
+            if (result.ok) reload();
+          }}
         />
       </SplitRow>
     </TabContent>

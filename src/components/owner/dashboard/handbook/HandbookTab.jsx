@@ -1,11 +1,16 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import styled from 'styled-components';
+
+import * as handbookApi from '../../../../apis/handbook';
+import { ENTRY_STATUS, REVIEW_DECISION, SCOPE_KIND } from '../../../../apis/constants';
+import { ErrorState, InlineError, LoadingState } from '../../../common/AsyncStates';
+import { useAsync, useMutation } from '../../../../hooks/useAsync';
 import HandbookHeaderControls from './HandbookHeaderControls';
 import ConfirmInboxPanel from './ConfirmInboxPanel';
 import AddItemPanel from './AddItemPanel';
 import HandbookTierTree from './HandbookTierTree';
 import HandbookDetailPanel from './HandbookDetailPanel';
-import { INITIAL_HANDBOOK_ITEMS, INITIAL_PROJECTS } from './handbookTabData';
+import { displayStatusOf } from './handbookTabData';
 
 const TabContent = styled.div`
   display: flex;
@@ -49,64 +54,152 @@ const RightColumn = styled.div`
   top: 16px;
 `;
 
-function HandbookTab() {
-  const [items, setItems] = useState(INITIAL_HANDBOOK_ITEMS);
-  const [projects, setProjects] = useState(INITIAL_PROJECTS);
+function toItem(entry) {
+  return {
+    id: entry.id,
+    tier: entry.scopeKind === SCOPE_KIND.PROJECT ? 'project' : 'company',
+    // 회사 규칙은 areaKey 로, 프로젝트는 scopeId 로 묶는다.
+    groupKey: entry.scopeKind === SCOPE_KIND.PROJECT ? entry.scopeId : entry.areaKey,
+    groupLabel: entry.scopeName,
+    text: entry.title,
+    enText: entry.ruleEn,
+    koSource: entry.originalKo,
+    sourceLabel: entry.source?.label ?? entry.sourceType,
+    sourceHref: entry.source?.permalink ?? null,
+    status: displayStatusOf(entry),
+    day0: entry.sourceType === 'ONBOARDING',
+    lastConfirmed: entry.reviewedAt ?? entry.updatedAt,
+    raw: entry,
+  };
+}
+
+function HandbookTab({ companyId }) {
   const [activeTier, setActiveTier] = useState('all');
-  const [selectedItemId, setSelectedItemId] = useState(INITIAL_HANDBOOK_ITEMS[0]?.id ?? null);
+  const [selectedItemId, setSelectedItemId] = useState(null);
   const [addPanelOpen, setAddPanelOpen] = useState(false);
   const [archiveOpen, setArchiveOpen] = useState(false);
 
+  // 대표는 확정·초안·빈칸을 모두 본다. 보관(ARCHIVED)은 거절한 것이라 목록에서 뺀다.
+  const entriesQuery = useAsync(
+    () => handbookApi.fetchAllEntries(companyId),
+    [companyId],
+    { enabled: Boolean(companyId) }
+  );
+  const scopesQuery = useAsync(
+    () => handbookApi.fetchScopes(companyId),
+    [companyId],
+    { enabled: Boolean(companyId) }
+  );
+
+  const review = useMutation(({ entryId, decision }) =>
+    handbookApi.reviewEntry(companyId, entryId, decision)
+  );
+  const reviewAll = useMutation((entryIds) => handbookApi.reviewAllEntries(companyId, entryIds));
+  const createEntry = useMutation((payload) => handbookApi.createEntry(companyId, payload));
+  const updateEntry = useMutation(({ entryId, patch }) =>
+    handbookApi.updateEntry(companyId, entryId, patch)
+  );
+  const deleteEntry = useMutation((entryId) => handbookApi.deleteEntry(companyId, entryId));
+  const createScope = useMutation((name) => handbookApi.createProjectScope(companyId, { name }));
+
+  const items = useMemo(
+    () =>
+      (entriesQuery.data ?? [])
+        .filter((entry) => entry.status !== ENTRY_STATUS.ARCHIVED)
+        .map(toItem),
+    [entriesQuery.data]
+  );
+
+  const scopes = scopesQuery.data?.items ?? [];
+  const projects = useMemo(
+    () =>
+      scopes
+        .filter((scope) => scope.kind === SCOPE_KIND.PROJECT)
+        .map((scope) => ({ key: scope.id, label: scope.name })),
+    [scopes]
+  );
+
   const waitingItems = items.filter((item) => item.status !== 'confirmed');
-  const selectedItem = items.find((item) => item.id === selectedItemId) ?? null;
+  const selectedItem = items.find((item) => item.id === selectedItemId) ?? items[0] ?? null;
 
-  const handleConfirm = (id) => {
-    setItems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, status: 'confirmed' } : item))
-    );
+  const reload = () => {
+    entriesQuery.reload();
+    scopesQuery.reload();
   };
 
-  const handleConfirmAll = () => {
-    setItems((prev) =>
-      prev.map((item) => (item.status !== 'confirmed' ? { ...item, status: 'confirmed' } : item))
-    );
+  const handleConfirm = async (id) => {
+    const result = await review.mutate({ entryId: id, decision: REVIEW_DECISION.APPROVE });
+    if (result.ok) reload();
   };
 
-  const handleAddProject = (key, label) => {
-    setProjects((prev) => (prev.some((p) => p.key === key) ? prev : [...prev, { key, label }]));
+  const handleConfirmAll = async () => {
+    // 내용이 없는 BLANK 항목은 서버가 건너뛰고 skipped 로 알려 준다.
+    const result = await reviewAll.mutate(waitingItems.map((item) => item.id));
+    if (result.ok) reload();
   };
 
-  const handleSaveNewItem = ({ tier, groupKey, text }) => {
-    const newItem = {
-      id: `owner-${Date.now()}`,
-      tier,
-      groupKey,
-      text,
-      enText: '',
-      koSource: text,
-      sourceLabel: '대표 직접 작성',
-      status: 'confirmed',
-      day0: false,
-      ownerAuthored: true,
-      lastConfirmed: '방금',
-    };
-    setItems((prev) => [...prev, newItem]);
-    setActiveTier('all');
-    setSelectedItemId(newItem.id);
+  const handleAddProject = async (_key, label) => {
+    const result = await createScope.mutate(label);
+    if (result.ok) scopesQuery.reload();
+    return result.ok ? result.data.id : null;
+  };
+
+  const handleSaveNewItem = async ({ groupKey, tier, text }) => {
+    // 서버는 scopeId 를 받는다. 회사 규칙이면 areaKey 에 해당하는 공간을 찾아 넘긴다.
+    const scope =
+      tier === 'project'
+        ? scopes.find((item) => item.id === groupKey)
+        : scopes.find(
+            (item) => item.kind === SCOPE_KIND.COMPANY && item.areaKey === groupKey
+          );
+    if (!scope) return;
+
+    const result = await createEntry.mutate({
+      title: text,
+      originalKo: text,
+      scopeId: scope.id,
+    });
+    if (!result.ok) return;
+
+    setSelectedItemId(result.data.id);
     setAddPanelOpen(false);
+    reload();
   };
 
-  const handleUpdateItemText = (id, text) => {
+  const handleUpdateItemText = async (id, text) => {
     if (!text) return;
-    setItems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, text, lastConfirmed: '방금' } : item))
-    );
+    const result = await updateEntry.mutate({ entryId: id, patch: { title: text } });
+    if (result.ok) reload();
   };
 
-  const handleDeleteItem = (id) => {
-    setItems((prev) => prev.filter((item) => item.id !== id));
-    setSelectedItemId((prev) => (prev === id ? null : prev));
+  const handleDeleteItem = async (id) => {
+    const item = items.find((entry) => entry.id === id);
+    // 확정 전 초안은 삭제가 아니라 거절(REJECT)로 내린다(handbook/views.py).
+    const result =
+      item?.status === 'confirmed'
+        ? await deleteEntry.mutate(id)
+        : await review.mutate({ entryId: id, decision: REVIEW_DECISION.REJECT });
+    if (result.ok) {
+      setSelectedItemId(null);
+      reload();
+    }
   };
+
+  if (entriesQuery.loading && !entriesQuery.data) {
+    return (
+      <TabContent>
+        <LoadingState label="핸드북을 불러오는 중…" />
+      </TabContent>
+    );
+  }
+
+  if (entriesQuery.error && !entriesQuery.data) {
+    return (
+      <TabContent>
+        <ErrorState error={entriesQuery.error} onRetry={entriesQuery.reload} />
+      </TabContent>
+    );
+  }
 
   return (
     <TabContent>
@@ -119,9 +212,21 @@ function HandbookTab() {
         onOpenAddPanel={() => setAddPanelOpen(true)}
       />
 
+      <InlineError
+        error={
+          review.error ||
+          reviewAll.error ||
+          createEntry.error ||
+          updateEntry.error ||
+          deleteEntry.error ||
+          createScope.error
+        }
+      />
+
       {addPanelOpen && (
         <AddItemPanel
           projects={projects}
+          pending={createEntry.pending}
           onAddProject={handleAddProject}
           onSave={handleSaveNewItem}
           onClose={() => setAddPanelOpen(false)}
@@ -131,6 +236,7 @@ function HandbookTab() {
       {archiveOpen && (
         <ConfirmInboxPanel
           items={waitingItems}
+          pending={review.pending || reviewAll.pending}
           onConfirm={handleConfirm}
           onConfirmAll={handleConfirmAll}
           onClose={() => setArchiveOpen(false)}
@@ -142,7 +248,7 @@ function HandbookTab() {
           <HandbookTierTree
             activeTier={activeTier}
             items={items}
-            selectedItemId={selectedItemId}
+            selectedItemId={selectedItem?.id ?? null}
             onSelect={setSelectedItemId}
             projects={projects}
           />
@@ -150,6 +256,7 @@ function HandbookTab() {
         <RightColumn>
           <HandbookDetailPanel
             item={selectedItem}
+            pending={updateEntry.pending || deleteEntry.pending}
             onSave={handleUpdateItemText}
             onDelete={handleDeleteItem}
           />

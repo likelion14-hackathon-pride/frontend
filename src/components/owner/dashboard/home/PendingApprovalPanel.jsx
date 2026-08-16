@@ -1,6 +1,7 @@
-import { useState } from 'react';
 import styled from 'styled-components';
-import { PENDING_OWNER_QUESTIONS } from './homeData';
+
+import { ESCALATION_STATUS, ESCALATION_STATUS_LABEL, lookup } from '../../../../apis/constants';
+import { formatShortKo } from '../../../../utils/time';
 
 const Panel = styled.div`
   box-sizing: border-box;
@@ -165,29 +166,28 @@ function CheckIcon() {
   );
 }
 
-function PendingApprovalPanel() {
-  const [resolvedIds, setResolvedIds] = useState(
-    () => new Set(PENDING_OWNER_QUESTIONS.filter((q) => q.variant === 'muted').map((q) => q.id))
-  );
+const EmptyRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 0;
+  color: rgba(255, 255, 255, 0.6);
+  font-family: 'Plus Jakarta Sans';
+  font-size: 12px;
+`;
 
-  const toggleResolved = (id) => {
-    setResolvedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
-  };
+// waitingQuestions 는 DRAFT / SENT 상태의 대표 확인 질문이다(companies/dashboard.py).
+// 아직 팀원이 보내지 않은 초안(DRAFT)과 보낸 질문(SENT)을 상태로 구분해 보여 준다.
+function PendingApprovalPanel({ waitingQuestions }) {
+  const items = waitingQuestions?.items ?? [];
+  const total = waitingQuestions?.totalCount ?? 0;
 
   return (
     <Panel>
       <HeadRow>
         <TitleGroup>
           <Title>대표님을 기다리는 질문</Title>
-          <Subtitle>핸드북에 근거가 없는 질문</Subtitle>
+          <Subtitle>핸드북에 근거가 없는 질문 · 전체 {total}건</Subtitle>
         </TitleGroup>
         <Chevron type="button" aria-label="전체 보기">
           ›
@@ -195,28 +195,37 @@ function PendingApprovalPanel() {
       </HeadRow>
 
       <List>
-        {PENDING_OWNER_QUESTIONS.map((q) => {
-          const resolved = resolvedIds.has(q.id);
-          return (
-            <Row key={q.id}>
+        {items.length === 0 ? (
+          <EmptyRow>기다리는 질문이 없습니다</EmptyRow>
+        ) : (
+          items.map((question) => (
+            <Row key={question.id}>
               <IconBox>
                 <IconShape />
               </IconBox>
               <TextGroup>
-                <QuestionText>{q.text}</QuestionText>
-                <MetaText>{q.meta}</MetaText>
+                <QuestionText>{question.question}</QuestionText>
+                <MetaText>
+                  {[
+                    question.askedByName,
+                    question.scopeName || '공통 규칙',
+                    formatShortKo(question.createdAt),
+                  ]
+                    .filter(Boolean)
+                    .join(' · ')}
+                </MetaText>
               </TextGroup>
               <CheckButton
                 type="button"
-                $resolved={resolved}
-                onClick={() => toggleResolved(q.id)}
-                aria-label={resolved ? '미확인으로 표시' : '확인함으로 표시'}
+                $resolved={question.status === ESCALATION_STATUS.DRAFT}
+                title={lookup(ESCALATION_STATUS_LABEL, question.status)}
+                aria-label={lookup(ESCALATION_STATUS_LABEL, question.status)}
               >
                 <CheckIcon />
               </CheckButton>
             </Row>
-          );
-        })}
+          ))
+        )}
       </List>
     </Panel>
   );

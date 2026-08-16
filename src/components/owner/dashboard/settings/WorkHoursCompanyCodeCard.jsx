@@ -146,6 +146,7 @@ const COPIED_RESET_MS = 2000;
 function WorkHoursCompanyCodeCard({
   workHoursEnabled,
   onToggleWorkHours,
+  togglePending = false,
   hours,
   companyCode,
   onCopyCode,
@@ -153,6 +154,7 @@ function WorkHoursCompanyCodeCard({
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
+    if (!companyCode) return;
     onCopyCode();
     setCopied(true);
     setTimeout(() => setCopied(false), COPIED_RESET_MS);
@@ -164,13 +166,20 @@ function WorkHoursCompanyCodeCard({
       <WorkHoursRow>
         <TextStack>
           <RangeText>
-            근무 시간 {hours.start}–{hours.end} ({hours.timezone})
+            근무 시간 {hours.start}–{hours.end}
+            {hours.timezone ? ` (${hours.timezone})` : ''}
           </RangeText>
-          <HintText>이 시간 밖 질문에는 대기 안내가 표시됩니다</HintText>
+          <HintText>
+            {/* 끄면 서버의 시차 계산이 UNKNOWN 이 되고 대기 안내가 사라진다. */}
+            {workHoursEnabled
+              ? '이 시간 밖 질문에는 대기 안내가 표시됩니다'
+              : '근무 시간을 쓰지 않습니다. 팀원 화면의 대기 안내가 표시되지 않습니다'}
+          </HintText>
         </TextStack>
         <Toggle
           type="button"
           $on={workHoursEnabled}
+          disabled={togglePending}
           onClick={onToggleWorkHours}
           aria-pressed={workHoursEnabled}
           aria-label="근무 시간 적용 토글"
@@ -184,9 +193,9 @@ function WorkHoursCompanyCodeCard({
       <SectionTitle>회사 코드</SectionTitle>
       <CodeRow>
         <CodeBlock>
-          <CodeValue>{companyCode}</CodeValue>
+          <CodeValue>{companyCode || '불러오는 중…'}</CodeValue>
         </CodeBlock>
-        <CopyButton type="button" $copied={copied} onClick={handleCopy}>
+        <CopyButton type="button" $copied={copied} onClick={handleCopy} disabled={!companyCode}>
           {copied ? '복사됨 ✓' : '코드 복사'}
         </CopyButton>
       </CodeRow>

@@ -203,6 +203,11 @@ const AddButton = styled.button`
   font-weight: 700;
   line-height: 128%;
   white-space: nowrap;
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
 `;
 
 const LastSyncText = styled.span`
@@ -215,11 +220,13 @@ const LastSyncText = styled.span`
   white-space: nowrap;
 `;
 
-const AddInput = styled.input`
+
+
+const AddSelect = styled.select`
   flex: 1 0 0;
   min-width: 0;
   height: 36px;
-  padding: 0 12px;
+  padding: 0 10px;
   border-radius: 11px;
   border: 0.667px solid #dbe4fc;
   font-family: 'Plus Jakarta Sans';
@@ -229,6 +236,12 @@ const AddInput = styled.input`
   &:focus {
     border-color: #2563eb;
   }
+`;
+
+const EmptyText = styled.span`
+  color: #b4b4bc;
+  font-family: 'Plus Jakarta Sans';
+  font-size: 11.5px;
 `;
 
 const SmallButton = styled.button`
@@ -245,17 +258,35 @@ const SmallButton = styled.button`
   color: ${({ $primary }) => ($primary ? '#ffffff' : '#6b6b73')};
 `;
 
-function SourceBoxCard({ icon, config, items, onAddItem }) {
+function SourceBoxCard({
+  icon,
+  config,
+  connected = false,
+  items = [],
+  availableOptions,
+  extractedCount = 0,
+  lastSync,
+  onAddItem,
+}) {
   const [adding, setAdding] = useState(false);
   const [value, setValue] = useState('');
   const isLive = config.syncMode === 'live';
+  // 채널·레포는 서버가 준 목록에서 고른다. 이름을 손으로 적게 하면 오타로 400 이 난다.
+  const usesPicker = Array.isArray(availableOptions);
 
   const handleAdd = () => {
-    const name = value.trim();
-    if (!name) return;
-    onAddItem(name);
+    if (!value) return;
+    onAddItem(value);
     setValue('');
     setAdding(false);
+  };
+
+  const handleAddClick = () => {
+    if (!usesPicker) {
+      onAddItem();
+      return;
+    }
+    setAdding(true);
   };
 
   return (
@@ -277,32 +308,37 @@ function SourceBoxCard({ icon, config, items, onAddItem }) {
           <StatLabel>{config.connectedLabel}</StatLabel>
         </StatBlock>
         <StatBlock>
-          <StatNumber>{config.extractedCount}</StatNumber>
+          <StatNumber>{extractedCount}</StatNumber>
           <StatLabel>추출된 항목</StatLabel>
         </StatBlock>
       </StatsRow>
 
       <List>
-        {items.map((item) => (
-          <Row key={item.id}>
-            <Dot />
-            <RowName>{item.name}</RowName>
-            <RowMeta>{item.meta}</RowMeta>
-          </Row>
-        ))}
+        {items.length === 0 ? (
+          <EmptyText>{connected ? config.emptyLabel : config.notConnectedLabel}</EmptyText>
+        ) : (
+          items.map((item) => (
+            <Row key={item.id}>
+              <Dot />
+              <RowName>{item.name}</RowName>
+              <RowMeta>{item.meta}</RowMeta>
+            </Row>
+          ))
+        )}
       </List>
 
       <FooterRow>
-        {adding ? (
+        {adding && usesPicker ? (
           <>
-            <AddInput
-              autoFocus
-              value={value}
-              placeholder={config.addPlaceholder}
-              onChange={(e) => setValue(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
-            />
-            <SmallButton type="button" $primary onClick={handleAdd}>
+            <AddSelect autoFocus value={value} onChange={(e) => setValue(e.target.value)}>
+              <option value="">{config.addPlaceholder}</option>
+              {availableOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </AddSelect>
+            <SmallButton type="button" $primary onClick={handleAdd} disabled={!value}>
               추가
             </SmallButton>
             <SmallButton type="button" onClick={() => setAdding(false)}>
@@ -311,10 +347,15 @@ function SourceBoxCard({ icon, config, items, onAddItem }) {
           </>
         ) : (
           <>
-            <AddButton type="button" $primary={!isLive} onClick={() => setAdding(true)}>
+            <AddButton
+              type="button"
+              $primary={!isLive}
+              disabled={usesPicker && !connected}
+              onClick={handleAddClick}
+            >
               {config.addLabel}
             </AddButton>
-            <LastSyncText>{config.lastSync}</LastSyncText>
+            <LastSyncText>{lastSync}</LastSyncText>
           </>
         )}
       </FooterRow>

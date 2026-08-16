@@ -1,197 +1,36 @@
-export const COMPANY_GROUPS = [
-  {
-    key: 'company-values',
-    label: 'COMPANY',
-    description: '가치 · 미션 · 커뮤니케이션 · 핸드북 운영',
-    dotColor: '#1D4ED8',
-  },
-  {
-    key: 'people-group',
-    label: 'PEOPLE GROUP',
-    description: '인사 · 채용 · 다양성 · 보상 · 학습',
-    dotColor: '#1D4ED8',
-  },
-  {
-    key: 'product-eng',
-    label: 'PRODUCT / ENGINEERING',
-    description: '제품 원칙 · 개발 운영 · 고객지원 · 오픈소스',
-    dotColor: '#1D4ED8',
-  },
-  {
-    key: 'security',
-    label: 'SECURITY',
-    description: '보안 표준 · 제품 보안 · 보안 운영 · 위협 관리',
-    dotColor: '#1D4ED8',
-  },
-];
+import {
+  AREA_KEY,
+  AREA_KEY_DESCRIPTION,
+  AREA_KEY_LABEL,
+  AREA_KEY_ORDER,
+  ENTRY_STATUS,
+  SCOPE_KIND,
+  lookup,
+} from '../../../../apis/constants';
 
-export const CATEGORY_OPTIONS = [
-  { key: 'company-values', label: 'Company' },
-  { key: 'people-group', label: 'People Group' },
-  { key: 'product-eng', label: 'Product /\nEngineering' },
-  { key: 'security', label: 'Security' },
-];
+export { AREA_KEY, AREA_KEY_ORDER, ENTRY_STATUS, SCOPE_KIND };
 
-export const INITIAL_PROJECTS = [
-  { key: 'payment-api', label: 'payment-api' },
-  { key: 'admin-web', label: 'admin-web' },
-  { key: 'landing', label: 'landing' },
-];
-
-export const INITIAL_HANDBOOK_ITEMS = [
-  {
-    id: 'h-1',
-    tier: 'company',
-    groupKey: 'company-values',
-    text: '질문은 스레드에 남기고 DM은 쓰지 않는다',
-    enText: 'Ask in the public thread, not by DM, so answers stay searchable.',
-    koSource: '질문은 채널 스레드에 남겨주세요. DM은 쓰지 않습니다.',
-    sourceLabel: 'Slack #dev-general',
-    status: 'confirmed',
-    day0: true,
-    lastConfirmed: '08.04',
-  },
-  {
-    id: 'h-2',
-    tier: 'company',
-    groupKey: 'company-values',
-    text: '모르면 30분 시도 후 바로 묻는다',
-    enText: 'Try for 30 minutes on your own, then ask right away.',
-    koSource: '30분 넘게 막히면 붙잡고 있지 말고 바로 질문 주세요.',
-    sourceLabel: 'Slack #dev-general',
-    status: 'confirmed',
-    day0: true,
-    lastConfirmed: '08.04',
-  },
-  {
-    id: 'h-3',
-    tier: 'company',
-    groupKey: 'company-values',
-    text: '작업 시작 전 담당자와 범위를 먼저 적는다',
-    enText: 'Write down the scope with the owner before starting work.',
-    koSource: '작업 시작 전 담당자와 범위를 먼저 적어주세요.',
-    sourceLabel: '직접 작성',
-    status: 'confirmed',
-    day0: false,
-    lastConfirmed: '08.06',
-  },
-  {
-    id: 'h-4',
-    tier: 'company',
-    groupKey: 'company-values',
-    text: '결정은 문서로 남기고 회의는 문서가 있을 때만 연다',
-    enText: 'Write decisions down and only hold meetings when a doc exists.',
-    koSource: '결정은 문서로 남기고 회의는 문서가 있을 때만 진행합니다.',
-    sourceLabel: '직접 작성',
-    status: 'confirmed',
-    day0: false,
-    lastConfirmed: '08.06',
-  },
-  {
-    id: 'h-5',
-    tier: 'company',
-    groupKey: 'people-group',
-    text: '연차는 사전 승인 없이 쓰고 캘린더에 등록만 한다',
-    enText: 'You can take PTO without prior approval — just add it to the calendar.',
-    koSource: '연차는 사전 승인 없이 쓰고 팀 캘린더에 등록만 해주세요.',
-    sourceLabel: 'Slack #general',
-    status: 'confirmed',
-    day0: true,
-    lastConfirmed: '08.04',
-  },
-  {
-    id: 'h-6',
-    tier: 'company',
-    groupKey: 'product-eng',
-    text: '배포는 대표가 실행한다',
-    enText: 'Deploys are executed by the CEO.',
-    koSource: '배포는 대표님이 직접 실행합니다.',
-    sourceLabel: 'github payment-api',
-    status: 'confirmed',
-    day0: false,
-    lastConfirmed: '08.07',
-  },
-  {
-    id: 'h-7',
-    tier: 'company',
-    groupKey: 'product-eng',
-    text: 'PR은 리뷰 1인 승인 후 머지',
-    enText: 'A PR needs one approval before it can be merged.',
-    koSource: 'PR은 리뷰어 1인 승인 후 머지해주세요.',
-    sourceLabel: 'github payment-api',
-    status: 'confirmed',
-    day0: false,
-    lastConfirmed: '08.07',
-  },
-  {
-    id: 'h-8',
-    tier: 'company',
-    groupKey: 'product-eng',
-    text: '응답 기대 시간은 다음 영업일 오전',
-    enText: 'Expected response time is the next business morning.',
-    koSource: '',
-    sourceLabel: 'Slack #dev-general',
-    status: 'unconfirmed',
-    day0: false,
-    lastConfirmed: null,
-  },
-  {
-    id: 'h-9',
-    tier: 'company',
-    groupKey: 'security',
-    text: '프로덕션 DB 직접 접근은 대표 입회 하에만',
-    enText: 'Direct production DB access only happens with the CEO present.',
-    koSource: '프로덕션 DB 직접 접근은 대표님 입회 하에만 진행해주세요.',
-    sourceLabel: 'Slack #dev-general',
-    status: 'confirmed',
-    day0: false,
-    lastConfirmed: '08.05',
-  },
-  {
-    id: 'h-10',
-    tier: 'project',
-    groupKey: 'payment-api',
-    text: '로그는 Sentry에서 확인',
-    enText: 'Check logs in Sentry.',
-    koSource: '로그는 Sentry에서 확인해주세요.',
-    sourceLabel: '대표 직접 추가',
-    status: 'confirmed',
-    day0: false,
-    ownerAuthored: true,
-    lastConfirmed: '08.08',
-  },
-  {
-    id: 'h-11',
-    tier: 'project',
-    groupKey: 'payment-api',
-    text: '이슈 등록 후 브랜치 생성',
-    enText: 'Create a branch only after the issue is filed.',
-    koSource: '이슈 등록 후 브랜치를 생성해주세요.',
-    sourceLabel: 'github payment-api · PR #218',
-    status: 'unconfirmed',
-    day0: false,
-    lastConfirmed: null,
-  },
-  {
-    id: 'h-12',
-    tier: 'project',
-    groupKey: 'payment-api',
-    text: '테스트 작성 범위',
-    enText: '',
-    koSource: '',
-    sourceLabel: 'payment-api',
-    status: 'empty',
-    day0: false,
-    lastConfirmed: null,
-  },
-];
-
-export function countByStatus(items, status) {
-  return items.filter((item) => item.status === status).length;
-}
+// 회사 전반 규칙 카테고리. 회사 생성 시 서버가 4개를 시딩한다.
+export const COMPANY_GROUPS = AREA_KEY_ORDER.map((areaKey) => ({
+  key: areaKey,
+  label: lookup(AREA_KEY_LABEL, areaKey),
+  description: lookup(AREA_KEY_DESCRIPTION, areaKey),
+  dotColor: '#1D4ED8',
+}));
 
 export function getGroupLabel(groupKey) {
-  const companyGroup = COMPANY_GROUPS.find((g) => g.key === groupKey);
+  const companyGroup = COMPANY_GROUPS.find((group) => group.key === groupKey);
   if (companyGroup) return companyGroup.label;
-  return groupKey.toUpperCase();
+  return groupKey ? String(groupKey).toUpperCase() : '';
+}
+
+// 확정 여부. 화면은 '확인됨 / 미확인 / 빈칸' 세 가지만 구분한다.
+export function displayStatusOf(entry) {
+  if (entry.status === ENTRY_STATUS.CONFIRMED) return 'confirmed';
+  if (entry.status === ENTRY_STATUS.BLANK) return 'empty';
+  return 'unconfirmed';
+}
+
+export function countByStatus(entries, status) {
+  return entries.filter((entry) => displayStatusOf(entry) === status).length;
 }

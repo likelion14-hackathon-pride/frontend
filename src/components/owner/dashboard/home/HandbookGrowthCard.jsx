@@ -76,7 +76,7 @@ const Footnote = styled.span`
   margin-top: auto;
 `;
 
-function HandbookGrowthCard({ value, delta, months, footnote }) {
+function HandbookGrowthCard({ value, delta, months = [], footnote }) {
   return (
     <StatCardShell title="쌓인 핸드북">
       <NumberBlock>
@@ -86,7 +86,7 @@ function HandbookGrowthCard({ value, delta, months, footnote }) {
 
       <BarsRow>
         {months.map((month, index) => (
-          <MonthColumn key={month.label}>
+          <MonthColumn key={`${month.label}-${index}`}>
             <Bar $height={month.height} $current={index === months.length - 1} />
             <MonthLabel>{month.label}</MonthLabel>
           </MonthColumn>
