@@ -1,4 +1,7 @@
 import styled from 'styled-components';
+
+import { RISK_LEVEL } from '../../../../apis/constants';
+import { ErrorState, InlineError, LoadingState } from '../../../common/AsyncStates';
 import Mascot from '../Mascot';
 import RiskKeywordItem from './RiskKeywordItem';
 import RiskKeywordForm from './RiskKeywordForm';
@@ -280,14 +283,26 @@ const NextButtonIcon = styled.img`
   height: 15px;
 `;
 
+// 서버는 severity 로 내려주고 값은 RiskKeyword.Level(CAUTION | DANGER) 이다.
+// DANGER 가 아닌 것은 전부 주의로 본다. 모르는 값이 와도 목록에서 사라지지 않게.
 function groupByLevel(keywords) {
   return {
-    danger: keywords.filter((keyword) => keyword.level === 'danger'),
-    warning: keywords.filter((keyword) => keyword.level === 'warning'),
+    danger: keywords.filter((keyword) => keyword.severity === RISK_LEVEL.DANGER),
+    caution: keywords.filter((keyword) => keyword.severity !== RISK_LEVEL.DANGER),
   };
 }
 
-function RiskKeywordStep({ keywords, onAddKeyword, onRemoveKeyword, onFinish }) {
+function RiskKeywordStep({
+  keywords,
+  loading,
+  error,
+  onReload,
+  pending,
+  actionError,
+  onAddKeyword,
+  onRemoveKeyword,
+  onFinish,
+}) {
   const grouped = groupByLevel(keywords);
 
   return (
@@ -309,13 +324,19 @@ function RiskKeywordStep({ keywords, onAddKeyword, onRemoveKeyword, onFinish }) 
         </MascotColumn>
       </HeaderRow>
 
+      <InlineError error={actionError} />
+
       <Layout>
         <RegisteredPanel>
           <PanelHeader>
             <PanelHeaderLabel>등록된 키워드</PanelHeaderLabel>
           </PanelHeader>
 
-          {keywords.length === 0 ? (
+          {loading && keywords.length === 0 ? (
+            <LoadingState compact label="키워드를 불러오는 중…" />
+          ) : error && keywords.length === 0 ? (
+            <ErrorState error={error} onRetry={onReload} compact />
+          ) : keywords.length === 0 ? (
             <EmptyState>
               <EmptyText>
                 아직 등록된 단어가 없습니다
@@ -343,8 +364,8 @@ function RiskKeywordStep({ keywords, onAddKeyword, onRemoveKeyword, onFinish }) 
                   {grouped.danger.map((keyword) => (
                     <RiskKeywordItem
                       key={keyword.id}
-                      label={keyword.label}
-                      level={keyword.level}
+                      label={keyword.keyword}
+                      level={keyword.severity}
                       onRemove={() => onRemoveKeyword(keyword.id)}
                     />
                   ))}
@@ -362,15 +383,15 @@ function RiskKeywordStep({ keywords, onAddKeyword, onRemoveKeyword, onFinish }) 
                     <LevelLine $color={WARNING_SOFT} />
                     <LevelSectionCountWrap>
                       <LevelSectionCount $color={WARNING_LINE}>
-                        {grouped.warning.length}건
+                        {grouped.caution.length}건
                       </LevelSectionCount>
                     </LevelSectionCountWrap>
                   </LevelSectionHeader>
-                  {grouped.warning.map((keyword) => (
+                  {grouped.caution.map((keyword) => (
                     <RiskKeywordItem
                       key={keyword.id}
-                      label={keyword.label}
-                      level={keyword.level}
+                      label={keyword.keyword}
+                      level={keyword.severity}
                       onRemove={() => onRemoveKeyword(keyword.id)}
                     />
                   ))}
@@ -380,12 +401,12 @@ function RiskKeywordStep({ keywords, onAddKeyword, onRemoveKeyword, onFinish }) 
           )}
         </RegisteredPanel>
 
-        <RiskKeywordForm onAddKeyword={onAddKeyword} />
+        <RiskKeywordForm onAddKeyword={onAddKeyword} pending={pending} />
       </Layout>
 
       <Footer>
-        <NextButton type="button" onClick={onFinish}>
-          <NextButtonLabel>등록하고 마치기</NextButtonLabel>
+        <NextButton type="button" onClick={onFinish} disabled={pending}>
+          <NextButtonLabel>{pending ? '마무리하는 중…' : '등록하고 마치기'}</NextButtonLabel>
           <NextButtonIcon src={nextArrowWhite} alt="" />
         </NextButton>
       </Footer>

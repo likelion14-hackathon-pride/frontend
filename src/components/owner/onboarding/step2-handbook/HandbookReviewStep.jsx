@@ -1,11 +1,18 @@
+import { useMemo } from 'react';
 import styled from 'styled-components';
+
+import { SCOPE_KIND } from '../../../../apis/constants';
+import * as handbookApi from '../../../../apis/handbook';
+import { useAsync, useMutation } from '../../../../hooks/useAsync';
+import { useOnboardingQuestions } from '../../../../hooks/owner/useOnboardingQuestions';
+import { ErrorState, InlineError, LoadingState } from '../../../common/AsyncStates';
 import Mascot from '../Mascot';
 import HandbookSectionBand from './HandbookSectionBand';
 import HandbookCategoryGroup from './HandbookCategoryGroup';
 import ProjectKnowledgeSection from './ProjectKnowledgeSection';
 import fileTransWhite from '../../../../assets/owner/file_trans_white.svg';
 import nextArrowWhite from '../../../../assets/owner/next_arrow_white.svg';
-import { HANDBOOK_CATEGORIES, TOTAL_HANDBOOK_QUESTIONS, countConfirmed } from './handbookData';
+import { countConfirmed, groupByCategory } from './handbookData';
 
 const PageContent = styled.div`
   display: flex;
@@ -107,18 +114,38 @@ const ArrowIcon = styled.img`
   height: 15px;
 `;
 
-function HandbookReviewStep({
-  handbookAnswers,
-  onAnswerChange,
-  projects,
-  onAddProject,
-  onToggleProjectExpand,
-  onProjectAnswerChange,
-  onSkipProjectToCompanyRules,
-  onFinish,
-}) {
-  const allQuestions = HANDBOOK_CATEGORIES.flatMap((category) => category.questions);
-  const confirmedCount = countConfirmed(allQuestions, handbookAnswers);
+function HandbookReviewStep({ companyId, onFinish }) {
+  const company = useOnboardingQuestions(companyId);
+
+  // 프로젝트 지식은 PROJECT 지식공간마다 한 벌씩 붙는다.
+  const scopesQuery = useAsync(
+    () => handbookApi.fetchScopes(companyId, { kind: SCOPE_KIND.PROJECT }),
+    [companyId],
+    { enabled: Boolean(companyId) }
+  );
+  const createScope = useMutation((name) => handbookApi.createProjectScope(companyId, { name }));
+
+  const categories = useMemo(
+    () => groupByCategory(company.questions.map((question) => ({
+      templateKey: question.id,
+      category: question.category,
+      question: question.text,
+      title: question.title,
+      options: question.options,
+      placeholder: question.placeholder,
+    }))),
+    [company.questions]
+  );
+
+  const confirmedCount = countConfirmed(company.questions, company.answers);
+  const totalCount = company.questions.length;
+
+  const projects = scopesQuery.data?.items ?? [];
+
+  async function handleAddProject(name) {
+    const result = await createScope.mutate(name);
+    if (result.ok) scopesQuery.reload();
+  }
 
   return (
     <PageContent>
@@ -127,41 +154,54 @@ function HandbookReviewStep({
           <Heading>회사의 기본 규칙부터 정할게요</Heading>
           <Subheading>
             핸드북으로 남아 팀원들과 공유됩니다. 정해진 게 없으면 그냥 넘기세요. 추후에 수정·추가도
-            가능합니다.
+            가능합니다. 답은 고르는 즉시 저장됩니다.
           </Subheading>
         </TextGroup>
         <Mascot pose="checking" width={148} height={111} />
       </Content>
 
-      <HandbookSectionBand
-        tone="company"
-        icon={fileTransWhite}
-        title="회사 규칙"
-        description="프로젝트가 바뀌어도 그대로 적용되는 상위 계층"
-        count={`${TOTAL_HANDBOOK_QUESTIONS}개 항목`}
-      />
-      <CategoryList>
-        {HANDBOOK_CATEGORIES.map((category) => (
-          <HandbookCategoryGroup
-            key={category.key}
-            category={category}
-            answers={handbookAnswers}
-            onAnswerChange={(questionId, patch) => onAnswerChange(questionId, patch)}
+      <InlineError error={company.saveError || createScope.error} />
+
+      {company.loading && totalCount === 0 && <LoadingState label="질문을 불러오는 중…" />}
+      {company.error && totalCount === 0 && (
+        <ErrorState error={company.error} onRetry={company.reload} />
+      )}
+
+      {totalCount > 0 && (
+        <>
+          <HandbookSectionBand
+            tone="company"
+            icon={fileTransWhite}
+            title="회사 규칙"
+            description="프로젝트가 바뀌어도 그대로 적용되는 상위 계층"
+            count={`${totalCount}개 항목`}
           />
-        ))}
-      </CategoryList>
+          <CategoryList>
+            {categories.map((category) => (
+              <HandbookCategoryGroup
+                key={category.key}
+                category={category}
+                answers={company.answers}
+                savingKey={company.savingKey}
+                onAnswerChange={company.setAnswer}
+              />
+            ))}
+          </CategoryList>
+        </>
+      )}
 
       <ProjectKnowledgeSection
+        companyId={companyId}
         projects={projects}
-        onAddProject={onAddProject}
-        onToggleExpand={onToggleProjectExpand}
-        onAnswerChange={onProjectAnswerChange}
-        onSkipToCompanyRules={onSkipProjectToCompanyRules}
+        loading={scopesQuery.loading}
+        error={scopesQuery.error}
+        onReload={scopesQuery.reload}
+        onAddProject={handleAddProject}
       />
 
       <Footer>
         <FooterHint>
-          {confirmedCount} / {TOTAL_HANDBOOK_QUESTIONS} 확인 · 나머지는 미확인 상태로 남습니다
+          {confirmedCount} / {totalCount} 확인 · 나머지는 미확인 상태로 남습니다
         </FooterHint>
         <FinishButton type="button" onClick={onFinish}>
           답변 마치고 다음으로

@@ -1,14 +1,18 @@
 import { useState } from 'react';
 import styled from 'styled-components';
 
+import * as sourcesApi from '../../../../apis/sources';
+import { toApiError } from '../../../../apis/errors';
+
 const TOTAL_STEPS = 5;
-const CONNECT_DELAY_MS = 1400;
 const COPY_RESET_MS = 1800;
+
+// 슬랙 이벤트 수신 주소. config/urls.py 의 path('api/slack/events/') 그대로다.
+const REQUEST_URL = `${(import.meta.env.VITE_API_URL ?? '').replace(/\/+$/, '')}/api/slack/events/`;
 
 const DEFAULT_APP_NAME = 'SAI';
 const DEFAULT_BOT_NAME = 'SAI';
 const DEFAULT_APP_DESC = '한국어 슬랙 대화를 외국인 동료가 이해할 수 있게 정리합니다';
-const REQUEST_URL = 'https://app.sai.so/api/slack/events';
 const DEFAULT_ERROR_MESSAGE = '토큰이 올바르지 않습니다. 다시 복사해 주세요.';
 
 const RAIL_META = [
@@ -25,13 +29,6 @@ const PERMISSION_ROWS = [
   { scope: 'channels:join', usage: '공개 채널에 자동으로 참여' },
   { scope: 'chat:write', usage: '확인 질문 보내기' },
   { scope: 'users:read, users:read.email', usage: '담당자 연결' },
-];
-
-const DEFAULT_CHANNELS = [
-  { name: 'general', members: '전체', private: false, on: true },
-  { name: 'product', members: '12명', private: false, on: true },
-  { name: 'dev-backend', members: '7명', private: false, on: false },
-  { name: 'leads-only', members: '4명', private: true, on: false },
 ];
 
 function quote(value) {
@@ -1151,7 +1148,7 @@ const PrimaryButtonDisabled = styled.button`
   cursor: not-allowed;
 `;
 
-function SlackConnectModal({ onClose, onConnected }) {
+function SlackConnectModal({ companyId, onClose, onConnected }) {
   const [screen, setScreen] = useState('modal');
   const [current, setCurrent] = useState(1);
   const [done, setDone] = useState({});
@@ -1167,7 +1164,13 @@ function SlackConnectModal({ onClose, onConnected }) {
   const [conn, setConn] = useState('idle');
   const [errorMsg, setErrorMsg] = useState('');
   const [copied, setCopied] = useState('');
-  const [channels, setChannels] = useState(DEFAULT_CHANNELS);
+  const [connection, setConnection] = useState(null);
+  // 채널 목록은 연결이 선 뒤에 슬랙에서 받아 온다. 미리 채워 두지 않는다.
+  const [channels, setChannels] = useState([]);
+  const [selected, setSelected] = useState(() => new Set());
+  const [channelsLoading, setChannelsLoading] = useState(false);
+  const [channelsError, setChannelsError] = useState('');
+  const [savingChannels, setSavingChannels] = useState(false);
 
   const resolvedName = (appName || DEFAULT_APP_NAME).trim() || DEFAULT_APP_NAME;
   const resolvedBot = (botName || DEFAULT_BOT_NAME).trim() || DEFAULT_BOT_NAME;
@@ -1211,29 +1214,68 @@ settings:
     setCurrent(next);
   };
 
+  // 서버도 xoxb- 로 시작하는지 먼저 본다(sources/serializers.py:357).
   const tokenBad = token.length > 0 && !token.startsWith('xoxb-');
 
-  const handleConnect = () => {
+  const handleConnect = async () => {
     if (conn === 'loading') return;
     setConn('loading');
     setErrorMsg('');
-    setTimeout(() => {
-      if (/fail|error/i.test(token)) {
-        setConn('error');
-        setErrorMsg(DEFAULT_ERROR_MESSAGE);
-      } else {
-        setConn('success');
-        setDone((prev) => ({ ...prev, 4: true }));
+    try {
+      const created = await sourcesApi.connectSlack(companyId, {
+        botToken: token.trim(),
+        signingSecret: secret.trim(),
+      });
+      setConnection(created);
+      setConn('success');
+      setDone((prev) => ({ ...prev, 4: true }));
+    } catch (caught) {
+      const error = toApiError(caught);
+      setConn('error');
+      setErrorMsg(error.message || DEFAULT_ERROR_MESSAGE);
+    }
+  };
+
+  // 아직 수집 대상으로 등록되지 않은 워크스페이스 채널.
+  const loadAvailableChannels = async () => {
+    if (!connection) return;
+    setChannelsLoading(true);
+    setChannelsError('');
+    try {
+      const data = await sourcesApi.fetchAvailableChannels(companyId, connection.id);
+      setChannels(data.items ?? []);
+    } catch (caught) {
+      setChannelsError(toApiError(caught).message);
+    } finally {
+      setChannelsLoading(false);
+    }
+  };
+
+  const toggleChannel = (externalId) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(externalId)) next.delete(externalId);
+      else next.add(externalId);
+      return next;
+    });
+  };
+
+  const handleFinishChannels = async () => {
+    if (!connection || savingChannels) return;
+    setSavingChannels(true);
+    setChannelsError('');
+    try {
+      for (const externalId of selected) {
+        // 채널마다 따로 추가한다. 비공개 채널은 봇이 스스로 못 들어가므로 실패할 수 있다.
+        // eslint-disable-next-line no-await-in-loop
+        await sourcesApi.addChannel(companyId, connection.id, externalId);
       }
-    }, CONNECT_DELAY_MS);
-  };
-
-  const toggleChannel = (index) => {
-    setChannels((prev) => prev.map((c, i) => (i === index ? { ...c, on: !c.on } : c)));
-  };
-
-  const handleFinishChannels = () => {
-    onConnected();
+      onConnected();
+    } catch (caught) {
+      setChannelsError(toApiError(caught).message);
+    } finally {
+      setSavingChannels(false);
+    }
   };
 
   const descOver = appDesc.length > 140;
@@ -1245,9 +1287,13 @@ settings:
   let showSkip = false;
 
   if (screen === 'channels') {
-    primaryLabel = '선택한 채널 연결';
+    primaryLabel = savingChannels ? '추가하는 중…' : '선택한 채널 연결';
     primaryAction = handleFinishChannels;
-    footerNote = '연결 이후에도 설정에서 채널을 추가하거나 뺄 수 있습니다.';
+    primaryEnabled = !savingChannels && selected.size > 0;
+    footerNote =
+      selected.size > 0
+        ? '연결 이후에도 설정에서 채널을 추가하거나 뺄 수 있습니다.'
+        : '수집할 채널을 하나 이상 골라 주세요.';
   } else if (current === 1) {
     primaryLabel = '슬랙에 추가했어요';
     primaryAction = () => complete(1, 2);
@@ -1282,6 +1328,7 @@ settings:
     primaryAction = () => {
       setDone((prev) => ({ ...prev, 5: true }));
       setScreen('channels');
+      loadAvailableChannels();
     };
     showSkip = true;
     footerNote =
@@ -1774,31 +1821,50 @@ settings:
             <ContentDescription style={{ margin: '8px 0 0' }}>
               채널마다 최근 대화를 가져옵니다. 슬랙 무료 플랜은 90일 이전 기록을 제공하지 않습니다.
             </ContentDescription>
+            {channelsLoading && <StatusRow><Spinner /><StatusTitle>채널 목록을 받는 중…</StatusTitle></StatusRow>}
+            {channelsError && (
+              <ErrorRow>
+                <ErrorIcon>!</ErrorIcon>
+                <ErrorTextGroup>
+                  <ErrorTitle>{channelsError}</ErrorTitle>
+                </ErrorTextGroup>
+              </ErrorRow>
+            )}
+            {!channelsLoading && !channelsError && channels.length === 0 && (
+              <ContentDescription style={{ margin: 0 }}>
+                추가할 수 있는 채널이 없습니다. 봇이 참여하지 않은 비공개 채널은 슬랙 특성상 목록에
+                나타나지 않습니다.
+              </ContentDescription>
+            )}
             <ChannelList>
-              {channels.map((channel, index) => (
-                <ChannelRow
-                  key={channel.name}
-                  type="button"
-                  $on={channel.on}
-                  onClick={() => toggleChannel(index)}
-                >
-                  <ChannelCheck $on={channel.on}>{channel.on ? '✓' : ''}</ChannelCheck>
-                  <ChannelTextGroup>
-                    <ChannelNameRow>
-                      <ChannelGlyph>{channel.private ? '🔒' : '#'}</ChannelGlyph>
-                      {channel.name}
-                    </ChannelNameRow>
-                    {channel.private && (
-                      <ChannelPrivateHint>
-                        <span>슬랙에서</span>
-                        <MonoChip>/invite @{resolvedBot}</MonoChip>
-                        <span>을 입력해 초대해 주세요.</span>
-                      </ChannelPrivateHint>
-                    )}
-                  </ChannelTextGroup>
-                  <ChannelMembers>{channel.members}</ChannelMembers>
-                </ChannelRow>
-              ))}
+              {channels.map((channel) => {
+                const on = selected.has(channel.externalId);
+                return (
+                  <ChannelRow
+                    key={channel.externalId}
+                    type="button"
+                    $on={on}
+                    onClick={() => toggleChannel(channel.externalId)}
+                  >
+                    <ChannelCheck $on={on}>{on ? '✓' : ''}</ChannelCheck>
+                    <ChannelTextGroup>
+                      <ChannelNameRow>
+                        <ChannelGlyph>{channel.isPrivate ? '🔒' : '#'}</ChannelGlyph>
+                        {channel.label}
+                      </ChannelNameRow>
+                      {/* isMember 가 false 인 공개 채널은 추가할 때 봇이 스스로 들어간다. */}
+                      {channel.isPrivate && !channel.isMember && (
+                        <ChannelPrivateHint>
+                          <span>슬랙에서</span>
+                          <MonoChip>/invite @{resolvedBot}</MonoChip>
+                          <span>을 입력해 초대해 주세요.</span>
+                        </ChannelPrivateHint>
+                      )}
+                    </ChannelTextGroup>
+                    <ChannelMembers>{channel.isMember ? '참여 중' : '추가 시 참여'}</ChannelMembers>
+                  </ChannelRow>
+                );
+              })}
             </ChannelList>
           </ChannelsWrap>
         )}
@@ -1812,7 +1878,13 @@ settings:
               </GhostButton>
             )}
             {showSkip && (
-              <GhostButton type="button" onClick={() => setScreen('channels')}>
+              <GhostButton
+                type="button"
+                onClick={() => {
+                  setScreen('channels');
+                  loadAvailableChannels();
+                }}
+              >
                 나중에 하기
               </GhostButton>
             )}

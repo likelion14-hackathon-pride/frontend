@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import styled from 'styled-components';
+
+import { ErrorState, LoadingState } from '../../../common/AsyncStates';
 import HandbookSectionBand from './HandbookSectionBand';
 import ProjectKnowledgeItem from './ProjectKnowledgeItem';
 import treeIcon from '../../../../assets/owner/tree.svg';
@@ -155,15 +157,11 @@ const CancelButton = styled.button`
   white-space: nowrap;
 `;
 
-function ProjectKnowledgeSection({
-  projects,
-  onAddProject,
-  onToggleExpand,
-  onAnswerChange,
-  onSkipToCompanyRules,
-}) {
+function ProjectKnowledgeSection({ companyId, projects, loading, error, onReload, onAddProject }) {
   const [isAdding, setIsAdding] = useState(false);
   const [nameDraft, setNameDraft] = useState('');
+  // 어느 프로젝트를 펼쳤는지는 화면 상태다. 서버에 저장할 것이 아니다.
+  const [expandedId, setExpandedId] = useState(null);
 
   const handleCreate = () => {
     const name = nameDraft.trim();
@@ -183,16 +181,21 @@ function ProjectKnowledgeSection({
         count={`${projects.length}개`}
       />
 
+      {loading && projects.length === 0 && <LoadingState compact label="프로젝트를 불러오는 중…" />}
+      {error && projects.length === 0 && <ErrorState error={error} onRetry={onReload} compact />}
+
       {projects.length > 0 && (
         <ProjectList>
           {projects.map((project, index) => (
             <ProjectKnowledgeItem
               key={project.id}
+              companyId={companyId}
               project={project}
               index={index}
-              onToggleExpand={() => onToggleExpand(project.id)}
-              onAnswerChange={(questionId, patch) => onAnswerChange(project.id, questionId, patch)}
-              onSkipToCompanyRules={() => onSkipToCompanyRules(project.id)}
+              expanded={expandedId === project.id}
+              onToggleExpand={() =>
+                setExpandedId((prev) => (prev === project.id ? null : project.id))
+              }
             />
           ))}
         </ProjectList>

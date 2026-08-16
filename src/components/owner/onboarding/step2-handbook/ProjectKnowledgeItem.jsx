@@ -1,6 +1,9 @@
 import styled from 'styled-components';
+
+import { useOnboardingQuestions } from '../../../../hooks/owner/useOnboardingQuestions';
+import { ErrorState, InlineError, LoadingState } from '../../../common/AsyncStates';
 import QuestionRow from './QuestionRow';
-import { EMPTY_ANSWER, PROJECT_QUESTION_TEMPLATE, countConfirmed } from './handbookData';
+import { EMPTY_ANSWER, countConfirmed } from './handbookData';
 
 const Card = styled.div`
   box-sizing: border-box;
@@ -121,48 +124,60 @@ const SkipButton = styled.button`
   cursor: pointer;
 `;
 
-function ProjectKnowledgeItem({
-  project,
-  index,
-  onToggleExpand,
-  onAnswerChange,
-  onSkipToCompanyRules,
-}) {
-  const confirmedCount = countConfirmed(PROJECT_QUESTION_TEMPLATE, project.answers);
+function ProjectKnowledgeItem({ companyId, project, index, expanded, onToggleExpand }) {
+  // 프로젝트 질문 8개도 서버가 준다. 펼쳤을 때만 받아 온다.
+  const questions = useOnboardingQuestions(expanded ? companyId : null, project.id);
+
+  const confirmedCount = countConfirmed(questions.questions, questions.answers);
+  const total = questions.questions.length;
   const summary = confirmedCount === 0 ? '회사 규칙만 적용' : '프로젝트에서만 다른 규칙';
 
   return (
-    <Card $expanded={project.expanded}>
-      <Header type="button" $expanded={project.expanded} onClick={onToggleExpand}>
-        <Number $expanded={project.expanded}>{index + 1}</Number>
+    <Card $expanded={expanded}>
+      <Header type="button" $expanded={expanded} onClick={onToggleExpand}>
+        <Number $expanded={expanded}>{index + 1}</Number>
         <Name>{project.name}</Name>
         <Summary>{summary}</Summary>
-        {project.expanded && (
+        {expanded && total > 0 && (
           <>
             <DividerLine />
             <Fraction>
-              {confirmedCount}/{PROJECT_QUESTION_TEMPLATE.length}
+              {confirmedCount}/{total}
             </Fraction>
           </>
         )}
-        <Chevron $expanded={project.expanded}>⌄</Chevron>
+        <Chevron $expanded={expanded}>⌄</Chevron>
       </Header>
 
-      {project.expanded && (
+      {expanded && (
         <Body>
-          <SkipRow>
-            <SkipButton type="button" onClick={onSkipToCompanyRules}>
-              회사 규칙만 쓰고 넘기기
-            </SkipButton>
-          </SkipRow>
-          {PROJECT_QUESTION_TEMPLATE.map((question) => (
-            <QuestionRow
-              key={question.id}
-              question={question}
-              answer={project.answers[question.id] ?? EMPTY_ANSWER}
-              onChange={(patch) => onAnswerChange(question.id, patch)}
-            />
-          ))}
+          <InlineError error={questions.saveError} />
+
+          {questions.loading && total === 0 && (
+            <LoadingState compact label="프로젝트 질문을 불러오는 중…" />
+          )}
+          {questions.error && total === 0 && (
+            <ErrorState error={questions.error} onRetry={questions.reload} compact />
+          )}
+
+          {total > 0 && (
+            <>
+              <SkipRow>
+                <SkipButton type="button" onClick={questions.skipAll}>
+                  회사 규칙만 쓰고 넘기기
+                </SkipButton>
+              </SkipRow>
+              {questions.questions.map((question) => (
+                <QuestionRow
+                  key={question.id}
+                  question={question}
+                  answer={questions.answers[question.id] ?? EMPTY_ANSWER}
+                  saving={questions.savingKey === question.id}
+                  onChange={(patch) => questions.setAnswer(question.id, patch)}
+                />
+              ))}
+            </>
+          )}
         </Body>
       )}
     </Card>
