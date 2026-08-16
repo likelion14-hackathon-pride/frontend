@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import SourceDetails from './SourceDetails';
 import DraftReplyBlock from './DraftReplyBlock';
 import saiSpeaking from '../../../assets/SAI-speaking.png';
+import { useMemberNavigation } from '../../../context/member/MemberContext';
 
 const UserBubble = styled.div`
   align-self: flex-end;
@@ -44,12 +45,23 @@ const AiBody = styled.div`
 
 export default function ChatBubble({ message }) {
   const [draftView, setDraftView] = useState('collapsed'); // 'collapsed' | 'reviewing' | 'sent'
+  const { moveTaskToWaiting } = useMemberNavigation();
 
   if (message.role === 'user') {
     return <UserBubble>{message.body}</UserBubble>;
   }
 
   const hasSources = message.sources?.length > 0;
+
+  function handleSent() {
+    setDraftView('sent');
+    if (message.relatedTaskId) {
+      moveTaskToWaiting(message.relatedTaskId, {
+        en: message.enSummary,
+        kr: message.draftKr,
+      });
+    }
+  }
 
   return (
     <AiRow>
@@ -69,9 +81,9 @@ export default function ChatBubble({ message }) {
             }
             sentLabel={message.sentLabel}
             onReview={() => setDraftView('reviewing')}
-            onSendAsIs={() => setDraftView('sent')}
+            onSendAsIs={handleSent}
             onCancelReview={() => setDraftView('collapsed')}
-            onSend={() => setDraftView('sent')}
+            onSend={handleSent}
           />
         )}
       </AiContent>
