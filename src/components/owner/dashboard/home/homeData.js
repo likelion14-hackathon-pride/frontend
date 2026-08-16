@@ -23,9 +23,9 @@ export const AI_ANSWERED_QUESTIONS = [
   {
     id: 'ai-4',
     time: '08:55',
-    text: '핫픽스는 제가 배포해도 되나요?',
-    sourceLine: '근거 없음 → 대표님께 전달',
-    badge: 'owner',
+    text: '장비 반납 절차가 어떻게 되나요?',
+    sourceLine: '근거 · 핸드북 · People',
+    badge: 'instant',
   },
 ];
 
@@ -61,7 +61,6 @@ export const STAT_SUMMARY = {
   aiAnsweredCount: 79,
   ownerAnsweredCount: 17,
   adoptionRate: 82,
-  adoptionDelta: '+14%p',
   answerReuseValue: '5.3회',
   answerReuseUnit: '답변 1건당',
   timeSavedLabel: '6h 20m',

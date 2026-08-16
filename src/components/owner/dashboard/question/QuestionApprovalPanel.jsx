@@ -4,9 +4,9 @@ import styled from 'styled-components';
 const Panel = styled.div`
   box-sizing: border-box;
   display: flex;
-  width: 613.333px;
+  flex: 1 1 320px;
+  min-width: 0;
   min-height: 388.823px;
-  flex-shrink: 0;
   flex-direction: column;
   padding: 24px 20.667px;
   gap: 16px;
@@ -81,16 +81,19 @@ const MessageRow = styled.div`
 
 const AvatarPill = styled.span`
   display: flex;
+  width: 28px;
   height: 28px;
-  padding: 7.667px 10px 7.333px 4.094px;
-  justify-content: flex-end;
+  justify-content: center;
   align-items: center;
   flex-shrink: 0;
-  border-radius: 50px;
+  border-radius: 50%;
   background: #dde7fd;
 `;
 
 const AvatarLabel = styled.span`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: #1d4ed8;
   text-align: center;
   font-family: 'Plus Jakarta Sans';
@@ -120,10 +123,10 @@ const OwnerAvatar = styled.span`
 const Bubble = styled.div`
   box-sizing: border-box;
   display: inline-flex;
-  max-width: 460px;
-  padding: 14px 18px 10px 14px;
+  max-width: 100%;
+  min-width: 0;
+  padding: 12px 18px 12px 14px;
   align-items: center;
-  flex-shrink: 0;
   border-radius: ${({ $reverse }) => ($reverse ? '14px 4px 14px 14px' : '4px 14px 14px 14px')};
   background: ${({ $reverse }) => ($reverse ? '#17171B' : '#FAFAFB')};
 `;
@@ -278,6 +281,58 @@ const GhostButton = styled.button`
   font-weight: 700;
   line-height: 123%;
   white-space: nowrap;
+`;
+
+const AiNotAnsweredBox = styled.div`
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: #FFF8EC;
+`;
+
+const AiNotAnsweredTitle = styled.span`
+  color: #9A6212;
+  font-family: 'Plus Jakarta Sans';
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 135%;
+`;
+
+const AiNotAnsweredBody = styled.p`
+  margin: 0;
+  color: #9A6212;
+  font-family: 'Plus Jakarta Sans';
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 170%;
+`;
+
+const SlackButton = styled.button`
+  display: flex;
+  width: 100%;
+  height: 48px;
+  justify-content: center;
+  align-items: center;
+  margin-top: auto;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  background: #2563EB;
+  color: #fff;
+  font-family: 'Plus Jakarta Sans';
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: #1d4ed8;
+  }
 `;
 
 const ComposeBox = styled.textarea`
@@ -455,14 +510,15 @@ function QuestionApprovalPanel({
 
       {question.status === 'waiting' && (
         <>
-          <ComposeBox
-            value={replyText}
-            placeholder="답변을 입력하면 핸드북 저장 제안이 만들어집니다"
-            onChange={(e) => setReplyText(e.target.value)}
-          />
-          <SendButton type="button" disabled={!replyText.trim()} onClick={handleSendReply}>
-            답변 보내기
-          </SendButton>
+          <AiNotAnsweredBox>
+            <AiNotAnsweredTitle>AI가 답하지 않았습니다</AiNotAnsweredTitle>
+            <AiNotAnsweredBody>
+              핸드북에 관련 근거가 없어 추측하지 않았습니다. 팀원이 대표님께 확인 질문을 보냈습니다.
+            </AiNotAnsweredBody>
+          </AiNotAnsweredBox>
+          <SlackButton type="button" onClick={() => onSendReply && onSendReply(question.id, '')}>
+            슬랙 스레드에서 답하기
+          </SlackButton>
         </>
       )}
 

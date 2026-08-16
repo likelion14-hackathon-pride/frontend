@@ -1,13 +1,12 @@
-import { useState } from 'react';
 import styled from 'styled-components';
 import { PENDING_OWNER_QUESTIONS } from './homeData';
 
 const Panel = styled.div`
   box-sizing: border-box;
   display: flex;
-  width: 660.333px;
+  flex: 1 1 320px;
+  min-width: 0;
   height: 290.917px;
-  flex-shrink: 0;
   flex-direction: column;
   padding: 20px 20.667px;
   gap: 14px;
@@ -142,45 +141,9 @@ const MetaText = styled.span`
   white-space: nowrap;
 `;
 
-const CheckButton = styled.button`
-  display: flex;
-  width: 20px;
-  height: 20px;
-  padding: 5px;
-  justify-content: center;
-  align-items: center;
-  flex-shrink: 0;
-  border: none;
-  border-radius: 50px;
-  cursor: pointer;
-  background: ${({ $resolved }) => ($resolved ? 'rgba(255, 255, 255, 0.14)' : '#2563EB')};
-  opacity: ${({ $resolved }) => ($resolved ? 0.55 : 1)};
-`;
 
-function CheckIcon() {
-  return (
-    <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-      <path d="M2 5.2L4 7.2L8 3" stroke="white" strokeWidth="1.8" />
-    </svg>
-  );
-}
 
-function PendingApprovalPanel() {
-  const [resolvedIds, setResolvedIds] = useState(
-    () => new Set(PENDING_OWNER_QUESTIONS.filter((q) => q.variant === 'muted').map((q) => q.id))
-  );
-
-  const toggleResolved = (id) => {
-    setResolvedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
-  };
+function PendingApprovalPanel({ onViewAll }) {
 
   return (
     <Panel>
@@ -189,14 +152,13 @@ function PendingApprovalPanel() {
           <Title>대표님을 기다리는 질문</Title>
           <Subtitle>핸드북에 근거가 없는 질문</Subtitle>
         </TitleGroup>
-        <Chevron type="button" aria-label="전체 보기">
+        <Chevron type="button" aria-label="전체 보기" onClick={onViewAll}>
           ›
         </Chevron>
       </HeadRow>
 
       <List>
         {PENDING_OWNER_QUESTIONS.map((q) => {
-          const resolved = resolvedIds.has(q.id);
           return (
             <Row key={q.id}>
               <IconBox>
@@ -206,14 +168,6 @@ function PendingApprovalPanel() {
                 <QuestionText>{q.text}</QuestionText>
                 <MetaText>{q.meta}</MetaText>
               </TextGroup>
-              <CheckButton
-                type="button"
-                $resolved={resolved}
-                onClick={() => toggleResolved(q.id)}
-                aria-label={resolved ? '미확인으로 표시' : '확인함으로 표시'}
-              >
-                <CheckIcon />
-              </CheckButton>
             </Row>
           );
         })}

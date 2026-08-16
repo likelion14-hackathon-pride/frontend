@@ -51,14 +51,13 @@ const SubheadingStrong = styled.strong`
 const SplitRow = styled.div`
   display: flex;
   width: 100%;
-  height: 290.917px;
-  flex-shrink: 0;
+  flex-wrap: wrap;
   justify-content: center;
   align-items: flex-start;
   gap: 14px;
 `;
 
-function DashboardHomeTab({ ownerName = '김대표' }) {
+function DashboardHomeTab({ ownerName = '김대표', onNavigateToQuestions }) {
   return (
     <TabContent>
       <HeaderTextGroup>
@@ -73,7 +72,7 @@ function DashboardHomeTab({ ownerName = '김대표' }) {
 
       <SplitRow>
         <AiAnsweredList />
-        <PendingApprovalPanel />
+        <PendingApprovalPanel onViewAll={onNavigateToQuestions} />
       </SplitRow>
     </TabContent>
   );

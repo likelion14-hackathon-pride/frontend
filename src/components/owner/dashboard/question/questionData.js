@@ -15,6 +15,7 @@ export const INITIAL_QUESTIONS = [
     project: '공통 규칙',
     time: '08.06 14:45',
     status: 'waiting',
+    relativeTime: '18시간 전',
   },
   {
     id: 'q-2',
@@ -24,6 +25,7 @@ export const INITIAL_QUESTIONS = [
     time: '08.06 21:40',
     status: 'waiting',
     declined: true,
+    relativeTime: '11시간 전',
   },
   {
     id: 'q-3',
@@ -66,5 +68,7 @@ export const INITIAL_QUESTIONS = [
     project: '공통 규칙',
     time: '08.05 16:50',
     status: 'saved',
+    relativeTime: '1일 전',
+    ownerReply: '장비는 계약 종료 2주 전에 착불로 사무실로 보내주시면 됩니다.',
   },
 ];

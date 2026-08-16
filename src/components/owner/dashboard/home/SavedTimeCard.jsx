@@ -3,7 +3,7 @@ import StatCardShell from './StatCardShell';
 
 const NumberBlock = styled.div`
   display: flex;
-  width: 285.833px;
+  width: 100%;
   height: 40px;
   align-items: baseline;
   gap: 10px;
@@ -30,7 +30,7 @@ const DeltaText = styled.span`
 
 const GraphWrap = styled.div`
   display: flex;
-  width: 285.833px;
+  width: 100%;
   padding: 43px 0 2px 0;
   justify-content: center;
   align-items: center;
@@ -38,7 +38,7 @@ const GraphWrap = styled.div`
 
 const GraphBox = styled.div`
   position: relative;
-  width: 285.833px;
+  width: 100%;
   height: 58px;
   flex-shrink: 0;
 `;
@@ -56,7 +56,7 @@ const EndDot = styled.span`
 `;
 
 const Footnote = styled.span`
-  width: 293.833px;
+  width: 100%;
   color: #a0a0a8;
   font-family: 'Plus Jakarta Sans';
   font-size: 11px;
@@ -77,9 +77,10 @@ function SavedTimeCard({ value, delta }) {
       <GraphWrap>
         <GraphBox>
           <svg
-            width="286"
+            width="100%"
             height="53"
             viewBox="0 0 286 53"
+            preserveAspectRatio="none"
             fill="none"
             style={{ position: 'absolute', top: 0, left: 0 }}
           >
@@ -90,9 +91,10 @@ function SavedTimeCard({ value, delta }) {
             />
           </svg>
           <svg
-            width="286"
+            width="100%"
             height="29"
             viewBox="0 0 286 29"
+            preserveAspectRatio="none"
             fill="none"
             style={{ position: 'absolute', top: 0, left: 0 }}
           >

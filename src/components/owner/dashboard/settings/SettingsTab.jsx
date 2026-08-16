@@ -47,8 +47,9 @@ const Subheading = styled.p`
 const CardRow = styled.div`
   display: flex;
   width: 100%;
+  flex-wrap: wrap;
   justify-content: center;
-  align-items: flex-start;
+  align-items: stretch;
   gap: 16px;
 `;
 

@@ -8,8 +8,7 @@ import { STAT_SUMMARY, TOP_REUSED_ANSWERS, HANDBOOK_MONTHLY_TREND } from './home
 const Row = styled.div`
   display: flex;
   width: 100%;
-  height: 250.333px;
-  flex-shrink: 0;
+  flex-wrap: wrap;
   justify-content: center;
   align-items: flex-start;
   gap: 14px;

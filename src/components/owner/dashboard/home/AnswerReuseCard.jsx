@@ -1,11 +1,9 @@
 import styled from 'styled-components';
 import StatCardShell from './StatCardShell';
 
-const TRACK_WIDTH = 285.833;
-
 const NumberBlock = styled.div`
   display: flex;
-  width: 285.833px;
+  width: 100%;
   height: 40px;
   align-items: baseline;
   gap: 10px;
@@ -32,7 +30,7 @@ const UnitText = styled.span`
 
 const BarsContainer = styled.div`
   display: flex;
-  width: 285.833px;
+  width: 100%;
   height: 103px;
   flex-direction: column;
   justify-content: center;
@@ -42,7 +40,7 @@ const BarsContainer = styled.div`
 
 const BarItem = styled.div`
   display: flex;
-  width: 285.833px;
+  width: 100%;
   height: 27.667px;
   flex-direction: column;
   justify-content: center;
@@ -53,7 +51,7 @@ const BarItem = styled.div`
 
 const LabelRow = styled.div`
   display: flex;
-  width: 285.833px;
+  width: 100%;
   height: 14.667px;
   justify-content: space-between;
   align-items: flex-start;
@@ -80,7 +78,7 @@ const CountText = styled.span`
 
 const Track = styled.div`
   display: flex;
-  width: 285.833px;
+  width: 100%;
   height: 8px;
   align-items: center;
   flex-shrink: 0;
@@ -93,11 +91,11 @@ const Bar = styled.div`
   flex-shrink: 0;
   border-radius: 999px;
   background: ${({ $color }) => $color};
-  width: ${({ $width }) => $width}px;
+  width: ${({ $width }) => $width}%;
 `;
 
 const Footnote = styled.span`
-  width: 293.833px;
+  width: 100%;
   color: #a0a0a8;
   font-family: 'Plus Jakarta Sans';
   font-size: 11px;
@@ -111,7 +109,7 @@ function AnswerReuseCard({ value, unit, items }) {
   const maxCount = Math.max(...items.map((item) => item.count));
 
   return (
-    <StatCardShell title="답변 재사용">
+    <StatCardShell title="핸드북 활용 횟수">
       <NumberBlock>
         <ValueText>{value}</ValueText>
         <UnitText>{unit}</UnitText>
@@ -126,7 +124,7 @@ function AnswerReuseCard({ value, unit, items }) {
             </LabelRow>
             <Track>
               <Bar
-                $width={(item.count / maxCount) * TRACK_WIDTH}
+                $width={(item.count / maxCount) * 100}
                 $color={index === 0 ? '#2563EB' : '#93B4FB'}
               />
             </Track>

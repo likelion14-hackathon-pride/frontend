@@ -33,15 +33,6 @@ const ValueText = styled.span`
   letter-spacing: -1.6px;
 `;
 
-const DeltaText = styled.span`
-  color: #1f7a45;
-  font-family: 'Plus Jakarta Sans';
-  font-size: 11.5px;
-  font-style: normal;
-  font-weight: 700;
-  line-height: 12.075px;
-`;
-
 const LegendRow = styled.div`
   display: inline-flex;
   height: 16px;
@@ -78,7 +69,7 @@ const LegendLabel = styled.span`
   white-space: nowrap;
 `;
 
-function AdoptionRateCard({ value, delta, aiCount, ownerCount }) {
+function AdoptionRateCard({ value, aiCount, ownerCount }) {
   return (
     <StatCardShell title="SAI 해결">
       <GraphContainer>
@@ -92,7 +83,6 @@ function AdoptionRateCard({ value, delta, aiCount, ownerCount }) {
         >
           <CenterLabel>
             <ValueText>{value}%</ValueText>
-            <DeltaText>{delta}</DeltaText>
           </CenterLabel>
         </DonutGauge>
       </GraphContainer>

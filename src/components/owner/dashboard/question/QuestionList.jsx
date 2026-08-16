@@ -9,9 +9,9 @@ const STATUS_META = {
 const Panel = styled.div`
   box-sizing: border-box;
   display: flex;
-  width: 705.323px;
+  flex: 1.15 1 320px;
+  min-width: 0;
   height: 334.792px;
-  flex-shrink: 0;
   flex-direction: column;
   padding: 12px;
   border-radius: 22px;
@@ -45,16 +45,19 @@ const Row = styled.button`
 
 const AvatarPill = styled.span`
   display: flex;
+  width: 34px;
   height: 34px;
-  padding: 10px 12px 10px 3.958px;
-  justify-content: flex-end;
+  justify-content: center;
   align-items: center;
   flex-shrink: 0;
-  border-radius: 50px;
+  border-radius: 50%;
   background: #dde7fd;
 `;
 
 const AvatarLabel = styled.span`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: #1d4ed8;
   text-align: center;
   font-family: 'Plus Jakarta Sans';

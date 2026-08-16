@@ -14,7 +14,9 @@ function OwnerDashboardPage() {
     <DashboardLayout>
       <DashboardHeader activeTab={activeTab} onTabChange={setActiveTab} />
 
-      {activeTab === 'dashboard' && <DashboardHomeTab />}
+      {activeTab === 'dashboard' && (
+        <DashboardHomeTab onNavigateToQuestions={() => setActiveTab('question')} />
+      )}
       {activeTab === 'handbook' && <HandbookTab />}
       {activeTab === 'question' && <QuestionTab />}
       {activeTab === 'source' && <SourceTab />}

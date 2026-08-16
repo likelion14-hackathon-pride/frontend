@@ -3,7 +3,7 @@ import StatCardShell from './StatCardShell';
 
 const NumberBlock = styled.div`
   display: flex;
-  width: 285.833px;
+  width: 100%;
   height: 40px;
   align-items: baseline;
   gap: 10px;
@@ -30,7 +30,7 @@ const DeltaText = styled.span`
 
 const BarsRow = styled.div`
   display: flex;
-  width: 285.833px;
+  width: 100%;
   padding: 14.333px 0 0 0;
   justify-content: center;
   align-items: flex-end;
@@ -39,15 +39,16 @@ const BarsRow = styled.div`
 
 const MonthColumn = styled.div`
   display: flex;
-  width: 41.8px;
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 41.8px;
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  flex-shrink: 0;
 `;
 
 const Bar = styled.div`
-  width: 41.8px;
+  width: 100%;
   height: ${({ $height }) => $height}px;
   flex-shrink: 0;
   border-radius: 6px;
@@ -55,7 +56,7 @@ const Bar = styled.div`
 `;
 
 const MonthLabel = styled.span`
-  width: 24.667px;
+  width: 100%;
   color: #a0a0a8;
   text-align: center;
   font-family: 'IBM Plex Mono';
@@ -66,7 +67,7 @@ const MonthLabel = styled.span`
 `;
 
 const Footnote = styled.span`
-  width: 293.833px;
+  width: 100%;
   color: #a0a0a8;
   font-family: 'Plus Jakarta Sans';
   font-size: 11px;

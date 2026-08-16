@@ -10,8 +10,10 @@ const LEVEL_META = {
 const Card = styled.div`
   box-sizing: border-box;
   display: flex;
-  flex: 1 0 0;
-  min-height: 248px;
+  flex: 1 1 320px;
+  min-width: 0;
+  min-height: 320px;
+  height: 100%;
   flex-direction: column;
   gap: 16px;
   padding: 24px 22.667px;
