@@ -40,7 +40,14 @@ function DonutGauge({
   return (
     <Wrap $wrapSize={wrapSize ?? size}>
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke={trackColor} strokeWidth={stroke} />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke={trackColor}
+          strokeWidth={stroke}
+        />
         <circle
           cx={size / 2}
           cy={size / 2}

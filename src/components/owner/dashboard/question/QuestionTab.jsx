@@ -54,7 +54,9 @@ const SplitRow = styled.div`
 
 function QuestionTab() {
   const [questions, setQuestions] = useState(INITIAL_QUESTIONS);
-  const [selectedId, setSelectedId] = useState(INITIAL_QUESTIONS[2]?.id ?? INITIAL_QUESTIONS[0]?.id ?? null);
+  const [selectedId, setSelectedId] = useState(
+    INITIAL_QUESTIONS[2]?.id ?? INITIAL_QUESTIONS[0]?.id ?? null
+  );
   const [savedCount, setSavedCount] = useState(0);
 
   const selectedQuestion = questions.find((q) => q.id === selectedId) ?? null;
@@ -98,7 +100,8 @@ function QuestionTab() {
       <HeaderTextGroup>
         <Heading>질문</Heading>
         <Subheading>
-          AI가 답하지 못한 질문은 대표님 답변을 거쳐 핸드북 항목이 됩니다. 저장 단위는 질문-답변 1쌍당 항목 1개입니다
+          AI가 답하지 못한 질문은 대표님 답변을 거쳐 핸드북 항목이 됩니다. 저장 단위는 질문-답변
+          1쌍당 항목 1개입니다
         </Subheading>
       </HeaderTextGroup>
 

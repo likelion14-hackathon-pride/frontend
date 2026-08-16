@@ -67,7 +67,7 @@ const EXAMPLE_MESSAGES_BY_SCOPE = {
 };
 
 export default function MemberAskPage() {
-  const [scope, setScope] = useState('payment-api');
+  const [scope, setScope] = useState('company');
   const [messagesByScope, setMessagesByScope] = useState(EXAMPLE_MESSAGES_BY_SCOPE);
   const { pendingQuestion, pendingQuestionTaskId, clearPendingQuestion } = useMemberNavigation();
   const handledQuestionRef = useRef(null);

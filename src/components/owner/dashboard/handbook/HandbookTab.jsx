@@ -61,11 +61,15 @@ function HandbookTab() {
   const selectedItem = items.find((item) => item.id === selectedItemId) ?? null;
 
   const handleConfirm = (id) => {
-    setItems((prev) => prev.map((item) => (item.id === id ? { ...item, status: 'confirmed' } : item)));
+    setItems((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, status: 'confirmed' } : item))
+    );
   };
 
   const handleConfirmAll = () => {
-    setItems((prev) => prev.map((item) => (item.status !== 'confirmed' ? { ...item, status: 'confirmed' } : item)));
+    setItems((prev) =>
+      prev.map((item) => (item.status !== 'confirmed' ? { ...item, status: 'confirmed' } : item))
+    );
   };
 
   const handleAddProject = (key, label) => {
@@ -94,7 +98,9 @@ function HandbookTab() {
 
   const handleUpdateItemText = (id, text) => {
     if (!text) return;
-    setItems((prev) => prev.map((item) => (item.id === id ? { ...item, text, lastConfirmed: '방금' } : item)));
+    setItems((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, text, lastConfirmed: '방금' } : item))
+    );
   };
 
   const handleDeleteItem = (id) => {
@@ -142,7 +148,11 @@ function HandbookTab() {
           />
         </LeftColumn>
         <RightColumn>
-          <HandbookDetailPanel item={selectedItem} onSave={handleUpdateItemText} onDelete={handleDeleteItem} />
+          <HandbookDetailPanel
+            item={selectedItem}
+            onSave={handleUpdateItemText}
+            onDelete={handleDeleteItem}
+          />
         </RightColumn>
       </Body>
     </TabContent>

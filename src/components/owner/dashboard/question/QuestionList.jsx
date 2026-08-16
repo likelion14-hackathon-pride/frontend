@@ -124,7 +124,12 @@ function QuestionList({ questions, selectedId, onSelect }) {
       {questions.map((q) => {
         const meta = STATUS_META[q.status];
         return (
-          <Row key={q.id} type="button" $active={q.id === selectedId} onClick={() => onSelect(q.id)}>
+          <Row
+            key={q.id}
+            type="button"
+            $active={q.id === selectedId}
+            onClick={() => onSelect(q.id)}
+          >
             <AvatarPill>
               <AvatarLabel>{q.employee}</AvatarLabel>
             </AvatarPill>

@@ -374,7 +374,14 @@ const STATUS_META = {
 
 const SAVE_DELAY_MS = 450;
 
-function QuestionApprovalPanel({ question, onSendReply, onApprove, onDiscard, onUndo, onEditSuggestion }) {
+function QuestionApprovalPanel({
+  question,
+  onSendReply,
+  onApprove,
+  onDiscard,
+  onUndo,
+  onEditSuggestion,
+}) {
   const [mode, setMode] = useState('view');
   const [draftTitle, setDraftTitle] = useState('');
   const [replyText, setReplyText] = useState('');
@@ -486,7 +493,11 @@ function QuestionApprovalPanel({ question, onSendReply, onApprove, onDiscard, on
               <ProjectTag>{question.suggestion.tag}</ProjectTag>
             </SuggestionHeadRow>
             {mode === 'editing' ? (
-              <EditTextarea autoFocus value={draftTitle} onChange={(e) => setDraftTitle(e.target.value)} />
+              <EditTextarea
+                autoFocus
+                value={draftTitle}
+                onChange={(e) => setDraftTitle(e.target.value)}
+              />
             ) : (
               <SuggestionTitle>{question.suggestion.title}</SuggestionTitle>
             )}
@@ -498,7 +509,11 @@ function QuestionApprovalPanel({ question, onSendReply, onApprove, onDiscard, on
             <SavingBanner>핸드북에 저장 중…</SavingBanner>
           ) : mode === 'editing' ? (
             <ButtonsRow>
-              <ApproveButton type="button" onClick={handleEditSave} disabled={draftTitle.trim().length === 0}>
+              <ApproveButton
+                type="button"
+                onClick={handleEditSave}
+                disabled={draftTitle.trim().length === 0}
+              >
                 수정 후 저장
               </ApproveButton>
               <GhostButton type="button" onClick={() => setMode('view')}>

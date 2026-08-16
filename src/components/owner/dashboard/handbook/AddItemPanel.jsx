@@ -263,7 +263,9 @@ function AddItemPanel({ projects, onAddProject, onSave, onClose }) {
     <Panel>
       <HeadRow>
         <Badge>대표 직접 작성</Badge>
-        <HeadDescription>질문을 기다리지 않고 규칙을 바로 등록합니다. 저장 즉시 확인됨 상태가 됩니다.</HeadDescription>
+        <HeadDescription>
+          질문을 기다리지 않고 규칙을 바로 등록합니다. 저장 즉시 확인됨 상태가 됩니다.
+        </HeadDescription>
         <CloseButton type="button" onClick={onClose} aria-label="닫기">
           ✕
         </CloseButton>

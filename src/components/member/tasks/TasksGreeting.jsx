@@ -36,13 +36,6 @@ const Title = styled.div`
   color: #17171b;
 `;
 
-const Subtitle = styled.div`
-  font-size: 14px;
-  color: #8a8a93;
-  margin-top: 8px;
-  line-height: 1.5;
-`;
-
 const ChannelName = styled.b`
   color: #17171b;
 `;
@@ -97,13 +90,7 @@ const EnterChip = styled.span`
   background: #f4f4f6;
 `;
 
-export default function TasksGreeting({
-  taskCount = 4,
-  userName = 'Minh',
-  date = 'August 6',
-  channels = ['payment-api', 'admin-web'],
-  onAskClick,
-}) {
+export default function TasksGreeting({ taskCount = 4, userName = 'Minh', onAskClick }) {
   return (
     <Wrap>
       <Header>
@@ -112,16 +99,6 @@ export default function TasksGreeting({
           <Title>
             {taskCount} new tasks, {userName}
           </Title>
-          <Subtitle>
-            {date} · read from{' '}
-            {channels.map((ch, i) => (
-              <span key={ch}>
-                <ChannelName>#{ch}</ChannelName>
-                {i < channels.length - 2 ? ', ' : i === channels.length - 2 ? ' and ' : ''}
-              </span>
-            ))}
-            , interpreted for you
-          </Subtitle>
         </TextBlock>
       </Header>
 

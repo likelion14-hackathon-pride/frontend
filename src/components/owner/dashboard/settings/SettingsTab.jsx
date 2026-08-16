@@ -73,11 +73,17 @@ function SettingsTab() {
     <TabContent>
       <HeaderTextGroup>
         <Heading>설정</Heading>
-        <Subheading>위험 작업 키워드와 근무 시간은 팀원 화면의 사전 안내·시차 응답에 그대로 쓰입니다</Subheading>
+        <Subheading>
+          위험 작업 키워드와 근무 시간은 팀원 화면의 사전 안내·시차 응답에 그대로 쓰입니다
+        </Subheading>
       </HeaderTextGroup>
 
       <CardRow>
-        <RiskKeywordCard keywords={keywords} onAddKeyword={handleAddKeyword} onRemoveKeyword={handleRemoveKeyword} />
+        <RiskKeywordCard
+          keywords={keywords}
+          onAddKeyword={handleAddKeyword}
+          onRemoveKeyword={handleRemoveKeyword}
+        />
         <WorkHoursCompanyCodeCard
           workHoursEnabled={workHoursEnabled}
           onToggleWorkHours={() => setWorkHoursEnabled((prev) => !prev)}

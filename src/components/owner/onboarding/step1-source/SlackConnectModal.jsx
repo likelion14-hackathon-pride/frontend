@@ -565,7 +565,8 @@ const TextInput = styled.input`
   border: none;
   border-radius: 13px;
   background: #fff;
-  box-shadow: 0 0 0 ${({ $bad }) => ($bad ? '1.5px' : '1px')} ${({ $bad }) => ($bad ? '#E4737C' : '#DDE2EA')};
+  box-shadow: 0 0 0 ${({ $bad }) => ($bad ? '1.5px' : '1px')}
+    ${({ $bad }) => ($bad ? '#E4737C' : '#DDE2EA')};
   font-family: Pretendard;
   font-size: 14px;
   font-weight: 600;
@@ -1009,7 +1010,8 @@ const ChannelRow = styled.button`
   text-align: left;
   cursor: pointer;
   background: ${({ $on }) => ($on ? '#F4F8FF' : '#FFFFFF')};
-  box-shadow: 0 0 0 ${({ $on }) => ($on ? '1.5px' : '1px')} ${({ $on }) => ($on ? '#9CC1FF' : '#E6EAF1')};
+  box-shadow: 0 0 0 ${({ $on }) => ($on ? '1.5px' : '1px')}
+    ${({ $on }) => ($on ? '#9CC1FF' : '#E6EAF1')};
 `;
 
 const ChannelCheck = styled.span`
@@ -1271,7 +1273,9 @@ settings:
       primaryLabel = conn === 'error' ? '다시 연결하기' : '연결하기';
       primaryAction = handleConnect;
       primaryEnabled = token.trim() !== '' && secret.trim() !== '' && !tokenBad;
-      footerNote = primaryEnabled ? 'SAI가 슬랙과 값이 맞는지 확인합니다.' : '두 값을 모두 붙여넣으면 연결할 수 있습니다.';
+      footerNote = primaryEnabled
+        ? 'SAI가 슬랙과 값이 맞는지 확인합니다.'
+        : '두 값을 모두 붙여넣으면 연결할 수 있습니다.';
     }
   } else if (current === 5) {
     primaryLabel = '완료';
@@ -1280,7 +1284,8 @@ settings:
       setScreen('channels');
     };
     showSkip = true;
-    footerNote = '건너뛰어도 지금까지의 대화는 가져옵니다. 다만 앞으로 새로 올라오는 메시지는 자동으로 수집되지 않습니다.';
+    footerNote =
+      '건너뛰어도 지금까지의 대화는 가져옵니다. 다만 앞으로 새로 올라오는 메시지는 자동으로 수집되지 않습니다.';
   }
 
   const canGoBack = screen === 'modal' && current > 1 && conn !== 'loading';
@@ -1330,7 +1335,9 @@ settings:
 
           <Banner>
             <BannerIcon>◆</BannerIcon>
-            <BannerText>이미 사용 중인 슬랙을 연결합니다. 지금까지 쌓인 대화도 함께 가져옵니다.</BannerText>
+            <BannerText>
+              이미 사용 중인 슬랙을 연결합니다. 지금까지 쌓인 대화도 함께 가져옵니다.
+            </BannerText>
           </Banner>
         </Header>
 
@@ -1369,8 +1376,8 @@ settings:
                   <Badge $type="slack">◆ Slack에서 할 일</Badge>
                   <ContentHeading>슬랙에 SAI 추가하기</ContentHeading>
                   <ContentDescription>
-                    슬랙이 외부 서비스에 대화를 열어주려면 연결용 앱을 하나 등록해야 합니다. 새 워크스페이스를 만드는
-                    것이 아니며, 기존 채널과 대화는 그대로 유지됩니다.
+                    슬랙이 외부 서비스에 대화를 열어주려면 연결용 앱을 하나 등록해야 합니다. 새
+                    워크스페이스를 만드는 것이 아니며, 기존 채널과 대화는 그대로 유지됩니다.
                   </ContentDescription>
 
                   <InstructionBox>
@@ -1378,7 +1385,11 @@ settings:
                       <InstructionNumber>1</InstructionNumber>
                       <Segments>
                         <span>슬랙 앱 관리 페이지에 접속해 로그인하세요.</span>
-                        <ChipLink href="https://api.slack.com/apps" target="_blank" rel="noreferrer">
+                        <ChipLink
+                          href="https://api.slack.com/apps"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
                           api.slack.com/apps ↗
                         </ChipLink>
                       </Segments>
@@ -1453,8 +1464,8 @@ settings:
                       <FieldFull>
                         <FieldLabel>앱 설명</FieldLabel>
                         <FieldHint>
-                          직원이 슬랙에서 이 앱을 눌렀을 때 보이는 한 줄 소개입니다. 무엇을 하는 앱인지 알 수 있게
-                          적어 주세요.
+                          직원이 슬랙에서 이 앱을 눌렀을 때 보이는 한 줄 소개입니다. 무엇을 하는
+                          앱인지 알 수 있게 적어 주세요.
                         </FieldHint>
                         <TextArea
                           value={appDesc}
@@ -1486,8 +1497,12 @@ settings:
                           <PermissionHeadCell>용도</PermissionHeadCell>
                           {PERMISSION_ROWS.map((row) => (
                             <>
-                              <PermissionScope key={`${row.scope}-scope`}>{row.scope}</PermissionScope>
-                              <PermissionUsage key={`${row.scope}-usage`}>{row.usage}</PermissionUsage>
+                              <PermissionScope key={`${row.scope}-scope`}>
+                                {row.scope}
+                              </PermissionScope>
+                              <PermissionUsage key={`${row.scope}-usage`}>
+                                {row.usage}
+                              </PermissionUsage>
                             </>
                           ))}
                         </PermissionGrid>
@@ -1496,20 +1511,23 @@ settings:
                   </Accordion>
 
                   <Accordion>
-                    <AccordionTrigger type="button" onClick={() => setExistingOpen((prev) => !prev)}>
+                    <AccordionTrigger
+                      type="button"
+                      onClick={() => setExistingOpen((prev) => !prev)}
+                    >
                       <span>이미 슬랙 앱이 있나요?</span>
                       <AccordionChevron>{existingOpen ? '▲' : '▼'}</AccordionChevron>
                     </AccordionTrigger>
                     {existingOpen && (
                       <AccordionBody>
                         <AccordionParagraph>
-                          새로 추가해도 기존 대화는 그대로 가져옵니다. 대화 기록은 슬랙 앱이 아니라 워크스페이스에
-                          저장되기 때문입니다.
+                          새로 추가해도 기존 대화는 그대로 가져옵니다. 대화 기록은 슬랙 앱이 아니라
+                          워크스페이스에 저장되기 때문입니다.
                         </AccordionParagraph>
                         <AccordionParagraph>
-                          그래도 기존 앱을 쓰려면 위 권한 8개를 추가하고 앱을 재설치한 뒤 토큰을 입력하세요. 단, 그
-                          앱이 이미 다른 서비스로 이벤트를 보내고 있다면 함께 쓸 수 없습니다. 슬랙은 앱마다 이벤트
-                          주소를 하나만 허용합니다.
+                          그래도 기존 앱을 쓰려면 위 권한 8개를 추가하고 앱을 재설치한 뒤 토큰을
+                          입력하세요. 단, 그 앱이 이미 다른 서비스로 이벤트를 보내고 있다면 함께 쓸
+                          수 없습니다. 슬랙은 앱마다 이벤트 주소를 하나만 허용합니다.
                         </AccordionParagraph>
                       </AccordionBody>
                     )}
@@ -1521,7 +1539,9 @@ settings:
                 <>
                   <Badge $type="slack">◆ Slack에서 할 일</Badge>
                   <ContentHeading>워크스페이스에 설치</ContentHeading>
-                  <ContentDescription>방금 추가한 앱을 현재 워크스페이스에 설치하면 토큰이 나타납니다.</ContentDescription>
+                  <ContentDescription>
+                    방금 추가한 앱을 현재 워크스페이스에 설치하면 토큰이 나타납니다.
+                  </ContentDescription>
 
                   <InstructionBox>
                     <InstructionRow>
@@ -1547,7 +1567,9 @@ settings:
 
                   <WarningBox>
                     <WarningIcon>💡</WarningIcon>
-                    <WarningText>설치를 먼저 해야 토큰이 나타납니다. 설치 전에는 이 항목이 보이지 않습니다.</WarningText>
+                    <WarningText>
+                      설치를 먼저 해야 토큰이 나타납니다. 설치 전에는 이 항목이 보이지 않습니다.
+                    </WarningText>
                   </WarningBox>
 
                   <HintLine>
@@ -1557,7 +1579,8 @@ settings:
                     <span>로 시작하는 값은 다른 토큰이니 주의하세요.</span>
                   </HintLine>
                   <ExtraParagraph>
-                    설치 시 관리자 승인이 필요하다는 안내가 뜨면, 워크스페이스 관리자에게 승인을 요청해야 합니다.
+                    설치 시 관리자 승인이 필요하다는 안내가 뜨면, 워크스페이스 관리자에게 승인을
+                    요청해야 합니다.
                   </ExtraParagraph>
                 </>
               )}
@@ -1566,7 +1589,9 @@ settings:
                 <>
                   <Badge $type="slack">◆ Slack에서 할 일</Badge>
                   <ContentHeading>Signing Secret 복사</ContentHeading>
-                  <ContentDescription>SAI가 슬랙에서 온 요청인지 확인할 때 쓰는 값입니다.</ContentDescription>
+                  <ContentDescription>
+                    SAI가 슬랙에서 온 요청인지 확인할 때 쓰는 값입니다.
+                  </ContentDescription>
 
                   <InstructionBox>
                     <InstructionRow>
@@ -1600,7 +1625,9 @@ settings:
                 <>
                   <Badge $type="sai">● SAI에서 할 일</Badge>
                   <ContentHeading>복사한 값 붙여넣기</ContentHeading>
-                  <ContentDescription>2단계와 3단계에서 복사한 값을 각각 넣어 주세요.</ContentDescription>
+                  <ContentDescription>
+                    2단계와 3단계에서 복사한 값을 각각 넣어 주세요.
+                  </ContentDescription>
 
                   <FieldStack>
                     <Field style={{ flexBasis: 'auto' }}>
@@ -1614,7 +1641,9 @@ settings:
                         onChange={(event) => setToken(event.target.value)}
                       />
                       {tokenBad && (
-                        <FieldErrorText>Bot Token이 아닙니다. xoxb- 로 시작하는 값인지 확인해 주세요.</FieldErrorText>
+                        <FieldErrorText>
+                          Bot Token이 아닙니다. xoxb- 로 시작하는 값인지 확인해 주세요.
+                        </FieldErrorText>
                       )}
                     </Field>
 
@@ -1660,7 +1689,9 @@ settings:
                         <ErrorIcon>!</ErrorIcon>
                         <ErrorTextGroup>
                           <ErrorTitle>{errorMsg || DEFAULT_ERROR_MESSAGE}</ErrorTitle>
-                          <ErrorHint>입력한 값이 일치하지 않았습니다. 고친 뒤 다시 시도하세요.</ErrorHint>
+                          <ErrorHint>
+                            입력한 값이 일치하지 않았습니다. 고친 뒤 다시 시도하세요.
+                          </ErrorHint>
                         </ErrorTextGroup>
                       </ErrorRow>
                     )}
@@ -1672,7 +1703,9 @@ settings:
                 <>
                   <Badge $type="slack">◆ Slack에서 할 일</Badge>
                   <ContentHeading>실시간 수신 설정</ContentHeading>
-                  <ContentDescription>앞으로 새로 올라오는 메시지를 SAI가 바로 받도록 주소를 등록합니다.</ContentDescription>
+                  <ContentDescription>
+                    앞으로 새로 올라오는 메시지를 SAI가 바로 받도록 주소를 등록합니다.
+                  </ContentDescription>
 
                   <InstructionBox>
                     <InstructionRow>
@@ -1699,12 +1732,17 @@ settings:
                       <CodeBoxLabel>REQUEST URL</CodeBoxLabel>
                       <CodeBoxActions>
                         {copied === 'url' && <CopiedLabel>복사했습니다</CopiedLabel>}
-                        <CodeCopyButton type="button" onClick={() => handleCopy('url', REQUEST_URL)}>
+                        <CodeCopyButton
+                          type="button"
+                          onClick={() => handleCopy('url', REQUEST_URL)}
+                        >
                           복사
                         </CodeCopyButton>
                       </CodeBoxActions>
                     </CodeBoxHeader>
-                    <CodePre style={{ padding: '15px 18px', fontSize: 13, lineHeight: 1.5 }}>{REQUEST_URL}</CodePre>
+                    <CodePre style={{ padding: '15px 18px', fontSize: 13, lineHeight: 1.5 }}>
+                      {REQUEST_URL}
+                    </CodePre>
                   </CodeBox>
 
                   <InfoBox>
@@ -1738,7 +1776,12 @@ settings:
             </ContentDescription>
             <ChannelList>
               {channels.map((channel, index) => (
-                <ChannelRow key={channel.name} type="button" $on={channel.on} onClick={() => toggleChannel(index)}>
+                <ChannelRow
+                  key={channel.name}
+                  type="button"
+                  $on={channel.on}
+                  onClick={() => toggleChannel(index)}
+                >
                   <ChannelCheck $on={channel.on}>{channel.on ? '✓' : ''}</ChannelCheck>
                   <ChannelTextGroup>
                     <ChannelNameRow>
@@ -1780,7 +1823,14 @@ settings:
             ) : (
               <PrimaryButtonDisabled type="button" disabled>
                 {conn === 'loading' && (
-                  <Spinner style={{ width: 14, height: 14, borderColor: '#CBD2DD', borderTopColor: '#7A818D' }} />
+                  <Spinner
+                    style={{
+                      width: 14,
+                      height: 14,
+                      borderColor: '#CBD2DD',
+                      borderTopColor: '#7A818D',
+                    }}
+                  />
                 )}
                 {primaryLabel}
               </PrimaryButtonDisabled>

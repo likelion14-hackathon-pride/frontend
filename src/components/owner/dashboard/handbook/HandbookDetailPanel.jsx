@@ -286,7 +286,9 @@ function HandbookDetailPanel({ item, onSave, onDelete }) {
         <DeleteButton type="button" onClick={() => onDelete(item.id)}>
           삭제
         </DeleteButton>
-        <TimestampText>{item.lastConfirmed ? `최근 확인 ${item.lastConfirmed}` : '확인 이력 없음'}</TimestampText>
+        <TimestampText>
+          {item.lastConfirmed ? `최근 확인 ${item.lastConfirmed}` : '확인 이력 없음'}
+        </TimestampText>
       </ButtonRow>
     </Panel>
   );

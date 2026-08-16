@@ -143,7 +143,13 @@ const CopyButton = styled.button`
 
 const COPIED_RESET_MS = 2000;
 
-function WorkHoursCompanyCodeCard({ workHoursEnabled, onToggleWorkHours, hours, companyCode, onCopyCode }) {
+function WorkHoursCompanyCodeCard({
+  workHoursEnabled,
+  onToggleWorkHours,
+  hours,
+  companyCode,
+  onCopyCode,
+}) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {

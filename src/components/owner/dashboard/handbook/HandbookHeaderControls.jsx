@@ -93,7 +93,8 @@ const ArchiveButton = styled.button`
   border-radius: 999px;
   cursor: pointer;
 
-  border: 0.667px solid ${({ $open, $hasItems }) => ($open ? '#9A6212' : $hasItems ? '#F0E0C0' : '#F0E0C0')};
+  border: 0.667px solid
+    ${({ $open, $hasItems }) => ($open ? '#9A6212' : $hasItems ? '#F0E0C0' : '#F0E0C0')};
   background: ${({ $open }) => ($open ? '#9A6212' : '#FFF')};
   opacity: ${({ $open, $hasItems }) => ($open || $hasItems ? 1 : 0.55)};
 `;
@@ -160,7 +161,12 @@ const AddLabel = styled.span`
 function ArchiveIcon({ color }) {
   return (
     <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-      <path d="M1.625 3.73749H11.375V6.17499H1.625V3.73749Z" stroke={color} strokeWidth="1.3" strokeLinejoin="round" />
+      <path
+        d="M1.625 3.73749H11.375V6.17499H1.625V3.73749Z"
+        stroke={color}
+        strokeWidth="1.3"
+        strokeLinejoin="round"
+      />
       <path
         d="M2.51855 6.17499H10.4811V10.4H2.51855V6.17499Z"
         stroke={color}
@@ -192,7 +198,9 @@ function HandbookHeaderControls({
     <HeaderRow>
       <TextGroup>
         <Heading>핸드북</Heading>
-        <Subheading>확인된 항목만 표시됩니다. 확인 전 항목은 보관함에서 한 번에 확인하세요</Subheading>
+        <Subheading>
+          확인된 항목만 표시됩니다. 확인 전 항목은 보관함에서 한 번에 확인하세요
+        </Subheading>
       </TextGroup>
 
       <ControlsGroup>
@@ -200,15 +208,28 @@ function HandbookHeaderControls({
           <TierTab type="button" $active={activeTier === 'all'} onClick={() => onTierChange('all')}>
             전체
           </TierTab>
-          <TierTab type="button" $active={activeTier === 'company'} onClick={() => onTierChange('company')}>
+          <TierTab
+            type="button"
+            $active={activeTier === 'company'}
+            onClick={() => onTierChange('company')}
+          >
             회사 규칙
           </TierTab>
-          <TierTab type="button" $active={activeTier === 'project'} onClick={() => onTierChange('project')}>
+          <TierTab
+            type="button"
+            $active={activeTier === 'project'}
+            onClick={() => onTierChange('project')}
+          >
             프로젝트
           </TierTab>
         </TierTrack>
 
-        <ArchiveButton type="button" $open={archiveOpen} $hasItems={waitingCount > 0} onClick={onToggleArchive}>
+        <ArchiveButton
+          type="button"
+          $open={archiveOpen}
+          $hasItems={waitingCount > 0}
+          onClick={onToggleArchive}
+        >
           <ArchiveIcon color={archiveOpen ? '#FFFFFF' : '#9A6212'} />
           <ArchiveLabel $open={archiveOpen}>확인 보관함</ArchiveLabel>
           <ArchiveCount $open={archiveOpen}>{waitingCount}</ArchiveCount>
