@@ -291,7 +291,7 @@ const EditButton = styled.button`
   flex-shrink: 0;
 `;
 
-function QuestionRow({ question, answer, onChange }) {
+function QuestionRow({ question, answer, saving = false, onChange }) {
   const status = getQuestionStatus(answer);
   const previewText = getAnswerPreviewText(question, answer);
   const [expanded, setExpanded] = useState(false);
@@ -334,7 +334,9 @@ function QuestionRow({ question, answer, onChange }) {
         <QuestionText>{question.text}</QuestionText>
         <RightGroup>
           {!expanded && previewText && <AnswerPreview>{previewText}</AnswerPreview>}
-          <StatusBadge $status={status}>{STATUS_META[status].label}</StatusBadge>
+          <StatusBadge $status={status}>
+            {saving ? '저장 중…' : STATUS_META[status].label}
+          </StatusBadge>
           <Chevron $expanded={expanded}>⌄</Chevron>
         </RightGroup>
       </Header>

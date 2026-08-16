@@ -1,5 +1,16 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import styled from 'styled-components';
+
+import * as sourcesApi from '../../../../apis/sources';
+import {
+  CONNECTION_KIND,
+  CONNECTION_STATUS,
+  LOCAL_FILE_EXTENSIONS,
+  LOCAL_FILE_MAX_SIZE,
+  LOCAL_FILE_MIME_TYPES,
+} from '../../../../apis/constants';
+import { toApiError } from '../../../../apis/errors';
+import { ErrorState, InlineError, LoadingState } from '../../../common/AsyncStates';
 import Mascot from '../Mascot';
 import SourceCard from './SourceCard';
 import SlackConnectModal from './SlackConnectModal';
@@ -72,16 +83,6 @@ const Heading = styled.h1`
   font-size: 32px;
   font-weight: 800;
   color: ${colors.textPrimary};
-`;
-
-const Subheading = styled.p`
-  margin: 12px 0 0;
-  font-size: 15px;
-  color: ${colors.textSecondary};
-
-  strong {
-    color: ${colors.textPrimary};
-  }
 `;
 
 const CardGrid = styled.div`
@@ -158,8 +159,8 @@ const CtaButton = styled.button`
   gap: 9px;
   border: none;
   border-radius: 999px;
-  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
-  background: ${({ disabled }) => (disabled ? 'rgba(255, 255, 255, 0.14)' : '#FFF')};
+  cursor: pointer;
+  background: #fff;
 `;
 
 const CtaButtonLabel = styled.span`
@@ -172,12 +173,11 @@ const CtaButtonLabel = styled.span`
   font-family: Pretendard;
   font-size: 14px;
   font-weight: 700;
-  color: ${({ $disabled }) => ($disabled ? '#FFFFFF' : '#17171B')};
+  color: #17171b;
 `;
 
-const SOURCES = [
-  {
-    key: 'github',
+const SOURCE_META = {
+  [CONNECTION_KIND.GITHUB]: {
     variant: 'github',
     icon: (
       <GithubIconCrop>
@@ -191,8 +191,7 @@ const SOURCES = [
     connectingLabel: '연결 중…',
     connectedLabel: '연결완료 ✓ ',
   },
-  {
-    key: 'slack',
+  [CONNECTION_KIND.SLACK]: {
     variant: 'slack',
     icon: <img src={slackIcon} alt="" width={27} height={27} />,
     title: 'Slack',
@@ -202,67 +201,98 @@ const SOURCES = [
     connectingLabel: '연결 중…',
     connectedLabel: '연결완료 ✓ ',
   },
-  {
-    key: 'localFile',
+  [CONNECTION_KIND.LOCAL]: {
     variant: 'localFile',
     icon: <img src={localFileIcon} alt="" width={22} height={22} />,
     title: '로컬 파일',
-    subtitle: 'md · txt · pdf 등',
+    subtitle: 'md · txt · pdf · docx',
     description:
       '어느 도구에도 올라가 있지 않은 문서를 그대로 올려 주세요. 파일명이 출처로 남습니다.',
     buttonLabel: '업로드하기',
     connectingLabel: '업로드 중…',
     connectedLabel: '업로드 완료 ✓ ',
   },
-];
+};
 
-const CONNECT_DELAY_MS = 900;
+const ORDER = [CONNECTION_KIND.GITHUB, CONNECTION_KIND.SLACK, CONNECTION_KIND.LOCAL];
 
-function SourceConnectStep({ connectedSources, onToggleSource, onCreateDraft }) {
-  const [connectingKeys, setConnectingKeys] = useState(new Set());
+function extensionOf(fileName) {
+  const dot = fileName.lastIndexOf('.');
+  return dot === -1 ? '' : fileName.slice(dot).toLowerCase();
+}
+
+function SourceConnectStep({ companyId, connections, loading, error, onReload, onCreateDraft }) {
   const [slackModalOpen, setSlackModalOpen] = useState(false);
   const [githubModalOpen, setGithubModalOpen] = useState(false);
-  const connectedCount = connectedSources.size;
+  const [uploadError, setUploadError] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef(null);
 
-  const handleConnect = (key) => {
-    if (connectedSources.has(key)) {
-      onToggleSource(key);
-      return;
-    }
-    if (connectingKeys.has(key)) return;
+  // 연결 여부는 서버 목록이 정한다. 화면이 따로 기억하지 않는다.
+  const byKind = new Map(connections.map((connection) => [connection.provider, connection]));
+  const connectedCount = connections.filter(
+    (connection) => connection.status === CONNECTION_STATUS.CONNECTED
+  ).length;
 
-    setConnectingKeys((prev) => new Set(prev).add(key));
-    setTimeout(() => {
-      setConnectingKeys((prev) => {
-        const next = new Set(prev);
-        next.delete(key);
-        return next;
-      });
-      onToggleSource(key);
-    }, CONNECT_DELAY_MS);
-  };
-
-  const handleCardToggle = (key) => {
-    if (key === 'slack' && !connectedSources.has(key)) {
+  const handleCardToggle = (kind) => {
+    if (kind === CONNECTION_KIND.SLACK) {
       setSlackModalOpen(true);
       return;
     }
-    if (key === 'github' && !connectedSources.has(key)) {
+    if (kind === CONNECTION_KIND.GITHUB) {
       setGithubModalOpen(true);
       return;
     }
-    handleConnect(key);
+    fileInputRef.current?.click();
   };
 
-  const handleSlackConnected = () => {
-    setSlackModalOpen(false);
-    onToggleSource('slack');
-  };
+  // 로컬 파일: 메타를 먼저 만들고, 서버가 준 S3 URL 로 파일을 직접 올린다.
+  async function handleFileSelected(event) {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
 
-  const handleGithubConnected = () => {
-    setGithubModalOpen(false);
-    onToggleSource('github');
-  };
+    setUploadError(null);
+
+    const extension = extensionOf(file.name);
+    if (!LOCAL_FILE_EXTENSIONS.includes(extension)) {
+      setUploadError({ message: `지원하지 않는 파일 형식입니다 (${LOCAL_FILE_EXTENSIONS.join(' · ')})` });
+      return;
+    }
+    if (file.size > LOCAL_FILE_MAX_SIZE) {
+      setUploadError({ message: '파일이 너무 큽니다. 20MB 이하만 올릴 수 있습니다.' });
+      return;
+    }
+    // 브라우저가 확장자를 못 알아보는 경우가 있어 서버가 받는 값으로 보정한다.
+    const mimeType = LOCAL_FILE_MIME_TYPES[extension].includes(file.type)
+      ? file.type
+      : LOCAL_FILE_MIME_TYPES[extension][0];
+
+    setUploading(true);
+    try {
+      const created = await sourcesApi.createLocalFileUpload(companyId, {
+        fileName: file.name,
+        mimeType,
+        size: file.size,
+      });
+      // S3 presigned URL 은 우리 서버가 아니므로 axios 인스턴스를 태우지 않는다.
+      const response = await fetch(created.uploadTarget, {
+        method: 'PUT',
+        headers: { 'Content-Type': mimeType },
+        body: file,
+      });
+      if (!response.ok) throw new Error('upload failed');
+      onReload();
+    } catch (caught) {
+      setUploadError(
+        caught?.response || caught?.code
+          ? toApiError(caught)
+          : { message: '파일을 올리지 못했습니다. 잠시 후 다시 시도해 주세요.' }
+      );
+    } finally {
+      setUploading(false);
+    }
+  }
 
   return (
     <>
@@ -278,31 +308,54 @@ function SourceConnectStep({ connectedSources, onToggleSource, onCreateDraft }) 
           </MascotContainer>
         </HeaderRow>
 
+        <InlineError error={uploadError} />
+
+        {loading && connections.length === 0 && <LoadingState label="연결 상태를 확인하는 중…" />}
+        {error && connections.length === 0 && <ErrorState error={error} onRetry={onReload} />}
+
         <CardGrid>
-          {SOURCES.map((source) => {
-            const status = connectedSources.has(source.key)
+          {ORDER.map((kind) => {
+            const meta = SOURCE_META[kind];
+            const connection = byKind.get(kind);
+            const status = connection
               ? 'connected'
-              : connectingKeys.has(source.key)
+              : kind === CONNECTION_KIND.LOCAL && uploading
                 ? 'connecting'
                 : 'idle';
 
             return (
               <SourceCard
-                key={source.key}
-                variant={source.variant}
-                icon={source.icon}
-                title={source.title}
-                subtitle={source.subtitle}
-                description={source.description}
-                buttonLabel={source.buttonLabel}
-                connectingLabel={source.connectingLabel}
-                connectedLabel={source.connectedLabel}
+                key={kind}
+                variant={meta.variant}
+                icon={meta.icon}
+                title={meta.title}
+                subtitle={
+                  connection?.displayName
+                    ? `${meta.subtitle} · ${connection.displayName}`
+                    : meta.subtitle
+                }
+                description={
+                  connection?.status === CONNECTION_STATUS.ERROR && connection.errorMessage
+                    ? connection.errorMessage
+                    : meta.description
+                }
+                buttonLabel={meta.buttonLabel}
+                connectingLabel={meta.connectingLabel}
+                connectedLabel={meta.connectedLabel}
                 status={status}
-                onToggle={() => handleCardToggle(source.key)}
+                onToggle={() => handleCardToggle(kind)}
               />
             );
           })}
         </CardGrid>
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          hidden
+          accept={LOCAL_FILE_EXTENSIONS.join(',')}
+          onChange={handleFileSelected}
+        />
 
         <CtaBar>
           <CtaTextGroup>
@@ -316,12 +369,12 @@ function SourceConnectStep({ connectedSources, onToggleSource, onCreateDraft }) 
             <CtaSubtitleWrap>
               <CtaSubtitle>
                 다음 단계에서 기본 규칙 질문에 답하면 핸드북이 시작됩니다. 소스는 그 위에 얹히는
-                자료입니다.
+                자료입니다. 소스를 연결하지 않아도 다음으로 넘어갈 수 있습니다.
               </CtaSubtitle>
             </CtaSubtitleWrap>
           </CtaTextGroup>
-          <CtaButton type="button" disabled={connectedCount === 0} onClick={onCreateDraft}>
-            <CtaButtonLabel $disabled={connectedCount === 0}>기본 규칙 정하기</CtaButtonLabel>
+          <CtaButton type="button" onClick={onCreateDraft}>
+            <CtaButtonLabel>기본 규칙 정하기</CtaButtonLabel>
             <img src={connectedCount === 0 ? nextArrowTrans : nextArrowBlack} alt="" />
           </CtaButton>
         </CtaBar>
@@ -329,15 +382,23 @@ function SourceConnectStep({ connectedSources, onToggleSource, onCreateDraft }) 
 
       {slackModalOpen && (
         <SlackConnectModal
+          companyId={companyId}
           onClose={() => setSlackModalOpen(false)}
-          onConnected={handleSlackConnected}
+          onConnected={() => {
+            setSlackModalOpen(false);
+            onReload();
+          }}
         />
       )}
 
       {githubModalOpen && (
         <GithubConnectModal
+          companyId={companyId}
           onClose={() => setGithubModalOpen(false)}
-          onConnected={handleGithubConnected}
+          onConnected={() => {
+            setGithubModalOpen(false);
+            onReload();
+          }}
         />
       )}
     </>
