@@ -2,7 +2,6 @@ import axios from 'axios';
 
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
-  withCredentials: true,
 });
 
 // 요청 시 토큰 자동 첨부
@@ -14,10 +13,14 @@ axiosInstance.interceptors.request.use((config) => {
   return config;
 });
 
-// 공통 에러 처리 (필요에 맞게 수정)
+// 인증 만료 시 토큰 정리 후 로그인 화면으로 이동
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('accessToken');
+      window.location.href = '/login';
+    }
     return Promise.reject(error);
   }
 );
