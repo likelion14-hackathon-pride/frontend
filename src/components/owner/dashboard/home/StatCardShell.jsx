@@ -3,9 +3,9 @@ import styled from 'styled-components';
 const Card = styled.div`
   box-sizing: border-box;
   display: flex;
-  width: 323.167px;
-  height: 250.333px;
-  flex-shrink: 0;
+  flex: 1 1 240px;
+  min-width: 0;
+  min-height: 250.333px;
   flex-direction: column;
   padding: 20px 14.667px;
   gap: 14px;
@@ -18,7 +18,7 @@ const Card = styled.div`
 `;
 
 const Title = styled.span`
-  width: 293.833px;
+  width: 100%;
   color: #6b6b73;
   font-family: 'Plus Jakarta Sans';
   font-size: 12.5px;

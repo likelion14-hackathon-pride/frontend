@@ -188,7 +188,8 @@ const FooterRow = styled.div`
 const AddButton = styled.button`
   display: flex;
   height: 36px;
-  padding: 10.667px 20.146px 10.333px 16px;
+  padding: 0 20px;
+  justify-content: center;
   align-items: center;
   flex-shrink: 0;
   border: none;

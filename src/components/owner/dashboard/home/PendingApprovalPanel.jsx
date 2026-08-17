@@ -6,9 +6,9 @@ import { formatShortKo } from '../../../../utils/time';
 const Panel = styled.div`
   box-sizing: border-box;
   display: flex;
-  width: 660.333px;
+  flex: 1 1 320px;
+  min-width: 0;
   height: 290.917px;
-  flex-shrink: 0;
   flex-direction: column;
   padding: 20px 20.667px;
   gap: 14px;
@@ -143,28 +143,7 @@ const MetaText = styled.span`
   white-space: nowrap;
 `;
 
-const CheckButton = styled.button`
-  display: flex;
-  width: 20px;
-  height: 20px;
-  padding: 5px;
-  justify-content: center;
-  align-items: center;
-  flex-shrink: 0;
-  border: none;
-  border-radius: 50px;
-  cursor: pointer;
-  background: ${({ $resolved }) => ($resolved ? 'rgba(255, 255, 255, 0.14)' : '#2563EB')};
-  opacity: ${({ $resolved }) => ($resolved ? 0.55 : 1)};
-`;
 
-function CheckIcon() {
-  return (
-    <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-      <path d="M2 5.2L4 7.2L8 3" stroke="white" strokeWidth="1.8" />
-    </svg>
-  );
-}
 
 const EmptyRow = styled.div`
   display: flex;
@@ -178,7 +157,7 @@ const EmptyRow = styled.div`
 
 // waitingQuestions 는 DRAFT / SENT 상태의 대표 확인 질문이다(companies/dashboard.py).
 // 아직 팀원이 보내지 않은 초안(DRAFT)과 보낸 질문(SENT)을 상태로 구분해 보여 준다.
-function PendingApprovalPanel({ waitingQuestions }) {
+function PendingApprovalPanel({ waitingQuestions, onViewAll }) {
   const items = waitingQuestions?.items ?? [];
   const total = waitingQuestions?.totalCount ?? 0;
 
@@ -189,7 +168,7 @@ function PendingApprovalPanel({ waitingQuestions }) {
           <Title>대표님을 기다리는 질문</Title>
           <Subtitle>핸드북에 근거가 없는 질문 · 전체 {total}건</Subtitle>
         </TitleGroup>
-        <Chevron type="button" aria-label="전체 보기">
+        <Chevron type="button" aria-label="전체 보기" onClick={onViewAll}>
           ›
         </Chevron>
       </HeadRow>

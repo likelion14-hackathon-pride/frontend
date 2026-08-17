@@ -9,8 +9,7 @@ import HandbookGrowthCard from './HandbookGrowthCard';
 const Row = styled.div`
   display: flex;
   width: 100%;
-  height: 250.333px;
-  flex-shrink: 0;
+  flex-wrap: wrap;
   justify-content: center;
   align-items: flex-start;
   gap: 14px;

@@ -55,14 +55,13 @@ const SubheadingStrong = styled.strong`
 const SplitRow = styled.div`
   display: flex;
   width: 100%;
-  height: 290.917px;
-  flex-shrink: 0;
+  flex-wrap: wrap;
   justify-content: center;
   align-items: flex-start;
   gap: 14px;
 `;
 
-function DashboardHomeTab({ companyId, ownerName }) {
+function DashboardHomeTab({ companyId, ownerName = '김대표', onNavigateToQuestions }) {
   const dashboard = useAsync(
     () => companiesApi.fetchOwnerDashboard(companyId),
     [companyId],
@@ -110,7 +109,10 @@ function DashboardHomeTab({ companyId, ownerName }) {
           recentAnswers={data.recentAnswers}
           ownerType={RESOLUTION_TYPE.OWNER}
         />
-        <PendingApprovalPanel waitingQuestions={data.waitingQuestions} />
+        <PendingApprovalPanel
+          waitingQuestions={data.waitingQuestions}
+          onViewAll={onNavigateToQuestions}
+        />
       </SplitRow>
     </TabContent>
   );

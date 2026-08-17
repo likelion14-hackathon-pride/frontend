@@ -8,9 +8,9 @@ import { ErrorState, LoadingState } from '../../../common/AsyncStates';
 const Panel = styled.div`
   box-sizing: border-box;
   display: flex;
-  width: 613.333px;
+  flex: 1 1 320px;
+  min-width: 0;
   min-height: 388.823px;
-  flex-shrink: 0;
   flex-direction: column;
   padding: 24px 20.667px;
   gap: 16px;
@@ -85,16 +85,19 @@ const MessageRow = styled.div`
 
 const AvatarPill = styled.span`
   display: flex;
+  width: 28px;
   height: 28px;
-  padding: 7.667px 10px 7.333px 4.094px;
-  justify-content: flex-end;
+  justify-content: center;
   align-items: center;
   flex-shrink: 0;
-  border-radius: 50px;
+  border-radius: 50%;
   background: #dde7fd;
 `;
 
 const AvatarLabel = styled.span`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: #1d4ed8;
   text-align: center;
   font-family: 'Plus Jakarta Sans';
@@ -124,10 +127,10 @@ const OwnerAvatar = styled.span`
 const Bubble = styled.div`
   box-sizing: border-box;
   display: inline-flex;
-  max-width: 460px;
-  padding: 14px 18px 10px 14px;
+  max-width: 100%;
+  min-width: 0;
+  padding: 12px 18px 12px 14px;
   align-items: center;
-  flex-shrink: 0;
   border-radius: ${({ $reverse }) => ($reverse ? '14px 4px 14px 14px' : '4px 14px 14px 14px')};
   background: ${({ $reverse }) => ($reverse ? '#17171B' : '#FAFAFB')};
 `;

@@ -42,7 +42,11 @@ function OwnerDashboardPage() {
       />
 
       {activeTab === 'dashboard' && (
-        <DashboardHomeTab companyId={companyId} ownerName={user?.name} />
+        <DashboardHomeTab
+          companyId={companyId}
+          ownerName={user?.name}
+          onNavigateToQuestions={() => setActiveTab('question')}
+        />
       )}
       {activeTab === 'handbook' && <HandbookTab companyId={companyId} />}
       {activeTab === 'question' && <QuestionTab companyId={companyId} />}

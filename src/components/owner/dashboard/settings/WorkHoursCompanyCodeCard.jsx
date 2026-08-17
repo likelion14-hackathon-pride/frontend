@@ -4,8 +4,10 @@ import styled from 'styled-components';
 const Card = styled.div`
   box-sizing: border-box;
   display: flex;
-  flex: 1 0 0;
-  min-height: 246.052px;
+  flex: 1 1 320px;
+  min-width: 0;
+  min-height: 320px;
+  height: 100%;
   flex-direction: column;
   gap: 18px;
   padding: 24px 22.667px;

@@ -24,6 +24,7 @@ const TabContent = styled.div`
 const Body = styled.div`
   display: flex;
   width: 100%;
+  flex-wrap: wrap;
   align-items: flex-start;
   gap: 16px;
 `;
@@ -34,7 +35,7 @@ const LeftColumn = styled.div`
   flex-direction: column;
   align-items: flex-start;
   gap: 12px;
-  flex: 1 0 0;
+  flex: 1.15 1 380px;
   min-width: 0;
   padding: 14.667px 14.667px 22.667px 14.667px;
   border-radius: 22px;
@@ -48,8 +49,8 @@ const LeftColumn = styled.div`
 const RightColumn = styled.div`
   display: flex;
   flex-direction: column;
-  width: 554.615px;
-  flex-shrink: 0;
+  flex: 1 1 320px;
+  min-width: 0;
   position: sticky;
   top: 16px;
 `;
