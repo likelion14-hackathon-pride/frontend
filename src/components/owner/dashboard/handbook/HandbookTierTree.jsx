@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import styled from 'styled-components';
 import { COMPANY_GROUPS } from './handbookTabData';
 import fileTransWhite from '../../../../assets/owner/file_trans_white.svg';
@@ -100,13 +101,20 @@ const CategorySection = styled.div`
   padding: 10px 0 4px 0;
 `;
 
-const Header = styled.div`
+const Header = styled.button`
   box-sizing: border-box;
   display: flex;
+  width: 100%;
   align-items: center;
   gap: 10px;
   height: 18.667px;
   margin-bottom: 12px;
+  border: none;
+  background: none;
+  padding: 0;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
 `;
 
 const CornerCurve = styled.span`
@@ -238,6 +246,20 @@ function ItemRowView({ item, active, onSelect }) {
 }
 
 function HandbookTierTree({ activeTier, items, selectedItemId, onSelect, projects }) {
+  const [collapsedGroups, setCollapsedGroups] = useState(() => new Set());
+
+  const toggleGroup = (groupKey) => {
+    setCollapsedGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(groupKey)) {
+        next.delete(groupKey);
+      } else {
+        next.add(groupKey);
+      }
+      return next;
+    });
+  };
+
   const confirmedItems = items.filter((item) => item.status === 'confirmed');
   const companyItems = confirmedItems.filter((item) => item.tier === 'company');
   const projectItems = confirmedItems.filter((item) => item.tier === 'project');
@@ -262,9 +284,15 @@ function HandbookTierTree({ activeTier, items, selectedItemId, onSelect, project
           <GroupList>
             {COMPANY_GROUPS.map((group) => {
               const groupItems = companyItems.filter((item) => item.groupKey === group.key);
+              const sectionKey = `company:${group.key}`;
+              const collapsed = collapsedGroups.has(sectionKey);
               return (
                 <CategorySection key={group.key}>
-                  <Header>
+                  <Header
+                    type="button"
+                    aria-expanded={!collapsed}
+                    onClick={() => toggleGroup(sectionKey)}
+                  >
                     <CornerCurve />
                     <Square />
                     <Label>{group.label}</Label>
@@ -272,20 +300,22 @@ function HandbookTierTree({ activeTier, items, selectedItemId, onSelect, project
                     <DividerLine />
                     <Count>{groupItems.length}개</Count>
                   </Header>
-                  <ItemList>
-                    {groupItems.length === 0 ? (
-                      <EmptyGroupHint>확인된 항목이 없습니다</EmptyGroupHint>
-                    ) : (
-                      groupItems.map((item) => (
-                        <ItemRowView
-                          key={item.id}
-                          item={item}
-                          active={item.id === selectedItemId}
-                          onSelect={onSelect}
-                        />
-                      ))
-                    )}
-                  </ItemList>
+                  {!collapsed && (
+                    <ItemList>
+                      {groupItems.length === 0 ? (
+                        <EmptyGroupHint>확인된 항목이 없습니다</EmptyGroupHint>
+                      ) : (
+                        groupItems.map((item) => (
+                          <ItemRowView
+                            key={item.id}
+                            item={item}
+                            active={item.id === selectedItemId}
+                            onSelect={onSelect}
+                          />
+                        ))
+                      )}
+                    </ItemList>
+                  )}
                 </CategorySection>
               );
             })}
@@ -310,29 +340,37 @@ function HandbookTierTree({ activeTier, items, selectedItemId, onSelect, project
           <GroupList>
             {projects.map((project) => {
               const groupItems = projectItems.filter((item) => item.groupKey === project.key);
+              const sectionKey = `project:${project.key}`;
+              const collapsed = collapsedGroups.has(sectionKey);
               return (
                 <CategorySection key={project.key}>
-                  <Header>
+                  <Header
+                    type="button"
+                    aria-expanded={!collapsed}
+                    onClick={() => toggleGroup(sectionKey)}
+                  >
                     <CornerCurve />
                     <Square />
                     <Label>{project.label}</Label>
                     <DividerLine />
                     <Count>{groupItems.length}개</Count>
                   </Header>
-                  <ItemList>
-                    {groupItems.length === 0 ? (
-                      <EmptyGroupHint>확인된 항목이 없습니다</EmptyGroupHint>
-                    ) : (
-                      groupItems.map((item) => (
-                        <ItemRowView
-                          key={item.id}
-                          item={item}
-                          active={item.id === selectedItemId}
-                          onSelect={onSelect}
-                        />
-                      ))
-                    )}
-                  </ItemList>
+                  {!collapsed && (
+                    <ItemList>
+                      {groupItems.length === 0 ? (
+                        <EmptyGroupHint>확인된 항목이 없습니다</EmptyGroupHint>
+                      ) : (
+                        groupItems.map((item) => (
+                          <ItemRowView
+                            key={item.id}
+                            item={item}
+                            active={item.id === selectedItemId}
+                            onSelect={onSelect}
+                          />
+                        ))
+                      )}
+                    </ItemList>
+                  )}
                 </CategorySection>
               );
             })}

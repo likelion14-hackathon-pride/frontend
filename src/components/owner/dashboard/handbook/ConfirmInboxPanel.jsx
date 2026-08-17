@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import styled from 'styled-components';
 import { getGroupLabel } from './handbookTabData';
 
@@ -111,6 +112,13 @@ const List = styled.div`
   flex-shrink: 0;
 `;
 
+const ItemGroup = styled.div`
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 8px;
+`;
+
 const Row = styled.div`
   box-sizing: border-box;
   display: flex;
@@ -133,7 +141,7 @@ const LeadingDot = styled.span`
   background: #d8d8de;
 `;
 
-const TextGroup = styled.div`
+const TextGroup = styled.button`
   display: flex;
   flex: 1 0 0;
   min-width: 0;
@@ -141,6 +149,12 @@ const TextGroup = styled.div`
   justify-content: center;
   align-items: flex-start;
   gap: 2px;
+  border: none;
+  background: none;
+  padding: 0;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
 `;
 
 const ItemText = styled.span`
@@ -170,22 +184,30 @@ const SourceText = styled.span`
   max-width: 100%;
 `;
 
-const StatusBadge = styled.span`
-  flex-shrink: 0;
+const DeleteButton = styled.button`
   display: flex;
-  height: 24px;
-  padding: ${({ $variant }) => ($variant === 'empty' ? '5.667px 11px 5.333px 10px' : '5.667px 12.5px 5.333px 10px')};
+  width: 51px;
+  height: 31.333px;
+  padding: 8px 14px;
   justify-content: center;
   align-items: center;
-  border-radius: 999px;
-  background: ${({ $variant }) => ($variant === 'empty' ? '#F4F4F6' : '#FFF6E8')};
-  color: ${({ $variant }) => ($variant === 'empty' ? '#A0A0A8' : '#9A6212')};
+  flex-shrink: 0;
+  border: none;
+  border-radius: 10px;
+  background: #fef2f2;
+  cursor: pointer;
+  color: #dc2626;
+  text-align: center;
   font-family: 'Plus Jakarta Sans';
-  font-size: 10.5px;
+  font-size: 11.5px;
   font-style: normal;
   font-weight: 700;
-  line-height: 121%;
-  white-space: nowrap;
+  line-height: 128%;
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
 `;
 
 const ConfirmButton = styled.button`
@@ -214,6 +236,49 @@ const ConfirmButton = styled.button`
   }
 `;
 
+const QuoteBox = styled.div`
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: -4px;
+  background: #fafafb;
+  border-radius: 11px;
+  padding: 14px 16px;
+`;
+
+const QuoteText = styled.div`
+  font-size: 13.5px;
+  line-height: 1.7;
+  font-family: 'IBM Plex Mono', monospace;
+  color: #3a3a42;
+`;
+
+const SourceLine = styled.a`
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: #8a8a93;
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid #e0e0e6;
+  padding-bottom: 2px;
+
+  &:hover {
+    color: #c96a14;
+    border-bottom-color: #f0c39a;
+  }
+`;
+
+const SourceLineText = styled.span`
+  font-size: 11.5px;
+  color: #8a8a93;
+  font-weight: 600;
+`;
+
 const EmptyRow = styled.div`
   box-sizing: border-box;
   display: flex;
@@ -238,20 +303,26 @@ const EmptyText = styled.span`
   line-height: 123%;
 `;
 
-function ConfirmInboxPanel({ items, pending = false, onConfirm, onConfirmAll, onClose }) {
+function ConfirmInboxPanel({ items, pending = false, onConfirm, onConfirmAll, onDelete, onClose }) {
+  const [expandedId, setExpandedId] = useState(null);
+
+  const toggleExpanded = (id) => {
+    setExpandedId((prev) => (prev === id ? null : id));
+  };
+
   return (
     <Panel>
       <HeadRow>
         <WaitingTag>확인 대기</WaitingTag>
         <Description>
-          소스에서 추출됐지만 대표 확인을 거치지 않은 항목입니다. 확인하면 핸드북 목록에 나타납니다.
+          깃·문서 파일에서 추출한 규칙 초안입니다. 저장하면 핸드북에 올라가고, 삭제하면 목록에서 사라집니다.
         </Description>
         <AllConfirmButton
           type="button"
           onClick={onConfirmAll}
           disabled={items.length === 0 || pending}
         >
-          {pending ? '확인 중…' : '전체 확인'}
+          {pending ? '확인 중…' : '전체 저장'}
         </AllConfirmButton>
         <CloseButton type="button" onClick={onClose} aria-label="확인 보관함 닫기">
           ✕
@@ -265,26 +336,45 @@ function ConfirmInboxPanel({ items, pending = false, onConfirm, onConfirmAll, on
       ) : (
         <List>
           {items.map((item) => (
-            <Row key={item.id}>
-              <LeadingDot />
-              <TextGroup>
-                <ItemText>{item.text || '(내용 없음)'}</ItemText>
-                <SourceText>
-                  {item.groupLabel || getGroupLabel(item.groupKey)} · {item.sourceLabel}
-                </SourceText>
-              </TextGroup>
-              <StatusBadge $variant={item.status}>
-                {item.status === 'empty' ? '빈칸' : '미확인'}
-              </StatusBadge>
-              {/* 내용이 없는 BLANK 항목은 서버가 승인을 거절한다(cannot_approve_blank). */}
-              <ConfirmButton
-                type="button"
-                onClick={() => onConfirm(item.id)}
-                disabled={pending || item.status === 'empty'}
-              >
-                확인
-              </ConfirmButton>
-            </Row>
+            <ItemGroup key={item.id}>
+              <Row>
+                <LeadingDot />
+                <TextGroup type="button" onClick={() => toggleExpanded(item.id)}>
+                  <ItemText>{item.text || '(내용 없음)'}</ItemText>
+                  <SourceText>
+                    {item.groupLabel || getGroupLabel(item.groupKey)} · {item.sourceLabel}
+                  </SourceText>
+                </TextGroup>
+                <DeleteButton
+                  type="button"
+                  onClick={() => onDelete(item.id)}
+                  disabled={pending}
+                >
+                  삭제
+                </DeleteButton>
+                {/* 내용이 없는 BLANK 항목은 서버가 승인을 거절한다(cannot_approve_blank). */}
+                <ConfirmButton
+                  type="button"
+                  onClick={() => onConfirm(item.id)}
+                  disabled={pending || item.status === 'empty'}
+                >
+                  저장
+                </ConfirmButton>
+              </Row>
+
+              {expandedId === item.id && item.koSource && (
+                <QuoteBox>
+                  <QuoteText>{item.koSource}</QuoteText>
+                  {item.sourceHref ? (
+                    <SourceLine href={item.sourceHref} target="_blank" rel="noreferrer">
+                      {item.sourceLabel}
+                    </SourceLine>
+                  ) : (
+                    <SourceLineText>{item.sourceLabel}</SourceLineText>
+                  )}
+                </QuoteBox>
+              )}
+            </ItemGroup>
           ))}
         </List>
       )}

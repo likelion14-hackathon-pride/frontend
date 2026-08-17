@@ -43,6 +43,12 @@ const GraphBox = styled.div`
   flex-shrink: 0;
 `;
 
+const SvgClip = styled.div`
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+`;
+
 const EndDot = styled.span`
   position: absolute;
   top: -3.5px;
@@ -67,7 +73,7 @@ const Footnote = styled.span`
 `;
 
 const WIDTH = 286;
-const HEIGHT = 52;
+const HEIGHT = 58;
 
 // 주별 절약 분을 꺾은선으로. 값이 전부 같거나 0이어도 선이 가운데에 곧게 그려지도록 한다.
 function buildPaths(weeklyTrend) {
@@ -105,23 +111,25 @@ function SavedTimeCard({ value, delta, weeklyTrend = [], minutesPerAnswer }) {
         <GraphBox>
           {paths && (
             <>
-              <svg
-                width={WIDTH}
-                height={HEIGHT}
-                viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-                fill="none"
-                style={{ position: 'absolute', top: 0, left: 0 }}
-              >
-                <path d={paths.area} fill="#8FD3A8" fillOpacity="0.16" />
-                <path
-                  d={paths.line}
-                  stroke="#4CB77A"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+              <SvgClip>
+                <svg
+                  width="100%"
+                  height="100%"
+                  viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+                  preserveAspectRatio="none"
                   fill="none"
-                />
-              </svg>
+                >
+                  <path d={paths.area} fill="#8FD3A8" fillOpacity="0.16" />
+                  <path
+                    d={paths.line}
+                    stroke="#4CB77A"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    fill="none"
+                  />
+                </svg>
+              </SvgClip>
               <EndDot style={{ top: paths.last[1] - 4.5, right: -4.5 }} />
             </>
           )}

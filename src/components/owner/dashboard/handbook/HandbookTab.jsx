@@ -231,9 +231,10 @@ function HandbookTab({ companyId }) {
       {archiveOpen && (
         <ConfirmInboxPanel
           items={waitingItems}
-          pending={review.pending || reviewAll.pending}
+          pending={review.pending || reviewAll.pending || deleteEntry.pending}
           onConfirm={handleConfirm}
           onConfirmAll={handleConfirmAll}
+          onDelete={handleDeleteItem}
           onClose={() => setArchiveOpen(false)}
         />
       )}

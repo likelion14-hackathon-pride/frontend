@@ -87,7 +87,7 @@ const SectionLabel = styled.span`
   font-style: normal;
   font-weight: 700;
   line-height: normal;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.44px;
   text-transform: uppercase;
 `;
 
@@ -282,7 +282,7 @@ function AddItemPanel({ projects, pending = false, onAddProject, onSave, onClose
       </HeadRow>
 
       <div style={{ width: '100%' }}>
-        <SectionLabel>카테고리</SectionLabel>
+        <SectionLabel>회사 규칙</SectionLabel>
         <ChipRow style={{ marginTop: 8 }}>
           {CATEGORY_OPTIONS.map((cat) => (
             <Chip
