@@ -1,4 +1,12 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import * as authApi from '../apis/auth';
@@ -121,16 +129,13 @@ export function AuthProvider({ children }) {
     []
   );
 
-  const routeForRole = useCallback(
-    (role, company) => {
-      if (role === ROLE.OWNER) {
-        // 온보딩을 끝내지 않은 대표는 대시보드가 아니라 온보딩으로 간다.
-        return company?.onboardingStatus === 'COMPLETED' ? '/owner' : '/owner/onboarding';
-      }
-      return '/member/home';
-    },
-    []
-  );
+  const routeForRole = useCallback((role, company) => {
+    if (role === ROLE.OWNER) {
+      // 온보딩을 끝내지 않은 대표는 대시보드가 아니라 온보딩으로 간다.
+      return company?.onboardingStatus === 'COMPLETED' ? '/owner' : '/owner/onboarding';
+    }
+    return '/member/home';
+  }, []);
 
   const finishAuth = useCallback(
     async ({ navigateAfter = true } = {}) => {
@@ -181,9 +186,13 @@ export function AuthProvider({ children }) {
 
   const logout = useCallback(async () => {
     await authApi.logout();
-    clearSession(SESSION_ENDED_REASON.MANUAL);
+    markSessionEnded();
+    setSession(null);
+    setStatus(STATUS.ANONYMOUS);
+    // reason: 'MANUAL'로 표시해서, RequireAuth가 이걸 자기 알림으로 덮어쓰지 않게 함
+    setSessionNotice({ reason: SESSION_ENDED_REASON.MANUAL, tone: 'info', text: '' });
     navigateRef.current('/login', { replace: true });
-  }, [clearSession]);
+  }, []);
 
   // PATCH /api/me 응답이 곧 새 세션이다.
   const applyMe = useCallback((me) => {

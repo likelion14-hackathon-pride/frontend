@@ -62,11 +62,9 @@ const SplitRow = styled.div`
 `;
 
 function DashboardHomeTab({ companyId, ownerName = '김대표', onNavigateToQuestions }) {
-  const dashboard = useAsync(
-    () => companiesApi.fetchOwnerDashboard(companyId),
-    [companyId],
-    { enabled: Boolean(companyId) }
-  );
+  const dashboard = useAsync(() => companiesApi.fetchOwnerDashboard(companyId), [companyId], {
+    enabled: Boolean(companyId),
+  });
 
   if (dashboard.loading && !dashboard.data) {
     return (
@@ -105,10 +103,7 @@ function DashboardHomeTab({ companyId, ownerName = '김대표', onNavigateToQues
       />
 
       <SplitRow>
-        <AiAnsweredList
-          recentAnswers={data.recentAnswers}
-          ownerType={RESOLUTION_TYPE.OWNER}
-        />
+        <AiAnsweredList recentAnswers={data.recentAnswers} ownerType={RESOLUTION_TYPE.OWNER} />
         <PendingApprovalPanel
           waitingQuestions={data.waitingQuestions}
           onViewAll={onNavigateToQuestions}

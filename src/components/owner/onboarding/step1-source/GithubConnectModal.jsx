@@ -1151,7 +1151,11 @@ function GithubConnectModal({ companyId, onClose, onConnected }) {
                       <WebhookValue>
                         {webhookSecret || '연결이 끝나면 여기에 표시됩니다'}
                       </WebhookValue>
-                      <CopyButton type="button" onClick={handleCopySecret} disabled={!webhookSecret}>
+                      <CopyButton
+                        type="button"
+                        onClick={handleCopySecret}
+                        disabled={!webhookSecret}
+                      >
                         {secretCopied ? '복사됨 ✓' : '복사'}
                       </CopyButton>
                     </WebhookRow>
@@ -1225,9 +1229,7 @@ function GithubConnectModal({ companyId, onClose, onConnected }) {
 
         {step === 4 && !connecting && (
           <Footer>
-            <FooterHint>
-              {connectError || '세 항목을 모두 입력하면 연결할 수 있습니다.'}
-            </FooterHint>
+            <FooterHint>{connectError || '세 항목을 모두 입력하면 연결할 수 있습니다.'}</FooterHint>
             <FooterButtons>
               <GhostButton type="button" onClick={() => setStep(3)}>
                 이전

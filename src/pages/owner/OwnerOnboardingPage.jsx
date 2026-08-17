@@ -22,28 +22,26 @@ function OwnerOnboardingPage() {
   const { companyId, company, refreshMe } = useAuth();
 
   // 가입 응답에만 담겨 오는 회사 코드. 없으면 회사 조회로 채운다.
-  const [companyCode, setCompanyCode] = useState(location.state?.companyCode ?? company?.code ?? '');
+  const [companyCode, setCompanyCode] = useState(
+    location.state?.companyCode ?? company?.code ?? ''
+  );
 
   const [currentStep, setCurrentStep] = useState(1);
   const [stepError, setStepError] = useState(null);
   const [summary, setSummary] = useState(null);
 
-  const companyQuery = useAsync(
-    () => companiesApi.fetchCompany(companyId),
-    [companyId],
-    { enabled: Boolean(companyId) && !companyCode }
-  );
+  const companyQuery = useAsync(() => companiesApi.fetchCompany(companyId), [companyId], {
+    enabled: Boolean(companyId) && !companyCode,
+  });
 
   useEffect(() => {
     if (companyQuery.data?.code) setCompanyCode(companyQuery.data.code);
   }, [companyQuery.data]);
 
   // 서버가 기억하는 진행 단계에서 이어 한다. 0(시작 전)이면 1단계부터.
-  const onboardingQuery = useAsync(
-    () => onboardingApi.fetchOnboarding(companyId),
-    [companyId],
-    { enabled: Boolean(companyId) }
-  );
+  const onboardingQuery = useAsync(() => onboardingApi.fetchOnboarding(companyId), [companyId], {
+    enabled: Boolean(companyId),
+  });
 
   useEffect(() => {
     const step = onboardingQuery.data?.onboardingStep;
@@ -51,17 +49,13 @@ function OwnerOnboardingPage() {
     setCurrentStep(Math.min(Math.max(step || 1, ONBOARDING_STEP.MIN), ONBOARDING_STEP.MAX));
   }, [onboardingQuery.data]);
 
-  const connectionsQuery = useAsync(
-    () => sourcesApi.fetchConnections(companyId),
-    [companyId],
-    { enabled: Boolean(companyId) }
-  );
+  const connectionsQuery = useAsync(() => sourcesApi.fetchConnections(companyId), [companyId], {
+    enabled: Boolean(companyId),
+  });
 
-  const keywordsQuery = useAsync(
-    () => policyApi.fetchRiskKeywords(companyId),
-    [companyId],
-    { enabled: Boolean(companyId) }
-  );
+  const keywordsQuery = useAsync(() => policyApi.fetchRiskKeywords(companyId), [companyId], {
+    enabled: Boolean(companyId),
+  });
 
   const saveStep = useMutation((step) => onboardingApi.updateOnboardingStep(companyId, step));
   const complete = useMutation(() => onboardingApi.completeOnboarding(companyId));

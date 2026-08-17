@@ -40,11 +40,7 @@ export const SOURCE_CONFIG = {
   },
 };
 
-export const SOURCE_ORDER = [
-  CONNECTION_KIND.GITHUB,
-  CONNECTION_KIND.SLACK,
-  CONNECTION_KIND.LOCAL,
-];
+export const SOURCE_ORDER = [CONNECTION_KIND.GITHUB, CONNECTION_KIND.SLACK, CONNECTION_KIND.LOCAL];
 
 export function formatBytes(size) {
   const bytes = Number(size);

@@ -42,8 +42,14 @@ const FieldError = styled.p`
 `;
 
 export default function LoginPage() {
-  const { login, signupOwner, signupMemberAccount, completeAuth, sessionNotice, clearSessionNotice } =
-    useAuth();
+  const {
+    login,
+    signupOwner,
+    signupMemberAccount,
+    completeAuth,
+    sessionNotice,
+    clearSessionNotice,
+  } = useAuth();
 
   const [lang, setLang] = useState('ko');
   const t = translations[lang];
@@ -66,8 +72,7 @@ export default function LoginPage() {
   // 서버 에러는 봉투의 field 를 보고 칸 밑에 붙이거나(폼 오류) 위쪽 배너로 띄운다.
   const [formError, setFormError] = useState(null); // { field, message }
 
-  const fieldError = (fieldName) =>
-    formError?.field === fieldName ? formError.message : null;
+  const fieldError = (fieldName) => (formError?.field === fieldName ? formError.message : null);
   const bannerError = formError && !formError.field ? formError.message : null;
 
   const showError = (caught) => {
@@ -194,7 +199,7 @@ export default function LoginPage() {
       onLangChange={setLang}
     >
       {/* 세션이 끊겨 되돌아온 경우 그 이유를 반드시 보여 준다. */}
-      {sessionNotice && <Notice $tone={sessionNotice.tone}>{sessionNotice.text}</Notice>}
+      {sessionNotice?.text && <Notice $tone={sessionNotice.tone}>{sessionNotice.text}</Notice>}
       {bannerError && <Notice $tone="error">{bannerError}</Notice>}
 
       <ModeToggle

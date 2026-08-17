@@ -1,4 +1,3 @@
-
 // WorkLocation(models.TextChoices) — accounts/profile.py:7
 export const WORK_LOCATION = {
   HANOI: 'HANOI',
@@ -8,7 +7,6 @@ export const WORK_LOCATION = {
   SEOUL: 'SEOUL',
   TOKYO: 'TOKYO',
 };
-
 
 export const WORK_LOCATION_LABEL = {
   HANOI: 'Hanoi',

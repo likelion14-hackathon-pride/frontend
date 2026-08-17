@@ -78,31 +78,27 @@ export function MemberProvider({ children }) {
 
   const enabled = Boolean(companyId);
 
-  const cardsQuery = useAsync(
-    () => cardsApi.fetchAllCards(companyId),
-    [companyId],
-    { enabled, initialData: null }
-  );
+  const cardsQuery = useAsync(() => cardsApi.fetchAllCards(companyId), [companyId], {
+    enabled,
+    initialData: null,
+  });
 
-  const scopesQuery = useAsync(
-    () => handbookApi.fetchScopes(companyId),
-    [companyId],
-    { enabled, initialData: null }
-  );
+  const scopesQuery = useAsync(() => handbookApi.fetchScopes(companyId), [companyId], {
+    enabled,
+    initialData: null,
+  });
 
   // 홈 요약과 시차는 여러 화면(사이드바 · 상단바 · 홈 · 모달)이 같이 쓴다.
   // 화면마다 부르면 같은 요청이 서너 번 나가므로 한 곳에서 받아 나눠 쓴다.
-  const homeQuery = useAsync(
-    () => cardsApi.fetchHome(companyId),
-    [companyId],
-    { enabled, initialData: null }
-  );
+  const homeQuery = useAsync(() => cardsApi.fetchHome(companyId), [companyId], {
+    enabled,
+    initialData: null,
+  });
 
-  const timingQuery = useAsync(
-    () => cardsApi.fetchTiming(companyId),
-    [companyId],
-    { enabled, initialData: null }
-  );
+  const timingQuery = useAsync(() => cardsApi.fetchTiming(companyId), [companyId], {
+    enabled,
+    initialData: null,
+  });
 
   const cards = cardsQuery.data ?? EMPTY;
   const columns = useMemo(() => buildColumns(cards), [cards]);
@@ -168,10 +164,7 @@ export function MemberProvider({ children }) {
     [moveCard, nextStatusFor]
   );
 
-  const handleReopen = useCallback(
-    (card) => moveCard(card, CARD_STATUS.IN_PROGRESS),
-    [moveCard]
-  );
+  const handleReopen = useCallback((card) => moveCard(card, CARD_STATUS.IN_PROGRESS), [moveCard]);
 
   const profile = useMemo(
     () => ({

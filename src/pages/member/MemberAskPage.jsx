@@ -66,11 +66,9 @@ export default function MemberAskPage() {
   const listRef = useRef(null);
 
   // 질문을 슬랙으로 보낼 때 올릴 채널. 수집 대상 채널 목록에서 고른다.
-  const channelsQuery = useAsync(
-    () => sourcesApi.fetchChannelSummaries(companyId),
-    [companyId],
-    { enabled: Boolean(companyId) }
-  );
+  const channelsQuery = useAsync(() => sourcesApi.fetchChannelSummaries(companyId), [companyId], {
+    enabled: Boolean(companyId),
+  });
   const channels = channelsQuery.data?.items ?? [];
 
   const scopes = useMemo(

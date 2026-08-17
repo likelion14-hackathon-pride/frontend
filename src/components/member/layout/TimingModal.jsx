@@ -324,7 +324,9 @@ export default function TimingModal({ onClose, onGoTaskCard, scale = 1 }) {
                   ))
                 )}
                 {timing.canDoTotal > TIMING_BUCKET_LIMIT && (
-                  <MoreNote>전체 {timing.canDoTotal}건 중 {canDo.length}건만 표시</MoreNote>
+                  <MoreNote>
+                    전체 {timing.canDoTotal}건 중 {canDo.length}건만 표시
+                  </MoreNote>
                 )}
               </ListCard>
 
@@ -340,7 +342,9 @@ export default function TimingModal({ onClose, onGoTaskCard, scale = 1 }) {
                       <ListItemSrc>
                         {[
                           item.scopeName,
-                          item.escalationStatus ? `질문 ${item.escalationStatus}` : '아직 보내지 않음',
+                          item.escalationStatus
+                            ? `질문 ${item.escalationStatus}`
+                            : '아직 보내지 않음',
                         ]
                           .filter(Boolean)
                           .join(' · ')}

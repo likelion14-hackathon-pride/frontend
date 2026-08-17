@@ -221,8 +221,6 @@ const LastSyncText = styled.span`
   white-space: nowrap;
 `;
 
-
-
 const AddSelect = styled.select`
   flex: 1 0 0;
   min-width: 0;

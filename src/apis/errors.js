@@ -1,6 +1,5 @@
 //   {"error": {"code": "scope_not_found", "field": "scopeId", "message": "scope not found"}}
 
-
 export const ERROR_CODE = {
   SERVER_ERROR: 'server_error',
   RATE_LIMITED: 'rate_limited',
@@ -84,7 +83,8 @@ const MESSAGE_BY_CODE = {
   [ERROR_CODE.INVALID_CREDENTIALS]: '이메일 또는 비밀번호가 올바르지 않습니다.',
   [ERROR_CODE.COMPANY_CODE_NOT_FOUND]: '이 코드에 해당하는 회사가 없습니다.',
   [ERROR_CODE.EMAIL_TAKEN]: '이미 가입된 이메일입니다.',
-  [ERROR_CODE.WEAK_PASSWORD]: '비밀번호가 너무 약합니다. 8자 이상으로, 숫자만으로는 만들 수 없습니다.',
+  [ERROR_CODE.WEAK_PASSWORD]:
+    '비밀번호가 너무 약합니다. 8자 이상으로, 숫자만으로는 만들 수 없습니다.',
   [ERROR_CODE.PROFILE_FIELD_REQUIRED]: '근무 위치, 담당 역할, 화면 언어 중 하나는 보내야 합니다.',
 
   [ERROR_CODE.WORKING_HOURS_IDENTICAL]: '근무 시작과 종료 시각이 같을 수 없습니다.',
@@ -211,4 +211,3 @@ export function messageOf(error, fallback = '요청을 처리하지 못했습니
   if (error instanceof ApiError) return error.message || fallback;
   return error.message || fallback;
 }
-

@@ -256,7 +256,9 @@ function SourceConnectStep({ companyId, connections, loading, error, onReload, o
 
     const extension = extensionOf(file.name);
     if (!LOCAL_FILE_EXTENSIONS.includes(extension)) {
-      setUploadError({ message: `지원하지 않는 파일 형식입니다 (${LOCAL_FILE_EXTENSIONS.join(' · ')})` });
+      setUploadError({
+        message: `지원하지 않는 파일 형식입니다 (${LOCAL_FILE_EXTENSIONS.join(' · ')})`,
+      });
       return;
     }
     if (file.size > LOCAL_FILE_MAX_SIZE) {

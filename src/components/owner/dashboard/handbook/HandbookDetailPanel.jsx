@@ -277,12 +277,7 @@ function HandbookDetailPanel({ item, pending = false, onSave, onDelete }) {
       <ButtonRow>
         {/* 원문 링크는 근거가 있을 때만 있다. 없으면 눌러도 갈 곳이 없으므로 감춘다. */}
         {item.sourceHref && (
-          <OpenSourceButton
-            as="a"
-            href={item.sourceHref}
-            target="_blank"
-            rel="noreferrer"
-          >
+          <OpenSourceButton as="a" href={item.sourceHref} target="_blank" rel="noreferrer">
             원문 열기
           </OpenSourceButton>
         )}
@@ -299,9 +294,7 @@ function HandbookDetailPanel({ item, pending = false, onSave, onDelete }) {
           {item.status === 'confirmed' ? '삭제' : '거절'}
         </DeleteButton>
         <TimestampText>
-          {item.lastConfirmed
-            ? `최근 확인 ${formatShortKo(item.lastConfirmed)}`
-            : '확인 이력 없음'}
+          {item.lastConfirmed ? `최근 확인 ${formatShortKo(item.lastConfirmed)}` : '확인 이력 없음'}
         </TimestampText>
       </ButtonRow>
     </Panel>

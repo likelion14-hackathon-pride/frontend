@@ -8,6 +8,7 @@ import logoMascot from '../../../assets/logo-mascot.png';
 import logoWordmark from '../../../assets/logo-wordmark.png';
 import { useAuth } from '../../../context/AuthContext';
 import { useMemberNavigation } from '../../../context/member/MemberContext';
+import logoutIcon from '../../../assets/icons/logout.svg';
 
 const DESIGN_WIDTH = 1440;
 const DESIGN_HEIGHT = 1024;
@@ -132,19 +133,19 @@ const UserCard = styled.div`
 const LogoutButton = styled.button`
   margin-top: 8px;
   width: 100%;
-  padding: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px;
   border: none;
-  border-radius: 10px;
-  background: transparent;
-  color: #a0a0a8;
-  font-size: 12.5px;
+  border-top: 1px solid #efeff1;
+  margin-top: 12px;
+  background: #fff;
+  color: #17171b;
+  font-size: 14px;
   font-weight: 700;
   cursor: pointer;
-
-  &:hover {
-    background: #f7f7f8;
-    color: #6b6b73;
-  }
 `;
 
 const Main = styled.main`
@@ -190,49 +191,50 @@ export default function MemberShell({ screenTitle, children }) {
   const scaledHeight = DESIGN_HEIGHT * scale;
 
   return (
-  <Page>
-    <PageBackground />
+    <Page>
+      <PageBackground />
 
-    <StageOuter $width={scaledWidth} $height={scaledHeight}>
-      <Shell $scale={scale}>
-        <Sidebar>
-          <Logo>
-            <MascotImg src={logoMascot} alt="SAI" />
-            <WordmarkImg src={logoWordmark} alt="SAI" />
-          </Logo>
-          <Nav>
-            <MemberNav />
-          </Nav>
-          <UserCard>
-            <MemberHomeSummary
-              slackMessages={readToday?.messages}
-              turnedIntoTasks={readToday?.cards}
-              waitingAnswer={readToday?.waiting}
-              user={profile}
-            />
-            <LogoutButton type="button" onClick={logout}>
-              로그아웃
-            </LogoutButton>
-          </UserCard>
-        </Sidebar>
+      <StageOuter $width={scaledWidth} $height={scaledHeight}>
+        <Shell $scale={scale}>
+          <Sidebar>
+            <Logo>
+              <MascotImg src={logoMascot} alt="SAI" />
+              <WordmarkImg src={logoWordmark} alt="SAI" />
+            </Logo>
+            <Nav>
+              <MemberNav />
+            </Nav>
+            <UserCard>
+              <MemberHomeSummary
+                slackMessages={readToday?.messages}
+                turnedIntoTasks={readToday?.cards}
+                waitingAnswer={readToday?.waiting}
+                user={profile}
+              />
+              <LogoutButton type="button" onClick={logout}>
+                <img src={logoutIcon} alt="" width={16} height={16} />
+                Logout
+              </LogoutButton>
+            </UserCard>
+          </Sidebar>
 
-        <Main>
-          <MemberTopBar screenTitle={screenTitle} onOpenTiming={() => setIsTzOpen(true)} />
-          <Content>{children}</Content>
-        </Main>
-      </Shell>
-    </StageOuter>
+          <Main>
+            <MemberTopBar screenTitle={screenTitle} onOpenTiming={() => setIsTzOpen(true)} />
+            <Content>{children}</Content>
+          </Main>
+        </Shell>
+      </StageOuter>
 
-    {isTzOpen && (
-      <TimingModal
-        scale={scale}
-        onClose={() => setIsTzOpen(false)}
-        onGoTaskCard={() => {
-          setIsTzOpen(false);
-          goToTasks();
-        }}
-      />
-    )}
-  </Page>
-);
+      {isTzOpen && (
+        <TimingModal
+          scale={scale}
+          onClose={() => setIsTzOpen(false)}
+          onGoTaskCard={() => {
+            setIsTzOpen(false);
+            goToTasks();
+          }}
+        />
+      )}
+    </Page>
+  );
 }

@@ -108,20 +108,15 @@ const FILE_POLL_INTERVAL = 3000;
 // 그런 행이 하나라도 있으면 타이머가 끝나지 않으므로 5분에서 끊는다.
 const FILE_POLL_MAX_ATTEMPTS = 100;
 
-const FILE_IN_FLIGHT_STATUSES = [
-  LOCAL_FILE_STATUS.PENDING_UPLOAD,
-  LOCAL_FILE_STATUS.PROCESSING,
-];
+const FILE_IN_FLIGHT_STATUSES = [LOCAL_FILE_STATUS.PENDING_UPLOAD, LOCAL_FILE_STATUS.PROCESSING];
 
 function SourceTab({ companyId }) {
   const [actionError, setActionError] = useState(null);
   const fileInputRef = useRef(null);
 
-  const connectionsQuery = useAsync(
-    () => sourcesApi.fetchConnections(companyId),
-    [companyId],
-    { enabled: Boolean(companyId) }
-  );
+  const connectionsQuery = useAsync(() => sourcesApi.fetchConnections(companyId), [companyId], {
+    enabled: Boolean(companyId),
+  });
 
   const connections = connectionsQuery.data?.items ?? [];
   const byKind = new Map(connections.map((connection) => [connection.provider, connection]));
@@ -149,11 +144,9 @@ function SourceTab({ companyId }) {
     [companyId, slack?.id],
     { enabled: Boolean(companyId && slack?.id) }
   );
-  const filesQuery = useAsync(
-    () => sourcesApi.fetchLocalFiles(companyId),
-    [companyId],
-    { enabled: Boolean(companyId) }
-  );
+  const filesQuery = useAsync(() => sourcesApi.fetchLocalFiles(companyId), [companyId], {
+    enabled: Boolean(companyId),
+  });
 
   const addRepository = useMutation((externalId) =>
     sourcesApi.addRepository(companyId, github.id, externalId)
@@ -197,7 +190,9 @@ function SourceTab({ companyId }) {
 
     const extension = extensionOf(file.name);
     if (!LOCAL_FILE_EXTENSIONS.includes(extension)) {
-      setActionError({ message: `지원하지 않는 파일 형식입니다 (${LOCAL_FILE_EXTENSIONS.join(' · ')})` });
+      setActionError({
+        message: `지원하지 않는 파일 형식입니다 (${LOCAL_FILE_EXTENSIONS.join(' · ')})`,
+      });
       return;
     }
     if (file.size > LOCAL_FILE_MAX_SIZE) {

@@ -39,7 +39,11 @@ export function useOnboardingQuestions(companyId, scopeId = null) {
       const question = questions.find((item) => item.id === templateKey);
       if (!question) return;
 
-      const previous = answers[templateKey] ?? { selected: null, customText: '', customSaved: false };
+      const previous = answers[templateKey] ?? {
+        selected: null,
+        customText: '',
+        customSaved: false,
+      };
       const next = { ...previous, ...patch };
       setAnswers((prev) => ({ ...prev, [templateKey]: next }));
 

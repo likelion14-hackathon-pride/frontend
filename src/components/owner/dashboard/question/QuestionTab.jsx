@@ -64,21 +64,14 @@ const SplitRow = styled.div`
 function QuestionTab({ companyId }) {
   const [selectedId, setSelectedId] = useState(null);
 
-  const listQuery = useAsync(
-    () => qnaApi.fetchAllEscalations(companyId),
-    [companyId],
-    { enabled: Boolean(companyId) }
-  );
-  const scopesQuery = useAsync(
-    () => handbookApi.fetchScopes(companyId),
-    [companyId],
-    { enabled: Boolean(companyId) }
-  );
+  const listQuery = useAsync(() => qnaApi.fetchAllEscalations(companyId), [companyId], {
+    enabled: Boolean(companyId),
+  });
+  const scopesQuery = useAsync(() => handbookApi.fetchScopes(companyId), [companyId], {
+    enabled: Boolean(companyId),
+  });
 
-  const rows = useMemo(
-    () => (listQuery.data ?? []).map(toQuestionRow),
-    [listQuery.data]
-  );
+  const rows = useMemo(() => (listQuery.data ?? []).map(toQuestionRow), [listQuery.data]);
 
   const activeId = selectedId ?? rows[0]?.id ?? null;
 
@@ -99,11 +92,9 @@ function QuestionTab({ companyId }) {
   };
 
   // 슬랙 스레드 주소를 만들려면 워크스페이스(팀) id 가 필요하다.
-  const connectionsQuery = useAsync(
-    () => sourcesApi.fetchConnections(companyId),
-    [companyId],
-    { enabled: Boolean(companyId) }
-  );
+  const connectionsQuery = useAsync(() => sourcesApi.fetchConnections(companyId), [companyId], {
+    enabled: Boolean(companyId),
+  });
   const slackWorkspaceId = (connectionsQuery.data?.items ?? []).find(
     (connection) => connection.provider === CONNECTION_KIND.SLACK
   )?.workspaceId;

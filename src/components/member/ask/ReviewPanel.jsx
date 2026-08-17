@@ -320,7 +320,9 @@ export default function ReviewPanel({
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
             placeholder={
-              atLimit ? `최대 ${MAX_ESCALATION_ADDITIONS}줄까지 덧붙일 수 있습니다` : 'Add something in your own words…'
+              atLimit
+                ? `최대 ${MAX_ESCALATION_ADDITIONS}줄까지 덧붙일 수 있습니다`
+                : 'Add something in your own words…'
             }
             disabled={atLimit}
           />

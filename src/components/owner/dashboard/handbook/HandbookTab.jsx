@@ -81,16 +81,12 @@ function HandbookTab({ companyId }) {
   const [archiveOpen, setArchiveOpen] = useState(false);
 
   // 대표는 확정·초안·빈칸을 모두 본다. 보관(ARCHIVED)은 거절한 것이라 목록에서 뺀다.
-  const entriesQuery = useAsync(
-    () => handbookApi.fetchAllEntries(companyId),
-    [companyId],
-    { enabled: Boolean(companyId) }
-  );
-  const scopesQuery = useAsync(
-    () => handbookApi.fetchScopes(companyId),
-    [companyId],
-    { enabled: Boolean(companyId) }
-  );
+  const entriesQuery = useAsync(() => handbookApi.fetchAllEntries(companyId), [companyId], {
+    enabled: Boolean(companyId),
+  });
+  const scopesQuery = useAsync(() => handbookApi.fetchScopes(companyId), [companyId], {
+    enabled: Boolean(companyId),
+  });
 
   const review = useMutation(({ entryId, decision }) =>
     handbookApi.reviewEntry(companyId, entryId, decision)
@@ -150,9 +146,7 @@ function HandbookTab({ companyId }) {
     const scope =
       tier === 'project'
         ? scopes.find((item) => item.id === groupKey)
-        : scopes.find(
-            (item) => item.kind === SCOPE_KIND.COMPANY && item.areaKey === groupKey
-          );
+        : scopes.find((item) => item.kind === SCOPE_KIND.COMPANY && item.areaKey === groupKey);
     if (!scope) return;
 
     const result = await createEntry.mutate({

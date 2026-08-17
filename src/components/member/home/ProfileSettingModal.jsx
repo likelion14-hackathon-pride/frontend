@@ -3,7 +3,12 @@ import styled from 'styled-components';
 
 import * as authApi from '../../../apis/auth';
 import * as companiesApi from '../../../apis/companies';
-import { JOB_ROLE_LABEL, LOCATION_ZONE, WORK_LOCATION_LABEL, lookup } from '../../../apis/constants';
+import {
+  JOB_ROLE_LABEL,
+  LOCATION_ZONE,
+  WORK_LOCATION_LABEL,
+  lookup,
+} from '../../../apis/constants';
 import { useAsync, useMutation } from '../../../hooks/useAsync';
 import { zoneOffsetLabel } from '../../../utils/time';
 import { ErrorState, InlineError, LoadingState } from '../../common/AsyncStates';
@@ -187,11 +192,9 @@ const CancelButton = styled.button`
 export default function ProfileSettingModal({ onClose }) {
   const { companyId, profile, applyMe } = useMemberNavigation();
 
-  const optionsQuery = useAsync(
-    () => companiesApi.fetchProfileOptions(companyId),
-    [companyId],
-    { enabled: Boolean(companyId) }
-  );
+  const optionsQuery = useAsync(() => companiesApi.fetchProfileOptions(companyId), [companyId], {
+    enabled: Boolean(companyId),
+  });
 
   const [location, setLocation] = useState(profile.location ?? '');
   const [role, setRole] = useState(profile.role ?? '');
@@ -265,8 +268,8 @@ export default function ProfileSettingModal({ onClose }) {
               </ChipGrid>
               {selectedLocation && (
                 <OverlapNote>
-                  대표 근무시간은 이곳 시계로 {String(selectedLocation.ownerHoursStart).slice(0, 5)}–
-                  {String(selectedLocation.ownerHoursEnd).slice(0, 5)} 입니다. 하루에 겹치는 시간은{' '}
+                  대표 근무시간은 이곳 시계로 {String(selectedLocation.ownerHoursStart).slice(0, 5)}
+                  –{String(selectedLocation.ownerHoursEnd).slice(0, 5)} 입니다. 하루에 겹치는 시간은{' '}
                   {selectedLocation.overlapHours}시간.
                 </OverlapNote>
               )}
