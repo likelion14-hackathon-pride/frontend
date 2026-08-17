@@ -105,7 +105,7 @@ export default function DraftReplyBlock({
       )}
 
       {view === 'sent' && (
-        <SentConfirmation label={sentLabel ?? "Sent to message in #payment-api"}/>
+        <SentConfirmation label={sentLabel ?? 'Sent to message in #payment-api'} />
       )}
     </Box>
   );

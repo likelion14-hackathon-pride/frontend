@@ -13,8 +13,6 @@ import { translations } from '../../components/auth/translations';
 import mailIcon from '../../assets/icons/mail.svg';
 import lockIcon from '../../assets/icons/lock.svg';
 
-
-
 export default function LoginPage() {
   const navigate = useNavigate();
   const [lang, setLang] = useState('ko');
@@ -30,8 +28,6 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [inviteCode, setInviteCode] = useState('');
-  
-  
 
   // 팀원 2단계(회원 설정) 전용 필드
   const [workLocation, setWorkLocation] = useState('');
@@ -53,8 +49,8 @@ export default function LoginPage() {
         alert(t.errorLoginRequired);
         return;
       }
-      
-      const loggedInRole = 'member'; 
+
+      const loggedInRole = 'member';
       navigate(loggedInRole === 'owner' ? '/owner' : '/member');
       return;
     }

@@ -204,7 +204,6 @@ const FooterRow = styled.div`
   gap: 8px;
 `;
 
-
 const CancelButton = styled.button`
   flex: none;
   font-size: 13px;
