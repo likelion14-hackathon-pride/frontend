@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import styled from 'styled-components';
+
+import { formatShortKo } from '../../../../utils/time';
 import { getGroupLabel } from './handbookTabData';
 
 const Panel = styled.div`
@@ -222,7 +224,7 @@ const EmptyPanel = styled.div`
   width: 100%;
 `;
 
-function HandbookDetailPanel({ item, onSave, onDelete }) {
+function HandbookDetailPanel({ item, pending = false, onSave, onDelete }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState('');
 
@@ -248,7 +250,7 @@ function HandbookDetailPanel({ item, onSave, onDelete }) {
     <Panel>
       <TagRow>
         <TierPill>{item.tier === 'company' ? '회사 규칙' : '프로젝트 지식'}</TierPill>
-        <GroupText>{getGroupLabel(item.groupKey)}</GroupText>
+        <GroupText>{item.groupLabel || getGroupLabel(item.groupKey)}</GroupText>
         {item.day0 && <Day0Text>Day 0 기본 규칙</Day0Text>}
       </TagRow>
 
@@ -273,21 +275,33 @@ function HandbookDetailPanel({ item, onSave, onDelete }) {
       )}
 
       <ButtonRow>
-        <OpenSourceButton type="button">원문 열기</OpenSourceButton>
+        {/* 원문 링크는 근거가 있을 때만 있다. 없으면 눌러도 갈 곳이 없으므로 감춘다. */}
+        {item.sourceHref && (
+          <OpenSourceButton
+            as="a"
+            href={item.sourceHref}
+            target="_blank"
+            rel="noreferrer"
+          >
+            원문 열기
+          </OpenSourceButton>
+        )}
         {editing ? (
-          <EditButton type="button" onClick={handleSave}>
-            수정 후 저장
+          <EditButton type="button" onClick={handleSave} disabled={pending}>
+            {pending ? '저장 중…' : '수정 후 저장'}
           </EditButton>
         ) : (
           <EditButton type="button" onClick={startEdit}>
             수정
           </EditButton>
         )}
-        <DeleteButton type="button" onClick={() => onDelete(item.id)}>
-          삭제
+        <DeleteButton type="button" onClick={() => onDelete(item.id)} disabled={pending}>
+          {item.status === 'confirmed' ? '삭제' : '거절'}
         </DeleteButton>
         <TimestampText>
-          {item.lastConfirmed ? `최근 확인 ${item.lastConfirmed}` : '확인 이력 없음'}
+          {item.lastConfirmed
+            ? `최근 확인 ${formatShortKo(item.lastConfirmed)}`
+            : '확인 이력 없음'}
         </TimestampText>
       </ButtonRow>
     </Panel>

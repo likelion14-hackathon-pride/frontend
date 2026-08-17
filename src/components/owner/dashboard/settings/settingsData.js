@@ -1,12 +1,5 @@
-export const INITIAL_SETTINGS_KEYWORDS = [
-  { id: 'sk-1', label: '배포', level: 'danger' },
-  { id: 'sk-2', label: 'deploy', level: 'danger' },
-  { id: 'sk-3', label: 'release', level: 'danger' },
-  { id: 'sk-4', label: '프로덕션 DB', level: 'danger' },
-  { id: 'sk-5', label: '마이그레이션', level: 'warning' },
-  { id: 'sk-6', label: '환불 처리', level: 'warning' },
-];
+// 근무 시간과 회사 코드는 서버에서 온다(GET /companies/{id}/settings, /companies/{id}).
+// 위험 키워드도 마찬가지다(GET /companies/{id}/risk-keywords).
+// 여기에는 화면이 쓰는 기본 표시값만 둔다.
 
-export const DEFAULT_WORK_HOURS = { start: '09:00', end: '18:00', timezone: 'KST' };
-
-export const MOCK_COMPANY_CODE = 'ECO-4K7Q';
+export const EMPTY_WORK_HOURS = { start: '--:--', end: '--:--', timezone: '' };

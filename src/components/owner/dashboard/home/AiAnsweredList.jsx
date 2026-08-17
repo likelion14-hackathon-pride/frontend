@@ -1,5 +1,6 @@
 import styled from 'styled-components';
-import { AI_ANSWERED_QUESTIONS } from './homeData';
+
+import { formatClock } from '../../../../utils/time';
 
 const Panel = styled.div`
   box-sizing: border-box;
@@ -134,26 +135,52 @@ const Badge = styled.span`
   white-space: nowrap;
 `;
 
-function AiAnsweredList() {
+const EmptyRow = styled.div`
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  color: #a0a0a8;
+  font-family: 'Plus Jakarta Sans';
+  font-size: 12.5px;
+`;
+
+function AiAnsweredList({ recentAnswers, ownerType }) {
+  const items = recentAnswers?.items ?? [];
+
   return (
     <Panel>
       <HeadRow>
         <Title>SAI가 대신 답한 순간</Title>
-        <TodayCount>오늘 12건</TodayCount>
+        <TodayCount>오늘 {recentAnswers?.todayCount ?? 0}건</TodayCount>
       </HeadRow>
       <List>
-        {AI_ANSWERED_QUESTIONS.map((q) => (
-          <Row key={q.id}>
-            <MainGroup>
-              <Time>{q.time}</Time>
-              <TextGroup>
-                <QuestionText>{q.text}</QuestionText>
-                <SourceText>{q.sourceLine}</SourceText>
-              </TextGroup>
-            </MainGroup>
-            {q.badge === 'owner' && <Badge>대표 확인</Badge>}
-          </Row>
-        ))}
+        {items.length === 0 ? (
+          <EmptyRow>오늘 처리된 질문이 아직 없습니다</EmptyRow>
+        ) : (
+          items.map((item, index) => {
+            const byOwner = item.resolutionType === ownerType;
+            return (
+              <Row key={`${item.resolvedAt}-${index}`}>
+                <MainGroup>
+                  <Time>{formatClock(item.resolvedAt, { fallback: '--:--' })}</Time>
+                  <TextGroup>
+                    <QuestionText>{item.question || '(질문 원문 없음)'}</QuestionText>
+                    <SourceText>
+                      {item.sourceLabels?.length
+                        ? `근거 · ${item.sourceLabels.join(' · ')}`
+                        : '근거 없음 → 대표님께 전달'}
+                    </SourceText>
+                  </TextGroup>
+                </MainGroup>
+                <Badge $tone={byOwner ? 'owner' : 'instant'}>
+                  {byOwner ? '대표 확인' : '즉시 답변'}
+                </Badge>
+              </Row>
+            );
+          })
+        )}
       </List>
     </Panel>
   );

@@ -48,7 +48,14 @@ export default function SourceDetails({ label = 'Show the Korean source', source
       {sources.map((s, i) => (
         <SourceItem key={i}>
           <SourceKr>{s.kr}</SourceKr>
-          <SourceLine>{s.line}</SourceLine>
+          {/* 과거 대화 근거에는 슬랙 원문 링크가 함께 온다. 규칙 근거에는 없다. */}
+          {s.href ? (
+            <SourceLine as="a" href={s.href} target="_blank" rel="noreferrer">
+              {s.line} ↗
+            </SourceLine>
+          ) : (
+            <SourceLine>{s.line}</SourceLine>
+          )}
         </SourceItem>
       ))}
     </Wrap>

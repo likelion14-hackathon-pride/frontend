@@ -381,17 +381,13 @@ const PrimaryButtonIcon = styled.img`
 
 const COPIED_RESET_MS = 2000;
 
-function CompletionStep({
-  connectedSourcesCount,
-  handbookConfirmedCount,
-  handbookTotal,
-  riskKeywordCount,
-  companyCode,
-  onReviewSettings,
-  onOpenHandbook,
-  onCopyCode,
-}) {
+// summary 는 POST /onboarding/complete 응답이 준다.
+// { sourceCount, handbookEntryCount, riskKeywordCount }
+function CompletionStep({ summary, companyCode, onReviewSettings, onOpenHandbook, onCopyCode }) {
   const [copied, setCopied] = useState(false);
+  const connectedSourcesCount = summary?.sourceCount ?? 0;
+  const handbookConfirmedCount = summary?.handbookEntryCount ?? 0;
+  const riskKeywordCount = summary?.riskKeywordCount ?? 0;
 
   const handleCopyCode = () => {
     onCopyCode();
@@ -454,7 +450,7 @@ function CompletionStep({
           }
           count={handbookConfirmedCount}
           unit="개 확인됨"
-          description={`전체 ${handbookTotal}개 중`}
+          description="확정된 규칙"
           border="#EFEFF1"
           bg="#EAF1FE"
         />
@@ -501,7 +497,7 @@ function CompletionStep({
               <CodeLabel>회사 코드</CodeLabel>
             </CodeLabelWrap>
             <CodeValueWrap>
-              <CodeValue>{companyCode}</CodeValue>
+              <CodeValue>{companyCode || '불러오는 중…'}</CodeValue>
             </CodeValueWrap>
           </CodeGroup>
 
@@ -510,7 +506,7 @@ function CompletionStep({
               <CopiedBadgeLabel>복사됨 ✓</CopiedBadgeLabel>
             </CopiedBadge>
           ) : (
-            <CopyButton type="button" onClick={handleCopyCode}>
+            <CopyButton type="button" onClick={handleCopyCode} disabled={!companyCode}>
               <CopyButtonLabelWrap>
                 <CopyButtonLabel>복사</CopyButtonLabel>
               </CopyButtonLabelWrap>

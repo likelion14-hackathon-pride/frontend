@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+
 import ReviewPanel from './ReviewPanel';
 import SentConfirmation from './SentConfirmation';
 
@@ -52,6 +53,11 @@ const ReviewButton = styled.button`
       inset 0 0 0 999px rgba(255, 255, 255, 0.12),
       0 8px 20px rgba(255, 96, 0, 0.32);
   }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: default;
+  }
 `;
 
 const SendAsIsButton = styled.button`
@@ -67,19 +73,34 @@ const SendAsIsButton = styled.button`
   &:hover {
     box-shadow: inset 0 0 0 999px rgba(23, 23, 27, 0.04);
   }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: default;
+  }
+`;
+
+const NoChannelNote = styled.div`
+  font-size: 12.5px;
+  color: #a0a0a8;
+  line-height: 1.6;
 `;
 
 export default function DraftReplyBlock({
   view,
   enText,
   draftKr,
-  ownerNote,
+  channels = [],
+  pending = false,
   sentLabel,
   onReview,
   onSendAsIs,
   onCancelReview,
   onSend,
 }) {
+  // 보낼 채널이 하나도 없으면 보낼 수 없다. 버튼을 눌러도 되는 척하지 않는다.
+  const hasChannel = channels.length > 0;
+
   return (
     <Box>
       <Title>The Korean question is already written for you.</Title>
@@ -87,10 +108,21 @@ export default function DraftReplyBlock({
       {view === 'collapsed' && (
         <>
           <DraftText>{draftKr}</DraftText>
-          <ButtonRow>
-            <ReviewButton onClick={onReview}>Review it</ReviewButton>
-            <SendAsIsButton onClick={onSendAsIs}>Send as is</SendAsIsButton>
-          </ButtonRow>
+          {hasChannel ? (
+            <ButtonRow>
+              <ReviewButton type="button" onClick={onReview} disabled={pending}>
+                {pending ? '준비 중…' : 'Review it'}
+              </ReviewButton>
+              <SendAsIsButton type="button" onClick={onSendAsIs} disabled={pending}>
+                Send as is
+              </SendAsIsButton>
+            </ButtonRow>
+          ) : (
+            <NoChannelNote>
+              보낼 슬랙 채널이 아직 없습니다. 대표님이 소스 연결에서 채널을 추가해야 보낼 수
+              있습니다.
+            </NoChannelNote>
+          )}
         </>
       )}
 
@@ -98,7 +130,8 @@ export default function DraftReplyBlock({
         <ReviewPanel
           enText={enText}
           krText={draftKr}
-          ownerNote={ownerNote}
+          channels={channels}
+          pending={pending}
           onCancel={onCancelReview}
           onSend={onSend}
         />
@@ -106,7 +139,7 @@ export default function DraftReplyBlock({
 
       {view === 'sent' && (
         <SentConfirmation
-          label={sentLabel ?? "Sent to 김대표's thread in #payment-api"}
+          label={sentLabel || '대표님께 보냈습니다'}
           onClose={onCancelReview}
         />
       )}

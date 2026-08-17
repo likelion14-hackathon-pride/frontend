@@ -15,24 +15,24 @@ const activeStyle = {
   boxShadow: '0 14px 34px -14px rgba(23, 44, 90, 0.22)',
 };
 
-const PROJECTS = [
-  { id: 'payment-api', label: 'payment-api', count: 3 },
-  { id: 'admin-web', label: 'admin-web', count: 2 },
-];
-
-export default function MemberNav({ taskCount = 3 }) {
+export default function MemberNav() {
   const { pathname } = useLocation();
-  const { goToHandbook } = useMemberNavigation();
+  const { goToHandbook, columns, companyScopes, projectScopes } = useMemberNavigation();
   const isHandbookActive = pathname.startsWith('/member/handbook');
   const isHandbookOpen = isHandbookActive;
   const [isProjectOpen, setIsProjectOpen] = useState(
     pathname.startsWith('/member/handbook/project')
   );
 
-  function handleHandbookClick() {
-    setIsHandbookOpen(true);
-    goToHandbook();
-  }
+  // 배지는 아직 안 끝낸 카드 수다. Done 열은 세지 않는다.
+  const taskCount = columns
+    .filter((column) => column.id !== 'DONE')
+    .reduce((sum, column) => sum + column.cards.length, 0);
+
+  // 규칙 수는 지식공간의 entryCount(확정 규칙만) 합계다.
+  const sumEntries = (scopes) => scopes.reduce((sum, scope) => sum + (scope.entryCount ?? 0), 0);
+  const companyRuleCount = sumEntries(companyScopes);
+  const projectRuleCount = sumEntries(projectScopes);
 
   return (
     <NavWrap>
@@ -75,26 +75,26 @@ export default function MemberNav({ taskCount = 3 }) {
           <SubItem to="/member/handbook/company">
             <img src={fileIcon} alt="" width={13} height={13} />
             <SubLabel>Company system</SubLabel>
-            <SubCount>12</SubCount>
+            <SubCount>{companyRuleCount}</SubCount>
           </SubItem>
 
           <SubToggle onClick={() => setIsProjectOpen((v) => !v)}>
             <img src={linkIcon} alt="" width={13} height={13} />
             <SubLabel>By project</SubLabel>
-            <SubCount>5</SubCount>
+            <SubCount>{projectRuleCount}</SubCount>
           </SubToggle>
 
-          {isProjectOpen && (
+          {isProjectOpen && projectScopes.length > 0 && (
             <ProjectTree>
-              {PROJECTS.map((p) => {
-                const isActive = pathname === `/member/handbook/project/${p.id}`;
+              {projectScopes.map((scope) => {
+                const isActive = pathname === `/member/handbook/project/${scope.id}`;
                 return (
-                  <ProjectRow key={p.id}>
+                  <ProjectRow key={scope.id}>
                     <TreeLine />
-                    <ProjectItem to={`/member/handbook/project/${p.id}`}>
+                    <ProjectItem to={`/member/handbook/project/${scope.id}`}>
                       <Dot $active={isActive} />
-                      <ProjectLabel>{p.label}</ProjectLabel>
-                      <SubCount>{p.count}</SubCount>
+                      <ProjectLabel>{scope.name}</ProjectLabel>
+                      <SubCount>{scope.entryCount ?? 0}</SubCount>
                     </ProjectItem>
                   </ProjectRow>
                 );

@@ -1,50 +1,55 @@
-export const INITIAL_SOURCES = {
-  github: {
+import { CONNECTION_KIND } from '../../../../apis/constants';
+
+// 소스 종류별 화면 문구. 숫자와 목록은 전부 서버에서 온다.
+export const SOURCE_CONFIG = {
+  [CONNECTION_KIND.GITHUB]: {
     key: 'github',
+    provider: CONNECTION_KIND.GITHUB,
     title: 'GitHub',
     subtitle: '코드 저장소',
     syncMode: 'live',
     connectedLabel: '연결된 저장소',
-    extractedCount: 186,
-    lastSync: '12분 전 동기화',
-    items: [
-      { id: 'gh-1', name: 'payment-api', meta: 'PR 218' },
-      { id: 'gh-2', name: 'admin-web', meta: 'PR 96' },
-      { id: 'gh-3', name: 'landing', meta: 'PR 24' },
-    ],
     addLabel: '저장소 추가',
-    addPlaceholder: '예: org/repo-name',
+    addPlaceholder: '추가할 저장소를 고르세요',
+    emptyLabel: '아직 수집 대상 저장소가 없습니다',
+    notConnectedLabel: 'GitHub 이 아직 연결되지 않았습니다',
   },
-  slack: {
+  [CONNECTION_KIND.SLACK]: {
     key: 'slack',
+    provider: CONNECTION_KIND.SLACK,
     title: 'Slack',
     subtitle: '팀 대화',
     syncMode: 'live',
     connectedLabel: '연결된 채널',
-    extractedCount: 132,
-    lastSync: '방금 전 수신',
-    items: [
-      { id: 'sl-1', name: '#dev-general', meta: '4,120건' },
-      { id: 'sl-2', name: '#payment', meta: '1,860건' },
-      { id: 'sl-3', name: '#general', meta: '980건' },
-    ],
     addLabel: '채널 추가',
-    addPlaceholder: '예: #channel-name',
+    addPlaceholder: '추가할 채널을 고르세요',
+    emptyLabel: '아직 수집 대상 채널이 없습니다',
+    notConnectedLabel: 'Slack 이 아직 연결되지 않았습니다',
   },
-  localFile: {
+  [CONNECTION_KIND.LOCAL]: {
     key: 'localFile',
+    provider: CONNECTION_KIND.LOCAL,
     title: '로컬 파일',
     subtitle: '직접 업로드',
     syncMode: 'manual',
     connectedLabel: '업로드된 파일',
-    extractedCount: 24,
-    lastSync: '3일 전 업로드',
-    items: [
-      { id: 'lf-1', name: '온보딩 가이드.pdf', meta: '2.4MB' },
-      { id: 'lf-2', name: '배포 체크리스트.md', meta: '18KB' },
-      { id: 'lf-3', name: '장비 지급 대장.xlsx', meta: '96KB' },
-    ],
     addLabel: '파일 업로드',
-    addPlaceholder: '예: 파일명.pdf',
+    addPlaceholder: '',
+    emptyLabel: '아직 올린 파일이 없습니다',
+    notConnectedLabel: '파일을 올리면 여기에 쌓입니다',
   },
 };
+
+export const SOURCE_ORDER = [
+  CONNECTION_KIND.GITHUB,
+  CONNECTION_KIND.SLACK,
+  CONNECTION_KIND.LOCAL,
+];
+
+export function formatBytes(size) {
+  const bytes = Number(size);
+  if (!bytes) return '';
+  if (bytes < 1024) return `${bytes}B`;
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)}KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)}MB`;
+}

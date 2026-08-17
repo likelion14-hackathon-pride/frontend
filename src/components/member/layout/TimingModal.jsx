@@ -1,5 +1,10 @@
 import styled from 'styled-components';
+
+import { REPLY_BASIS, TIMING_BUCKET_LIMIT, WORK_STATE } from '../../../apis/constants';
 import { useZoneTime } from '../../../hooks/member/useZoneTime.js';
+import { formatDateTime, formatTimeOfDay } from '../../../utils/time';
+import { EmptyState, ErrorState, LoadingState } from '../../common/AsyncStates';
+import { useMemberNavigation } from '../../../context/member/MemberContext';
 
 const Overlay = styled.div`
   position: absolute;
@@ -93,6 +98,7 @@ const TimeRow = styled.div`
   display: flex;
   align-items: center;
   gap: 28px;
+  flex-wrap: wrap;
 `;
 
 const TimeLabel = styled.div`
@@ -100,6 +106,7 @@ const TimeLabel = styled.div`
   font-weight: 700;
   color: #a0a0a8;
   letter-spacing: 0.07em;
+  white-space: nowrap;
 `;
 
 const TimeValue = styled.div`
@@ -118,6 +125,7 @@ const VerticalDivider = styled.div`
 
 const NoteBox = styled.div`
   flex: 1;
+  min-width: 240px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -185,6 +193,12 @@ const ListItemSrc = styled.div`
   margin-top: 5px;
 `;
 
+const MoreNote = styled.div`
+  font-size: 12px;
+  color: #b4b4bc;
+  padding-top: 10px;
+`;
+
 const TaskButton = styled.button`
   width: 100%;
   color: #fff;
@@ -201,40 +215,56 @@ const TaskButton = styled.button`
   border: none;
 `;
 
-const DEFAULT_CAN_DO = [
-  {
-    title: 'Pull the failure logs from Sentry and summarise the cause',
-    src: 'Source · payment-api/config/sentry.yml · config file',
-  },
-  {
-    title: 'Open the issue and draft the PR against it',
-    src: 'Source · CONTRIBUTING.md, line 24 · config file',
-  },
-  {
-    title: 'Set up locally with docker compose up',
-    src: 'Source · payment-api/README.md, line 8 · config file',
-  },
-];
+function cityOf(timezone) {
+  if (!timezone) return '';
+  return timezone.split('/').pop().replace(/_/g, ' ').toUpperCase();
+}
 
-const DEFAULT_MUST_WAIT = [
-  {
-    title: 'Whether tests are required with the fix',
-    src: 'Not established in payment-api · needs 김대표',
-  },
-  {
-    title: 'Whether you may run the deploy yourself',
-    src: 'Decision, not a lookup · needs 김대표',
-  },
-];
+function PersonClock({ label, person, muted }) {
+  const time = useZoneTime(person?.timezone);
+  return (
+    <div>
+      <TimeLabel>
+        {label}
+        {person?.timezone ? ` · ${cityOf(person.timezone)}` : ''}
+      </TimeLabel>
+      <TimeValue $muted={muted}>{time}</TimeValue>
+    </div>
+  );
+}
 
-export default function TimingModal({
-  onClose,
-  onGoTaskCard,
-  canDo = DEFAULT_CAN_DO,
-  mustWait = DEFAULT_MUST_WAIT,
-}) {
-  const yourTime = useZoneTime('Asia/Ho_Chi_Minh');
-  const ownerTime = useZoneTime('Asia/Seoul');
+export default function TimingModal({ onClose, onGoTaskCard }) {
+  const { timing, timingLoading, timingError, reloadTiming, profile } = useMemberNavigation();
+
+  const hours = timing?.workingHours;
+  const hoursLabel = hours
+    ? `${formatTimeOfDay(hours.start)}–${formatTimeOfDay(hours.end)} ${cityOf(hours.timezone)}`
+    : '';
+
+  const ownerState = timing?.owner?.state;
+  const noteTitle = (() => {
+    if (!timing) return '';
+    if (ownerState === WORK_STATE.WORKING) return `대표 근무시간입니다 (${hoursLabel})`;
+    if (ownerState === WORK_STATE.OFF_HOURS) return `대표 근무시간 밖입니다 (${hoursLabel})`;
+    return '이 회사는 근무시간을 쓰지 않습니다';
+  })();
+
+  const replyAt = formatDateTime(timing?.replyExpected?.at, {
+    fallback: '—',
+    timeZone: profile.timezone,
+  });
+  const basis = timing?.replyExpected?.basis;
+  const noteDesc = (() => {
+    if (!timing) return '';
+    if (basis === REPLY_BASIS.HISTORY) {
+      return `지금 보내면 ${replyAt}쯤 답이 올 것으로 보입니다. 실제 답변 이력 ${timing.replyExpected.sampleSize}건의 중앙값 기준입니다.`;
+    }
+    // WORKING_HOURS: 표본이 모자라 다음 근무 시작 시각을 그대로 쓴 것이다.
+    return `지금 보내면 다음 근무 시작인 ${replyAt}쯤 확인됩니다. 답변 이력이 아직 ${timing?.replyExpected?.sampleSize ?? 0}건뿐이라 근무시간 기준으로 잡았습니다.`;
+  })();
+
+  const canDo = timing?.canDo ?? [];
+  const needsPerson = timing?.needsPerson ?? [];
 
   return (
     <Overlay onClick={onClose}>
@@ -242,60 +272,91 @@ export default function TimingModal({
         <Header>
           <HeaderText>
             <Title>Timing</Title>
-            <Subtitle>Owner hours 09:00–18:00 KST</Subtitle>
+            <Subtitle>
+              {hours
+                ? hours.enabled
+                  ? `Owner hours ${hoursLabel}`
+                  : '근무시간을 쓰지 않는 회사입니다'
+                : '근무시간 정보를 불러오는 중'}
+            </Subtitle>
           </HeaderText>
           <CloseButton onClick={onClose}>✕</CloseButton>
         </Header>
 
-        <Body>
-          <TimeCard>
-            <TimeRow>
-              <div>
-                <TimeLabel>YOUR TIME · HANOI</TimeLabel>
-                <TimeValue>{yourTime}</TimeValue>
-              </div>
+        {timingLoading && !timing && <LoadingState label="시차 정보를 불러오는 중…" />}
+        {timingError && !timing && <ErrorState error={timingError} onRetry={reloadTiming} />}
 
-              <VerticalDivider />
+        {timing && (
+          <Body>
+            <TimeCard>
+              <TimeRow>
+                <PersonClock label="YOUR TIME" person={timing.you} />
+                <VerticalDivider />
+                <PersonClock label="OWNER" person={timing.owner} muted />
 
-              <div>
-                <TimeLabel>OWNER · SEOUL</TimeLabel>
-                <TimeValue $muted>{ownerTime}</TimeValue>
-              </div>
+                <NoteBox>
+                  <NoteTitle>{noteTitle}</NoteTitle>
+                  <NoteDesc>{noteDesc}</NoteDesc>
+                </NoteBox>
+              </TimeRow>
+            </TimeCard>
 
-              <NoteBox>
-                <NoteTitle>Outside the Owner's hours (09:00–18:00 KST)</NoteTitle>
-                <NoteDesc>
-                  If you send now, expect a reply roughly the next working morning in Seoul.
-                </NoteDesc>
-              </NoteBox>
-            </TimeRow>
-          </TimeCard>
+            <Grid>
+              <ListCard>
+                <ListCardTitle>You can move on these now</ListCardTitle>
+                <ListCardSubtitle>
+                  대표의 답을 기다리지 않는 단계입니다. 핸드북에 근거가 있는 것부터 나옵니다.
+                </ListCardSubtitle>
+                {canDo.length === 0 ? (
+                  <EmptyState compact label="지금 바로 할 수 있는 단계가 없습니다" />
+                ) : (
+                  canDo.map((item) => (
+                    <ListItem key={`${item.cardId}-${item.stepId}`}>
+                      <ListItemTitle>{item.title}</ListItemTitle>
+                      <ListItemSrc>
+                        {/* entryId 가 있으면 그 규칙이 근거, 없으면 근거로 삼을 규칙이 없다는 뜻. */}
+                        {item.entryId
+                          ? `근거 · ${item.entryTitle}${item.scopeName ? ` · ${item.scopeName}` : ''}`
+                          : '근거로 삼을 규칙 없음'}
+                      </ListItemSrc>
+                    </ListItem>
+                  ))
+                )}
+                {timing.canDoTotal > TIMING_BUCKET_LIMIT && (
+                  <MoreNote>전체 {timing.canDoTotal}건 중 {canDo.length}건만 표시</MoreNote>
+                )}
+              </ListCard>
 
-          <Grid>
-            <ListCard>
-              <ListCardTitle>You can move on these now</ListCardTitle>
-              <ListCardSubtitle>The handbook already answers them.</ListCardSubtitle>
-              {canDo.map((item, i) => (
-                <ListItem key={i}>
-                  <ListItemTitle>{item.title}</ListItemTitle>
-                  <ListItemSrc>{item.src}</ListItemSrc>
-                </ListItem>
-              ))}
-            </ListCard>
-
-            <ListCard>
-              <ListCardTitle>These need a person</ListCardTitle>
-              <ListCardSubtitle>Send now and it waits, or hold it — your call.</ListCardSubtitle>
-              {mustWait.map((item, i) => (
-                <ListItem key={i}>
-                  <ListItemTitle>{item.title}</ListItemTitle>
-                  <ListItemSrc>{item.src}</ListItemSrc>
-                </ListItem>
-              ))}
-              <TaskButton onClick={onGoTaskCard}>Open the related task card</TaskButton>
-            </ListCard>
-          </Grid>
-        </Body>
+              <ListCard>
+                <ListCardTitle>These need a person</ListCardTitle>
+                <ListCardSubtitle>대표의 답이 있어야 풀리는 미정 항목입니다.</ListCardSubtitle>
+                {needsPerson.length === 0 ? (
+                  <EmptyState compact label="대표를 기다리는 항목이 없습니다" />
+                ) : (
+                  needsPerson.map((item) => (
+                    <ListItem key={`${item.cardId}-${item.blankId}`}>
+                      <ListItemTitle>{item.title}</ListItemTitle>
+                      <ListItemSrc>
+                        {[
+                          item.scopeName,
+                          item.escalationStatus ? `질문 ${item.escalationStatus}` : '아직 보내지 않음',
+                        ]
+                          .filter(Boolean)
+                          .join(' · ')}
+                      </ListItemSrc>
+                    </ListItem>
+                  ))
+                )}
+                {timing.needsPersonTotal > TIMING_BUCKET_LIMIT && (
+                  <MoreNote>
+                    전체 {timing.needsPersonTotal}건 중 {needsPerson.length}건만 표시
+                  </MoreNote>
+                )}
+                <TaskButton onClick={onGoTaskCard}>Open the related task card</TaskButton>
+              </ListCard>
+            </Grid>
+          </Body>
+        )}
       </Modal>
     </Overlay>
   );

@@ -1,10 +1,14 @@
 import { useState } from 'react';
 import styled from 'styled-components';
+
+import { lookup } from '../../../../apis/constants';
 import KeywordAddModal from './KeywordAddModal';
 
+// 키는 백엔드 RiskKeyword.Level 값 그대로다(policy/models.py:5).
 const LEVEL_META = {
-  danger: { label: '위험', color: '#DC2626', bg: '#FEF2F2', dot: '#DC2626' },
-  warning: { label: '주의', color: '#EA6A0A', bg: '#FFF7ED', dot: '#EA6A0A' },
+  DANGER: { label: '위험', color: '#DC2626', bg: '#FEF2F2', dot: '#DC2626' },
+  CAUTION: { label: '주의', color: '#EA6A0A', bg: '#FFF7ED', dot: '#EA6A0A' },
+  DEFAULT: { label: '주의', color: '#EA6A0A', bg: '#FFF7ED', dot: '#EA6A0A' },
 };
 
 const Card = styled.div`
@@ -150,30 +154,31 @@ const AddChip = styled.button`
   }
 `;
 
-function RiskKeywordCard({ keywords, onAddKeyword, onRemoveKeyword }) {
+function RiskKeywordCard({ keywords, loading = false, pending = false, onAddKeyword, onRemoveKeyword }) {
   const [modalOpen, setModalOpen] = useState(false);
 
   return (
     <Card>
       <TitleRow>
         <Title>위험 작업 키워드</Title>
-        <CountText>{keywords.length}개 등록됨</CountText>
+        <CountText>{loading ? '불러오는 중…' : `${keywords.length}개 등록됨`}</CountText>
       </TitleRow>
 
       <ChipWrap>
         {keywords.map((keyword) => {
-          const meta = LEVEL_META[keyword.level];
+          const meta = lookup(LEVEL_META, keyword.severity);
           return (
-            <KeywordChip key={keyword.id}>
+            <KeywordChip key={keyword.id} title={keyword.message || undefined}>
               <Dot $color={meta.dot} />
-              <KeywordLabel>{keyword.label}</KeywordLabel>
+              <KeywordLabel>{keyword.keyword}</KeywordLabel>
               <LevelBadge $bg={meta.bg} $color={meta.color}>
                 {meta.label}
               </LevelBadge>
               <RemoveButton
                 type="button"
+                disabled={pending}
                 onClick={() => onRemoveKeyword(keyword.id)}
-                aria-label={`${keyword.label} 삭제`}
+                aria-label={`${keyword.keyword} 삭제`}
               >
                 ✕
               </RemoveButton>
@@ -186,7 +191,13 @@ function RiskKeywordCard({ keywords, onAddKeyword, onRemoveKeyword }) {
       </ChipWrap>
 
       {modalOpen && (
-        <KeywordAddModal onAddKeyword={onAddKeyword} onClose={() => setModalOpen(false)} />
+        <KeywordAddModal
+          onAddKeyword={(keyword, severity) => {
+            onAddKeyword(keyword, severity);
+            setModalOpen(false);
+          }}
+          onClose={() => setModalOpen(false)}
+        />
       )}
     </Card>
   );

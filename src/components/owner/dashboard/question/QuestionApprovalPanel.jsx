@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
+import { lookup } from '../../../../apis/constants';
+import { formatShortKo } from '../../../../utils/time';
+import { ErrorState, LoadingState } from '../../../common/AsyncStates';
+
 const Panel = styled.div`
   box-sizing: border-box;
   display: flex;
@@ -232,6 +236,43 @@ const EditTextarea = styled.textarea`
   }
 `;
 
+const ScopeSelect = styled.select`
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1px solid #dbe4fc;
+  font-family: 'Plus Jakarta Sans';
+  font-size: 13px;
+  outline: none;
+
+  &:focus {
+    border-color: #2563eb;
+  }
+`;
+
+const ThreadLinkButton = styled.a`
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  height: 40.667px;
+  justify-content: center;
+  align-items: center;
+  margin-top: auto;
+  border-radius: 12px;
+  text-decoration: none;
+  background: ${({ $disabled }) => ($disabled ? '#F4F4F6' : '#2563EB')};
+  color: ${({ $disabled }) => ($disabled ? '#A0A0A8' : '#FFFFFF')};
+  cursor: ${({ $disabled }) => ($disabled ? 'default' : 'pointer')};
+  font-family: 'Plus Jakarta Sans';
+  font-size: 12.5px;
+  font-weight: 700;
+  line-height: 123%;
+
+  &:hover {
+    background: ${({ $disabled }) => ($disabled ? '#F4F4F6' : '#1D4ED8')};
+  }
+`;
+
 const ButtonsRow = styled.div`
   display: flex;
   width: 100%;
@@ -283,96 +324,9 @@ const GhostButton = styled.button`
   white-space: nowrap;
 `;
 
-const AiNotAnsweredBox = styled.div`
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 16px 18px;
-  border-radius: 14px;
-  background: #FFF8EC;
-`;
 
-const AiNotAnsweredTitle = styled.span`
-  color: #9A6212;
-  font-family: 'Plus Jakarta Sans';
-  font-size: 13px;
-  font-style: normal;
-  font-weight: 700;
-  line-height: 135%;
-`;
 
-const AiNotAnsweredBody = styled.p`
-  margin: 0;
-  color: #9A6212;
-  font-family: 'Plus Jakarta Sans';
-  font-size: 12px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 170%;
-`;
 
-const SlackButton = styled.button`
-  display: flex;
-  width: 100%;
-  height: 48px;
-  justify-content: center;
-  align-items: center;
-  margin-top: auto;
-  border: none;
-  border-radius: 14px;
-  cursor: pointer;
-  background: #2563EB;
-  color: #fff;
-  font-family: 'Plus Jakarta Sans';
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: -0.2px;
-  transition: background 0.15s ease;
-
-  &:hover {
-    background: #1d4ed8;
-  }
-`;
-
-const ComposeBox = styled.textarea`
-  resize: none;
-  min-height: 80px;
-  width: 100%;
-  padding: 14px;
-  border-radius: 14px;
-  border: 0.667px solid #efeff1;
-  background: #fafafb;
-  font-family: 'Plus Jakarta Sans';
-  font-size: 12.5px;
-  outline: none;
-
-  &::placeholder {
-    color: #a0a0a8;
-  }
-
-  &:focus {
-    border-color: #2563eb;
-    background: #fff;
-  }
-`;
-
-const SendButton = styled.button`
-  display: flex;
-  width: 100%;
-  height: 40.667px;
-  justify-content: center;
-  align-items: center;
-  margin-top: auto;
-  border: none;
-  border-radius: 12px;
-  cursor: ${({ disabled }) => (disabled ? 'default' : 'pointer')};
-  background: ${({ disabled }) => (disabled ? '#DBE4FC' : '#2563EB')};
-  color: #fff;
-  font-family: 'Plus Jakarta Sans';
-  font-size: 12.5px;
-  font-weight: 700;
-`;
 
 const StatusBanner = styled.div`
   display: flex;
@@ -425,25 +379,30 @@ const STATUS_META = {
   pending_approval: { label: '승인 대기', bg: '#EEF3FF', color: '#1D4ED8' },
   saved: { label: '저장됨', bg: '#EAF6EF', color: '#1F7A45' },
   discarded: { label: '저장 안 함', bg: '#F4F4F6', color: '#6B6B73' },
+  DEFAULT: { label: '알 수 없음', bg: '#F4F4F6', color: '#6B6B73' },
 };
 
-const SAVE_DELAY_MS = 450;
-
+// 대표는 슬랙 스레드에 답장한다. 대시보드에서 직접 답을 입력하는 API 는 없다.
 function QuestionApprovalPanel({
   question,
-  onSendReply,
+  detail,
+  detailLoading,
+  detailError,
+  onRetryDetail,
+  scopes = [],
+  pending = false,
+  threadUrl,
+  onOpenThread,
   onApprove,
-  onDiscard,
-  onUndo,
-  onEditSuggestion,
+  onDismiss,
 }) {
   const [mode, setMode] = useState('view');
   const [draftTitle, setDraftTitle] = useState('');
-  const [replyText, setReplyText] = useState('');
+  const [draftRule, setDraftRule] = useState('');
+  const [draftScopeId, setDraftScopeId] = useState('');
 
   useEffect(() => {
     setMode('view');
-    setReplyText('');
   }, [question?.id]);
 
   if (!question) {
@@ -454,36 +413,31 @@ function QuestionApprovalPanel({
     );
   }
 
-  const meta = STATUS_META[question.status];
-  const headerLabel = question.queueNumber ? `${question.queueNumber} · ${meta.label}` : meta.label;
+  const meta = lookup(STATUS_META, question.status);
+  const proposal = detail?.proposal ?? null;
 
   const startEdit = () => {
-    setDraftTitle(question.suggestion?.title ?? '');
+    setDraftTitle(proposal?.title ?? '');
+    setDraftRule(proposal?.bodyEn ?? '');
+    setDraftScopeId(proposal?.scopeId ?? '');
     setMode('editing');
   };
 
-  const handleApprove = () => {
-    setMode('saving');
-    setTimeout(() => onApprove(question.id), SAVE_DELAY_MS);
-  };
+  const handleApprove = () => onApprove({});
 
-  const handleEditSave = () => {
-    onEditSuggestion(question.id, draftTitle.trim());
-    setMode('saving');
-    setTimeout(() => onApprove(question.id), SAVE_DELAY_MS);
-  };
-
-  const handleSendReply = () => {
-    if (!replyText.trim()) return;
-    onSendReply(question.id, replyText.trim());
-  };
+  const handleEditSave = () =>
+    onApprove({
+      ...(draftTitle.trim() ? { title: draftTitle.trim() } : {}),
+      ...(draftRule.trim() ? { ruleEn: draftRule.trim() } : {}),
+      ...(draftScopeId ? { scopeId: Number(draftScopeId) } : {}),
+    });
 
   return (
     <Panel>
       <HeaderRow>
         <HeaderLeft>
           <StatusBadge $bg={meta.bg} $color={meta.color}>
-            {headerLabel}
+            {meta.label}
           </StatusBadge>
           <ProjectText>{question.project}</ProjectText>
         </HeaderLeft>
@@ -501,7 +455,7 @@ function QuestionApprovalPanel({
 
       {question.ownerReply && (
         <MessageRow $reverse>
-          <OwnerAvatar>김</OwnerAvatar>
+          <OwnerAvatar>답</OwnerAvatar>
           <Bubble $reverse>
             <BubbleText $reverse>{question.ownerReply}</BubbleText>
           </Bubble>
@@ -510,84 +464,129 @@ function QuestionApprovalPanel({
 
       {question.status === 'waiting' && (
         <>
-          <AiNotAnsweredBox>
-            <AiNotAnsweredTitle>AI가 답하지 않았습니다</AiNotAnsweredTitle>
-            <AiNotAnsweredBody>
-              핸드북에 관련 근거가 없어 추측하지 않았습니다. 팀원이 대표님께 확인 질문을 보냈습니다.
-            </AiNotAnsweredBody>
-          </AiNotAnsweredBox>
-          <SlackButton type="button" onClick={() => onSendReply && onSendReply(question.id, '')}>
-            슬랙 스레드에서 답하기
-          </SlackButton>
+          <StatusBanner style={{ background: '#FFF6E8' }}>
+            <StatusBannerTitle style={{ color: '#9A6212' }}>
+              {question.serverStatus === 'DRAFT'
+                ? '팀원이 아직 슬랙으로 보내지 않았습니다.'
+                : '슬랙 스레드에 답장해 주세요.'}
+            </StatusBannerTitle>
+            <StatusBannerHint>
+              {question.declined
+                ? `직전 답장은 답으로 보지 않았습니다 · ${question.answerReason ?? ''}`
+                : '답장하고 이 화면으로 돌아오면 SAI가 답을 가져와 정리합니다.'}
+            </StatusBannerHint>
+          </StatusBanner>
+
+          {/* 보내기 전에는 스레드가 없어 열 곳이 없다. */}
+          {threadUrl ? (
+            <ThreadLinkButton
+              href={threadUrl}
+              target="_blank"
+              rel="noreferrer"
+              onClick={onOpenThread}
+            >
+              슬랙 스레드에서 답하기 ↗
+            </ThreadLinkButton>
+          ) : (
+            <ThreadLinkButton as="span" $disabled>
+              {question.serverStatus === 'DRAFT'
+                ? '아직 보내지 않은 질문입니다'
+                : '슬랙 스레드를 찾을 수 없습니다'}
+            </ThreadLinkButton>
+          )}
         </>
       )}
 
       {question.status === 'saved' && (
         <StatusBanner>
           <StatusBannerTitle>핸드북에 저장되었습니다.</StatusBannerTitle>
-          <StatusBannerHint>다음부터 같은 질문은 SAI가 직접 답합니다.</StatusBannerHint>
+          <StatusBannerHint>
+            초안으로 들어갔습니다. 핸드북 탭의 확인 보관함에서 확정하면 SAI가 바로 답합니다.
+          </StatusBannerHint>
         </StatusBanner>
       )}
 
       {question.status === 'discarded' && (
-        <>
-          <StatusBanner style={{ background: '#F4F4F6' }}>
-            <StatusBannerTitle style={{ color: '#6B6B73' }}>저장하지 않았습니다.</StatusBannerTitle>
-            <StatusBannerHint>답변은 남았지만 핸드북에는 반영되지 않습니다.</StatusBannerHint>
-          </StatusBanner>
-          <GhostButton type="button" onClick={() => onUndo(question.id)}>
-            실행 취소
-          </GhostButton>
-        </>
+        <StatusBanner style={{ background: '#F4F4F6' }}>
+          <StatusBannerTitle style={{ color: '#6B6B73' }}>저장하지 않았습니다.</StatusBannerTitle>
+          <StatusBannerHint>답변은 남았지만 핸드북에는 반영되지 않습니다.</StatusBannerHint>
+        </StatusBanner>
       )}
 
-      {question.status === 'pending_approval' && question.suggestion && (
+      {question.status === 'pending_approval' && (
         <>
-          <SuggestionBox>
-            <SuggestionHeadRow>
-              <SuggestionLabel>저장 제안 · 항목 1개</SuggestionLabel>
-              <ProjectTag>{question.suggestion.tag}</ProjectTag>
-            </SuggestionHeadRow>
-            {mode === 'editing' ? (
-              <EditTextarea
-                autoFocus
-                value={draftTitle}
-                onChange={(e) => setDraftTitle(e.target.value)}
-              />
-            ) : (
-              <SuggestionTitle>{question.suggestion.title}</SuggestionTitle>
-            )}
-            <SuggestionEn>{question.suggestion.en}</SuggestionEn>
-            <SuggestionSource>출처 {question.suggestion.source}</SuggestionSource>
-          </SuggestionBox>
+          {detailLoading && !proposal && <LoadingState compact label="저장 제안을 만드는 중…" />}
+          {detailError && !proposal && (
+            <ErrorState error={detailError} onRetry={onRetryDetail} compact />
+          )}
 
-          {mode === 'saving' ? (
-            <SavingBanner>핸드북에 저장 중…</SavingBanner>
-          ) : mode === 'editing' ? (
-            <ButtonsRow>
-              <ApproveButton
-                type="button"
-                onClick={handleEditSave}
-                disabled={draftTitle.trim().length === 0}
-              >
-                수정 후 저장
-              </ApproveButton>
-              <GhostButton type="button" onClick={() => setMode('view')}>
-                되돌리기
-              </GhostButton>
-            </ButtonsRow>
-          ) : (
-            <ButtonsRow>
-              <ApproveButton type="button" onClick={handleApprove}>
-                승인 후 저장
-              </ApproveButton>
-              <GhostButton type="button" onClick={startEdit}>
-                수정
-              </GhostButton>
-              <GhostButton type="button" $muted onClick={() => onDiscard(question.id)}>
-                저장 안 함
-              </GhostButton>
-            </ButtonsRow>
+          {proposal && (
+            <>
+              <SuggestionBox>
+                <SuggestionHeadRow>
+                  <SuggestionLabel>저장 제안 · 항목 1개</SuggestionLabel>
+                  <ProjectTag>{proposal.scopeName ?? '공통 규칙'}</ProjectTag>
+                </SuggestionHeadRow>
+                {mode === 'editing' ? (
+                  <>
+                    <EditTextarea
+                      autoFocus
+                      value={draftTitle}
+                      placeholder="규칙 제목"
+                      onChange={(e) => setDraftTitle(e.target.value)}
+                    />
+                    <EditTextarea
+                      value={draftRule}
+                      placeholder="팀원에게 보이는 영어 문장 (비워 두면 서버가 만든 값을 씁니다)"
+                      onChange={(e) => setDraftRule(e.target.value)}
+                    />
+                    <ScopeSelect
+                      value={draftScopeId}
+                      onChange={(e) => setDraftScopeId(e.target.value)}
+                    >
+                      <option value="">{proposal.scopeName ?? '기본 지식공간'}</option>
+                      {scopes.map((scope) => (
+                        <option key={scope.id} value={scope.id}>
+                          {scope.name}
+                        </option>
+                      ))}
+                    </ScopeSelect>
+                  </>
+                ) : (
+                  <SuggestionTitle>{proposal.title}</SuggestionTitle>
+                )}
+                <SuggestionEn>{proposal.bodyEn || proposal.bodyKo}</SuggestionEn>
+                <SuggestionSource>
+                  출처 {proposal.sourceLabel ?? '대표 확인 답변'}
+                  {proposal.answeredAt ? ` · ${formatShortKo(proposal.answeredAt)}` : ''}
+                </SuggestionSource>
+              </SuggestionBox>
+
+              {pending ? (
+                <SavingBanner>처리 중…</SavingBanner>
+              ) : mode === 'editing' ? (
+                <ButtonsRow>
+                  <ApproveButton type="button" onClick={handleEditSave}>
+                    수정 후 저장
+                  </ApproveButton>
+                  <GhostButton type="button" onClick={() => setMode('view')}>
+                    되돌리기
+                  </GhostButton>
+                </ButtonsRow>
+              ) : (
+                <ButtonsRow>
+                  <ApproveButton type="button" onClick={handleApprove}>
+                    승인 후 저장
+                  </ApproveButton>
+                  <GhostButton type="button" onClick={startEdit}>
+                    수정
+                  </GhostButton>
+                  <GhostButton type="button" $muted onClick={onDismiss}>
+                    저장 안 함
+                  </GhostButton>
+                </ButtonsRow>
+              )}
+            </>
           )}
         </>
       )}

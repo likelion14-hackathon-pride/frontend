@@ -105,8 +105,15 @@ const Footnote = styled.span`
   margin-top: auto;
 `;
 
-function AnswerReuseCard({ value, unit, items }) {
-  const maxCount = Math.max(...items.map((item) => item.count));
+const EmptyText = styled.span`
+  color: #b4b4bc;
+  font-family: 'Plus Jakarta Sans';
+  font-size: 12px;
+`;
+
+function AnswerReuseCard({ value, unit, items = [] }) {
+  // 항목이 하나도 없으면 Math.max 가 -Infinity 를 준다. 막대 너비가 NaN 이 되어 화면이 깨진다.
+  const maxCount = items.length ? Math.max(...items.map((item) => item.count)) : 1;
 
   return (
     <StatCardShell title="핸드북 활용 횟수">
@@ -116,6 +123,7 @@ function AnswerReuseCard({ value, unit, items }) {
       </NumberBlock>
 
       <BarsContainer>
+        {items.length === 0 && <EmptyText>아직 재사용된 규칙이 없습니다</EmptyText>}
         {items.map((item, index) => (
           <BarItem key={item.label}>
             <LabelRow>

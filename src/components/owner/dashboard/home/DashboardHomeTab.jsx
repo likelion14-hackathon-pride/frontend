@@ -1,8 +1,12 @@
 import styled from 'styled-components';
+
+import * as companiesApi from '../../../../apis/companies';
+import { RESOLUTION_TYPE } from '../../../../apis/constants';
+import { ErrorState, LoadingState } from '../../../common/AsyncStates';
+import { useAsync } from '../../../../hooks/useAsync';
 import StatCardsRow from './StatCardsRow';
 import AiAnsweredList from './AiAnsweredList';
 import PendingApprovalPanel from './PendingApprovalPanel';
-import { STAT_SUMMARY } from './homeData';
 
 const TabContent = styled.div`
   display: flex;
@@ -57,22 +61,58 @@ const SplitRow = styled.div`
   gap: 14px;
 `;
 
-function DashboardHomeTab({ ownerName = '김대표', onNavigateToQuestions }) {
+function DashboardHomeTab({ companyId, ownerName = '김대표', onNavigateToQuestions }) {
+  const dashboard = useAsync(
+    () => companiesApi.fetchOwnerDashboard(companyId),
+    [companyId],
+    { enabled: Boolean(companyId) }
+  );
+
+  if (dashboard.loading && !dashboard.data) {
+    return (
+      <TabContent>
+        <LoadingState label="대시보드를 불러오는 중…" />
+      </TabContent>
+    );
+  }
+
+  if (dashboard.error && !dashboard.data) {
+    return (
+      <TabContent>
+        <ErrorState error={dashboard.error} onRetry={dashboard.reload} />
+      </TabContent>
+    );
+  }
+
+  const data = dashboard.data;
+  const weekly = data.weeklyQuestions;
+
   return (
     <TabContent>
       <HeaderTextGroup>
-        <Heading>안녕하세요, {ownerName}님</Heading>
+        <Heading>안녕하세요, {ownerName || '대표'}님</Heading>
         <Subheading>
-          이번 주 질문 {STAT_SUMMARY.totalQuestions}건 중{' '}
-          <SubheadingStrong>{STAT_SUMMARY.aiAnsweredCount}건은 SAI가 답했습니다</SubheadingStrong>
+          이번 주 질문 {weekly.totalCount}건 중{' '}
+          <SubheadingStrong>{weekly.saiAnsweredCount}건은 SAI가 답했습니다</SubheadingStrong>
         </Subheading>
       </HeaderTextGroup>
 
-      <StatCardsRow />
+      <StatCardsRow
+        resolution={data.resolution}
+        answerReuse={data.answerReuse}
+        ownerTimeSaved={data.ownerTimeSaved}
+        handbook={data.handbook}
+      />
 
       <SplitRow>
-        <AiAnsweredList />
-        <PendingApprovalPanel onViewAll={onNavigateToQuestions} />
+        <AiAnsweredList
+          recentAnswers={data.recentAnswers}
+          ownerType={RESOLUTION_TYPE.OWNER}
+        />
+        <PendingApprovalPanel
+          waitingQuestions={data.waitingQuestions}
+          onViewAll={onNavigateToQuestions}
+        />
       </SplitRow>
     </TabContent>
   );

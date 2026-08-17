@@ -1,8 +1,13 @@
-import { useState } from 'react';
 import styled from 'styled-components';
+
+import * as companiesApi from '../../../../apis/companies';
+import * as policyApi from '../../../../apis/policy';
+import { ErrorState, InlineError, LoadingState } from '../../../common/AsyncStates';
+import { useAsync, useMutation } from '../../../../hooks/useAsync';
+import { formatTimeOfDay } from '../../../../utils/time';
 import RiskKeywordCard from './RiskKeywordCard';
 import WorkHoursCompanyCodeCard from './WorkHoursCompanyCodeCard';
-import { INITIAL_SETTINGS_KEYWORDS, DEFAULT_WORK_HOURS, MOCK_COMPANY_CODE } from './settingsData';
+import { EMPTY_WORK_HOURS } from './settingsData';
 
 const TabContent = styled.div`
   display: flex;
@@ -53,22 +58,62 @@ const CardRow = styled.div`
   gap: 16px;
 `;
 
-function SettingsTab() {
-  const [keywords, setKeywords] = useState(INITIAL_SETTINGS_KEYWORDS);
-  const [workHoursEnabled, setWorkHoursEnabled] = useState(true);
-  const [workHours] = useState(DEFAULT_WORK_HOURS);
+function SettingsTab({ companyId }) {
+  const keywordsQuery = useAsync(
+    () => policyApi.fetchRiskKeywords(companyId),
+    [companyId],
+    { enabled: Boolean(companyId) }
+  );
+  const settingsQuery = useAsync(
+    () => companiesApi.fetchCompanySettings(companyId),
+    [companyId],
+    { enabled: Boolean(companyId) }
+  );
+  const companyQuery = useAsync(
+    () => companiesApi.fetchCompany(companyId),
+    [companyId],
+    { enabled: Boolean(companyId) }
+  );
 
-  const handleAddKeyword = (label, level) => {
-    setKeywords((prev) => [...prev, { id: `sk-${Date.now()}`, label, level }]);
+  const addKeyword = useMutation((payload) => policyApi.createRiskKeyword(companyId, payload));
+  const removeKeyword = useMutation((id) => policyApi.deleteRiskKeyword(companyId, id));
+  const updateSettings = useMutation((patch) =>
+    companiesApi.updateCompanySettings(companyId, patch)
+  );
+
+  const settings = settingsQuery.data;
+  const workHours = settings
+    ? {
+        start: formatTimeOfDay(settings.workingHoursStart),
+        end: formatTimeOfDay(settings.workingHoursEnd),
+        timezone: settings.timezone,
+      }
+    : EMPTY_WORK_HOURS;
+
+  const companyCode = companyQuery.data?.code ?? '';
+
+  const handleToggleWorkHours = async () => {
+    const result = await updateSettings.mutate({
+      workingHoursEnabled: !settings?.workingHoursEnabled,
+    });
+    if (result.ok) settingsQuery.reload();
   };
 
-  const handleRemoveKeyword = (id) => {
-    setKeywords((prev) => prev.filter((keyword) => keyword.id !== id));
-  };
+  if (settingsQuery.loading && !settings) {
+    return (
+      <TabContent>
+        <LoadingState label="설정을 불러오는 중…" />
+      </TabContent>
+    );
+  }
 
-  const handleCopyCode = () => {
-    navigator.clipboard?.writeText(MOCK_COMPANY_CODE);
-  };
+  if (settingsQuery.error && !settings) {
+    return (
+      <TabContent>
+        <ErrorState error={settingsQuery.error} onRetry={settingsQuery.reload} />
+      </TabContent>
+    );
+  }
 
   return (
     <TabContent>
@@ -79,18 +124,32 @@ function SettingsTab() {
         </Subheading>
       </HeaderTextGroup>
 
+      <InlineError
+        error={addKeyword.error || removeKeyword.error || updateSettings.error || keywordsQuery.error}
+        onRetry={keywordsQuery.error ? keywordsQuery.reload : undefined}
+      />
+
       <CardRow>
         <RiskKeywordCard
-          keywords={keywords}
-          onAddKeyword={handleAddKeyword}
-          onRemoveKeyword={handleRemoveKeyword}
+          keywords={keywordsQuery.data ?? []}
+          loading={keywordsQuery.loading}
+          pending={addKeyword.pending || removeKeyword.pending}
+          onAddKeyword={async (keyword, severity) => {
+            const result = await addKeyword.mutate({ keyword, severity });
+            if (result.ok) keywordsQuery.reload();
+          }}
+          onRemoveKeyword={async (id) => {
+            const result = await removeKeyword.mutate(id);
+            if (result.ok) keywordsQuery.reload();
+          }}
         />
         <WorkHoursCompanyCodeCard
-          workHoursEnabled={workHoursEnabled}
-          onToggleWorkHours={() => setWorkHoursEnabled((prev) => !prev)}
+          workHoursEnabled={Boolean(settings?.workingHoursEnabled)}
+          onToggleWorkHours={handleToggleWorkHours}
+          togglePending={updateSettings.pending}
           hours={workHours}
-          companyCode={MOCK_COMPANY_CODE}
-          onCopyCode={handleCopyCode}
+          companyCode={companyCode}
+          onCopyCode={() => companyCode && navigator.clipboard?.writeText(companyCode)}
         />
       </CardRow>
     </TabContent>
