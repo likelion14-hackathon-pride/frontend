@@ -26,7 +26,7 @@ const CenterLabel = styled.div`
 const ValueText = styled.span`
   color: #17171b;
   font-family: 'Plus Jakarta Sans';
-  font-size: 38px;
+  font-size: 30px;
   font-style: normal;
   font-weight: 700;
   line-height: 39.9px;
