@@ -21,6 +21,7 @@ export default function MemberNav() {
   const isHandbookActive = pathname.startsWith('/member/handbook');
   const isHandbookOpen = isHandbookActive;
   const isTasksActive = pathname.startsWith('/member/tasks');
+  const isCompanyActive = pathname === '/member/handbook/company';
   const [isProjectOpen, setIsProjectOpen] = useState(
     pathname.startsWith('/member/handbook/project')
   );
@@ -69,7 +70,7 @@ export default function MemberNav() {
 
       {isHandbookOpen && (
         <SubMenu>
-          <SubItem to="/member/handbook/company">
+          <SubItem to="/member/handbook/company" $active={isCompanyActive}>
             <img src={fileIcon} alt="" width={13} height={13} />
             <SubLabel>Company system</SubLabel>
             <SubCount>{companyRuleCount}</SubCount>
@@ -88,7 +89,7 @@ export default function MemberNav() {
                 return (
                   <ProjectRow key={scope.id}>
                     <TreeLine />
-                    <ProjectItem to={`/member/handbook/project/${scope.id}`}>
+                    <ProjectItem to={`/member/handbook/project/${scope.id}`} $active={isActive}>
                       <Dot $active={isActive} />
                       <ProjectLabel>{scope.name}</ProjectLabel>
                       <SubCount>{scope.entryCount ?? 0}</SubCount>
@@ -234,6 +235,16 @@ const SubMenu = styled.div`
 
 const SubItem = styled(NavLink)`
   ${subItemStyles}
+
+  ${(props) =>
+    props.$active &&
+    css`
+      background: linear-gradient(135deg, rgba(255, 96, 0, 0.08), rgba(255, 138, 61, 0.03));
+
+      &:hover {
+        box-shadow: none;
+      }
+    `}
 `;
 
 const SubToggle = styled.button`
@@ -296,6 +307,16 @@ const ProjectItem = styled(NavLink)`
   &:hover {
     box-shadow: inset 0 0 0 999px rgba(23, 23, 27, 0.045);
   }
+
+  ${(props) =>
+    props.$active &&
+    css`
+      background: linear-gradient(135deg, rgba(255, 96, 0, 0.08), rgba(255, 138, 61, 0.03));
+
+      &:hover {
+        box-shadow: none;
+      }
+    `}
 `;
 
 const Dot = styled.span`

@@ -57,13 +57,6 @@ const Delta = styled.span`
   white-space: nowrap;
 `;
 
-const Description = styled.div`
-  font-size: 12px;
-  color: #8a8a93;
-  margin-top: 5px;
-  line-height: 1.5;
-`;
-
 const ChartWrap = styled.svg`
   width: 100%;
   flex: 1;
@@ -119,8 +112,6 @@ export default function HandbookGrowthCard({ count, delta, dateRange, points = [
           <Number>{count}</Number>
           <Delta>{delta}</Delta>
         </NumberRow>
-
-        <Description>Answers to your questions become team rules.</Description>
 
         {coords.length > 0 && (
           <ChartWrap viewBox="0 0 260 96" preserveAspectRatio="none">
