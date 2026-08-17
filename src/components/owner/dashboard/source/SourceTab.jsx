@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 
 import * as sourcesApi from '../../../../apis/sources';
@@ -7,6 +7,7 @@ import {
   LOCAL_FILE_EXTENSIONS,
   LOCAL_FILE_MAX_SIZE,
   LOCAL_FILE_MIME_TYPES,
+  LOCAL_FILE_STATUS,
   LOCAL_FILE_STATUS_LABEL,
   lookup,
 } from '../../../../apis/constants';
@@ -99,6 +100,19 @@ function extensionOf(fileName) {
   return dot === -1 ? '' : fileName.slice(dot).toLowerCase();
 }
 
+// 업로드가 끝나도 파일은 곧바로 READY 가 되지 않는다. 워커가 텍스트를 뽑는 동안
+// PENDING_UPLOAD·PROCESSING 에 머무는데, 끝났다고 알려 주는 신호가 없어서 다시 부른다.
+const FILE_POLL_INTERVAL = 3000;
+
+// 올리다 만 파일은 PENDING_UPLOAD 에서 영영 내려오지 않는다(sources/serializers.py:214).
+// 그런 행이 하나라도 있으면 타이머가 끝나지 않으므로 5분에서 끊는다.
+const FILE_POLL_MAX_ATTEMPTS = 100;
+
+const FILE_IN_FLIGHT_STATUSES = [
+  LOCAL_FILE_STATUS.PENDING_UPLOAD,
+  LOCAL_FILE_STATUS.PROCESSING,
+];
+
 function SourceTab({ companyId }) {
   const [actionError, setActionError] = useState(null);
   const fileInputRef = useRef(null);
@@ -148,6 +162,33 @@ function SourceTab({ companyId }) {
     sourcesApi.addChannel(companyId, slack.id, externalId)
   );
 
+  // 처리 중인 파일이 남아 있는 동안만 목록을 다시 부른다. 개수가 줄면 타이머를
+  // 새로 걸어 남은 파일에 다시 5분을 준다.
+  const pendingFileCount = (filesQuery.data?.items ?? []).filter((item) =>
+    FILE_IN_FLIGHT_STATUSES.includes(item.status)
+  ).length;
+
+  const { reload: reloadFiles } = filesQuery;
+  const { reload: reloadConnections } = connectionsQuery;
+
+  useEffect(() => {
+    if (pendingFileCount === 0) return undefined;
+
+    let attempts = 0;
+    const timer = setInterval(() => {
+      attempts += 1;
+      if (attempts > FILE_POLL_MAX_ATTEMPTS) {
+        clearInterval(timer);
+        return;
+      }
+      reloadFiles();
+      // 추출이 끝나면 연결 카드의 수집 건수와 동기화 시각도 같이 움직인다.
+      reloadConnections();
+    }, FILE_POLL_INTERVAL);
+
+    return () => clearInterval(timer);
+  }, [pendingFileCount, reloadFiles, reloadConnections]);
+
   async function handleUploadFile(event) {
     const file = event.target.files?.[0];
     event.target.value = '';
@@ -179,6 +220,19 @@ function SourceTab({ companyId }) {
         body: file,
       });
       if (!response.ok) throw new Error('upload failed');
+
+      // S3 에 올려 두는 것만으로는 아무 일도 일어나지 않는다. 텍스트 추출과 분류는
+      // 수집 작업이 한다. 서버 스케줄러도 곧 집어 가지만 그만큼 기다려야 하므로 바로 건다.
+      try {
+        await sourcesApi.startIngestion(companyId, {
+          provider: CONNECTION_KIND.LOCAL,
+          itemIds: [created.sourceFile.id],
+        });
+      } catch {
+        // 파일은 이미 올라갔다. 여기서 실패해도 스케줄러가 대신 처리하므로
+        // 업로드가 실패한 것처럼 알리지 않는다.
+      }
+
       filesQuery.reload();
       connectionsQuery.reload();
     } catch (caught) {
