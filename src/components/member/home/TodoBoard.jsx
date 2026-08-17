@@ -1,5 +1,11 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
+
+import * as cardsApi from '../../../apis/cards';
+import { TASK_STATUS } from '../../../apis/constants';
+import { useAsync, useMutation } from '../../../hooks/useAsync';
+import { EmptyState, ErrorState, InlineError, LoadingState } from '../../common/AsyncStates';
+import { useMemberNavigation } from '../../../context/member/MemberContext';
 import sharpIcon from '../../../assets/icons/sharp.svg';
 import plusIcon from '../../../assets/icons/plus.svg';
 
@@ -74,7 +80,8 @@ const Row = styled.div`
   border: 1px solid ${(props) => (props.$done ? '#F6E2D0' : '#EFEFF1')};
   background: ${(props) =>
     props.$done ? '#F7F7F8' : 'linear-gradient(180deg, #FFFBF7 0%, #fff 70%)'};
-  cursor: pointer;
+  cursor: ${(props) => (props.$busy ? 'progress' : 'pointer')};
+  opacity: ${(props) => (props.$busy ? 0.6 : 1)};
 
   &:hover {
     border-color: ${(props) => (props.$done ? '#D8D8DE' : '#FFC49B')};
@@ -108,13 +115,22 @@ const CheckBox = styled.span`
   }
 `;
 
-const TaskTitle = styled.div`
+const TaskText = styled.div`
   flex: 1;
   min-width: 0;
+`;
+
+const TaskTitle = styled.div`
   font-size: 15px;
   font-weight: 700;
   color: ${(props) => (props.$done ? '#B4B4BC' : '#17171B')};
   text-decoration: ${(props) => (props.$done ? 'line-through' : 'none')};
+`;
+
+const TaskMeta = styled.div`
+  font-size: 11.5px;
+  color: #a0a0a8;
+  margin-top: 4px;
 `;
 
 const AddRow = styled.div`
@@ -186,41 +202,56 @@ const AddCircle = styled.button`
   }
 `;
 
-const EXPIRE_HOURS = 3;
-const MAX_VISIBLE = 4;
+// 서버가 순서(완료는 아래)와 보존 기간(완료 후 하루)을 이미 정해 준다.
+// 화면은 받은 순서 그대로 그린다.
+export default function TodoBoard() {
+  const { companyId, reloadHome } = useMemberNavigation();
 
-export default function TodoBoard({ initialTasks = [] }) {
-  const [tasks, setTasks] = useState(() =>
-    initialTasks.map((t) => ({ ...t, isDone: false, completedAt: null }))
+  const tasksQuery = useAsync(
+    () => cardsApi.fetchTasks(companyId),
+    [companyId],
+    { enabled: Boolean(companyId) }
   );
-  const [, forceTick] = useState(0);
+
   const [isAdding, setIsAdding] = useState(false);
   const [draft, setDraft] = useState('');
+  const [busyId, setBusyId] = useState(null);
   const inputRef = useRef(null);
-
-  useEffect(() => {
-    const timer = setInterval(() => forceTick((n) => n + 1), 60000);
-    return () => clearInterval(timer);
-  }, []);
 
   useEffect(() => {
     if (isAdding) inputRef.current?.focus();
   }, [isAdding]);
 
-  function handleToggle(id) {
-    setTasks((prev) =>
-      prev.map((t) =>
-        t.id === id ? { ...t, isDone: !t.isDone, completedAt: !t.isDone ? Date.now() : null } : t
-      )
-    );
+  const toggle = useMutation(async (task) => {
+    const next = task.done ? TASK_STATUS.TODO : TASK_STATUS.DONE;
+    return cardsApi.updateTask(companyId, task.id, { status: next });
+  });
+
+  const create = useMutation((title) => cardsApi.createTask(companyId, { title }));
+
+  const tasks = tasksQuery.data?.items ?? [];
+  const remainingCount = tasks.filter((task) => !task.done).length;
+
+  async function handleToggle(task) {
+    if (busyId) return;
+    setBusyId(task.id);
+    const result = await toggle.mutate(task);
+    setBusyId(null);
+    if (result.ok) {
+      await tasksQuery.reload();
+      // 홈의 '오늘 처리한 양'도 같이 움직인다.
+      reloadHome();
+    }
   }
 
-  function handleSubmitTask() {
+  async function handleSubmitTask() {
     const title = draft.trim();
     if (!title) return;
-    setTasks((prev) => [{ id: Date.now(), title, isDone: false, completedAt: null }, ...prev]);
+    const result = await create.mutate(title);
+    if (!result.ok) return;
     setDraft('');
     setIsAdding(false);
+    tasksQuery.reload();
   }
 
   function handleKeyDown(e) {
@@ -231,16 +262,6 @@ export default function TodoBoard({ initialTasks = [] }) {
     }
   }
 
-  const visibleTasks = tasks
-    .filter((t) => {
-      if (!t.isDone) return true;
-      const elapsedHours = (Date.now() - t.completedAt) / (1000 * 60 * 60);
-      return elapsedHours < EXPIRE_HOURS;
-    })
-    .slice(0, MAX_VISIBLE);
-
-  const remainingCount = tasks.filter((t) => !t.isDone).length;
-
   return (
     <Board>
       <Header>
@@ -250,15 +271,46 @@ export default function TodoBoard({ initialTasks = [] }) {
       </Header>
 
       <Body>
-        <TaskList>
-          {visibleTasks.map((t) => (
-            <Row key={t.id} $done={t.isDone} onClick={() => handleToggle(t.id)}>
-              <Accent $done={t.isDone} />
-              <CheckBox $done={t.isDone}>{t.isDone && <CheckIcon />}</CheckBox>
-              <TaskTitle $done={t.isDone}>{t.title}</TaskTitle>
-            </Row>
-          ))}
-        </TaskList>
+        <InlineError error={toggle.error || create.error} />
+
+        {tasksQuery.loading && !tasksQuery.data && <LoadingState compact label="할 일을 불러오는 중…" />}
+        {tasksQuery.error && !tasksQuery.data && (
+          <ErrorState error={tasksQuery.error} onRetry={tasksQuery.reload} compact />
+        )}
+
+        {tasksQuery.data && (
+          <TaskList>
+            {tasks.length === 0 ? (
+              <EmptyState
+                compact
+                label="아직 할 일이 없습니다. 아래에서 직접 추가할 수 있습니다."
+              />
+            ) : (
+              tasks.map((task) => (
+                <Row
+                  key={task.id}
+                  $done={task.done}
+                  $busy={busyId === task.id}
+                  onClick={() => handleToggle(task)}
+                >
+                  <Accent $done={task.done} />
+                  <CheckBox $done={task.done}>{task.done && <CheckIcon />}</CheckBox>
+                  <TaskText>
+                    <TaskTitle $done={task.done}>{task.title}</TaskTitle>
+                    {/* origin 이 CARD 면 지시 카드에서 담긴 것, SELF 면 직접 적은 것. */}
+                    {(task.scopeName || task.requestedBy) && (
+                      <TaskMeta>
+                        {[task.scopeName, task.requestedBy && `from ${task.requestedBy}`]
+                          .filter(Boolean)
+                          .join(' · ')}
+                      </TaskMeta>
+                    )}
+                  </TaskText>
+                </Row>
+              ))
+            )}
+          </TaskList>
+        )}
 
         <AddRow>
           {isAdding ? (
@@ -276,7 +328,7 @@ export default function TodoBoard({ initialTasks = [] }) {
 
           <AddCircle
             onClick={isAdding ? handleSubmitTask : () => setIsAdding(true)}
-            disabled={isAdding && !draft.trim()}
+            disabled={create.pending || (isAdding && !draft.trim())}
           >
             <img src={plusIcon} alt="" width={9} height={9} />
           </AddCircle>

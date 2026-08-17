@@ -1,5 +1,13 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
+
+import * as authApi from '../../../apis/auth';
+import * as companiesApi from '../../../apis/companies';
+import { JOB_ROLE_LABEL, LOCATION_ZONE, WORK_LOCATION_LABEL, lookup } from '../../../apis/constants';
+import { useAsync, useMutation } from '../../../hooks/useAsync';
+import { zoneOffsetLabel } from '../../../utils/time';
+import { ErrorState, InlineError, LoadingState } from '../../common/AsyncStates';
+import { useMemberNavigation } from '../../../context/member/MemberContext';
 
 const Overlay = styled.div`
   position: absolute;
@@ -82,7 +90,7 @@ const Label = styled.div`
   color: #a0a0a8;
 `;
 
-const NameInput = styled.input`
+const ReadOnlyValue = styled.div`
   font-size: 15px;
   font-weight: 700;
   color: #17171b;
@@ -90,12 +98,13 @@ const NameInput = styled.input`
   border: 1px solid #efeff1;
   border-radius: 12px;
   padding: 12px 14px;
-  outline: none;
+`;
 
-  &:focus {
-    border-color: #e3e3e3;
-    box-shadow: 0 0 0 3px rgba(184, 182, 181, 0.12);
-  }
+const FieldNote = styled.p`
+  margin: 0;
+  font-size: 11.5px;
+  color: #a0a0a8;
+  line-height: 1.5;
 `;
 
 const ChipGrid = styled.div`
@@ -130,23 +139,6 @@ const ChipMeta = styled.span`
   font-family: 'IBM Plex Mono';
 `;
 
-const AddChip = styled.button`
-  width: 36px;
-  height: 36px;
-  border-radius: 12px;
-  border: 1px dashed #dadae0;
-  background: transparent;
-  color: #b4b4bc;
-  font-size: 13.5px;
-  font-weight: 700;
-  cursor: pointer;
-
-  &:hover {
-    border-color: #b4b4bc;
-    color: #8a8a93;
-  }
-`;
-
 const OverlapNote = styled.div`
   font-size: 12px;
   color: #a0a0a8;
@@ -156,22 +148,6 @@ const OverlapNote = styled.div`
 const ButtonRow = styled.div`
   display: flex;
   gap: 10px;
-`;
-
-const RunSetupButton = styled.button`
-  flex: none;
-  font-size: 13px;
-  font-weight: 700;
-  color: #6b6b73;
-  background: #f7f7f8;
-  border: none;
-  padding: 12px 16px;
-  border-radius: 12px;
-  cursor: pointer;
-
-  &:hover {
-    box-shadow: inset 0 0 0 999px rgba(23, 23, 27, 0.045);
-  }
 `;
 
 const SaveButton = styled.button`
@@ -188,37 +164,62 @@ const SaveButton = styled.button`
   &:hover {
     opacity: 0.9;
   }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
 `;
 
-const LOCATIONS = [
-  { id: 'hanoi', label: 'Hanoi', utc: 'UTC+7' },
-  { id: 'hcm', label: 'Ho Chi Minh', utc: 'UTC+7' },
-  { id: 'bangkok', label: 'Bangkok', utc: 'UTC+7' },
-  { id: 'jakarta', label: 'Jakarta', utc: 'UTC+7' },
-  { id: 'manila', label: 'Manila', utc: 'UTC+8' },
-  { id: 'seoul', label: 'Seoul', utc: 'UTC+9' },
-  { id: 'tokyo', label: 'Tokyo', utc: 'UTC+9' },
-];
+const CancelButton = styled.button`
+  flex: none;
+  font-size: 13px;
+  font-weight: 700;
+  color: #6b6b73;
+  background: #f7f7f8;
+  border: none;
+  padding: 12px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+`;
 
-const ROLES = ['Backend', 'Frontend', 'Design', 'PM', 'QA', 'Data'];
+// GET /companies/{id}/profile-options 가 위치별 대표 근무시간과 겹치는 시간까지 함께 준다.
+export default function ProfileSettingModal({ onClose }) {
+  const { companyId, profile, applyMe } = useMemberNavigation();
 
-export default function ProfileSettingModal({
-  initialName = '',
-  initialLocationId = 'hanoi',
-  initialRole = 'Backend',
-  onClose,
-  onSave,
-  onRunSetupAgain,
-}) {
-  const [name, setName] = useState(initialName);
-  const [locationId, setLocationId] = useState(initialLocationId);
-  const [role, setRole] = useState(initialRole);
+  const optionsQuery = useAsync(
+    () => companiesApi.fetchProfileOptions(companyId),
+    [companyId],
+    { enabled: Boolean(companyId) }
+  );
 
-  const selectedLocation = LOCATIONS.find((l) => l.id === locationId);
+  const [location, setLocation] = useState(profile.location ?? '');
+  const [role, setRole] = useState(profile.role ?? '');
 
-  function handleSave() {
-    onSave?.({ name, locationId, role });
-  }
+  useEffect(() => {
+    setLocation(profile.location ?? '');
+    setRole(profile.role ?? '');
+  }, [profile.location, profile.role]);
+
+  const save = useMutation(async () => {
+    const patch = {};
+    if (location && location !== profile.location) patch.location = location;
+    if (role && role !== profile.role) patch.role = role;
+    // 아무것도 안 바뀌었으면 서버가 profile_field_required 로 거절한다. 그냥 닫는다.
+    if (Object.keys(patch).length === 0) return null;
+    return authApi.updateMe(patch);
+  });
+
+  const handleSave = async () => {
+    const result = await save.mutate();
+    if (!result.ok) return;
+    if (result.data) applyMe(result.data);
+    onClose?.();
+  };
+
+  const locations = optionsQuery.data?.locations ?? [];
+  const roles = optionsQuery.data?.roles ?? [];
+  const selectedLocation = locations.find((item) => item.value === location);
 
   return (
     <Overlay onClick={onClose}>
@@ -226,53 +227,78 @@ export default function ProfileSettingModal({
         <Header>
           <HeaderText>
             <Title>Setting</Title>
-            <Subtitle>Name, location and role</Subtitle>
+            <Subtitle>Where you work and what you do</Subtitle>
           </HeaderText>
           <CloseButton onClick={onClose}>✕</CloseButton>
         </Header>
 
         <Field>
           <Label>YOUR NAME</Label>
-          <NameInput value={name} onChange={(e) => setName(e.target.value)} />
+          <ReadOnlyValue>{profile.name || '—'}</ReadOnlyValue>
+          {/* PATCH /api/me 는 location / role / locale 만 받는다. 이름은 가입 때 정해진다. */}
+          <FieldNote>이름은 가입할 때 정해집니다. 지금은 여기서 바꿀 수 없습니다.</FieldNote>
         </Field>
 
-        <Field>
-          <Label>WHERE YOU WORK</Label>
-          <ChipGrid>
-            {LOCATIONS.map((loc) => (
-              <Chip
-                key={loc.id}
-                $active={locationId === loc.id}
-                onClick={() => setLocationId(loc.id)}
-              >
-                {loc.label}
-                <ChipMeta $active={locationId === loc.id}>{loc.utc}</ChipMeta>
-              </Chip>
-            ))}
-            <AddChip onClick={() => {}}>+</AddChip>
-          </ChipGrid>
-          {selectedLocation && (
-            <OverlapNote>
-              Seoul is 2h ahead. Overlap with owner hours 09:00–18:00 KST is 07:00–16:00 your time.
-            </OverlapNote>
-          )}
-        </Field>
+        {optionsQuery.loading && <LoadingState compact label="선택지를 불러오는 중…" />}
+        {optionsQuery.error && !optionsQuery.data && (
+          <ErrorState error={optionsQuery.error} onRetry={optionsQuery.reload} compact />
+        )}
 
-        <Field>
-          <Label>YOUR ROLE</Label>
-          <ChipGrid>
-            {ROLES.map((r) => (
-              <Chip key={r} $active={role === r} onClick={() => setRole(r)}>
-                {r}
-              </Chip>
-            ))}
-            <AddChip onClick={() => {}}>+</AddChip>
-          </ChipGrid>
-        </Field>
+        {optionsQuery.data && (
+          <>
+            <Field>
+              <Label>WHERE YOU WORK</Label>
+              <ChipGrid>
+                {locations.map((item) => (
+                  <Chip
+                    key={item.value}
+                    type="button"
+                    $active={location === item.value}
+                    onClick={() => setLocation(item.value)}
+                  >
+                    {item.label ?? lookup(WORK_LOCATION_LABEL, item.value)}
+                    <ChipMeta $active={location === item.value}>
+                      {zoneOffsetLabel(item.timezone ?? lookup(LOCATION_ZONE, item.value))}
+                    </ChipMeta>
+                  </Chip>
+                ))}
+              </ChipGrid>
+              {selectedLocation && (
+                <OverlapNote>
+                  대표 근무시간은 이곳 시계로 {String(selectedLocation.ownerHoursStart).slice(0, 5)}–
+                  {String(selectedLocation.ownerHoursEnd).slice(0, 5)} 입니다. 하루에 겹치는 시간은{' '}
+                  {selectedLocation.overlapHours}시간.
+                </OverlapNote>
+              )}
+            </Field>
+
+            <Field>
+              <Label>YOUR ROLE</Label>
+              <ChipGrid>
+                {roles.map((item) => (
+                  <Chip
+                    key={item.value}
+                    type="button"
+                    $active={role === item.value}
+                    onClick={() => setRole(item.value)}
+                  >
+                    {item.label ?? lookup(JOB_ROLE_LABEL, item.value)}
+                  </Chip>
+                ))}
+              </ChipGrid>
+            </Field>
+          </>
+        )}
+
+        <InlineError error={save.error} />
 
         <ButtonRow>
-          <RunSetupButton onClick={onRunSetupAgain}>Run setup again</RunSetupButton>
-          <SaveButton onClick={handleSave}>Save</SaveButton>
+          <CancelButton type="button" onClick={onClose}>
+            닫기
+          </CancelButton>
+          <SaveButton type="button" onClick={handleSave} disabled={save.pending}>
+            {save.pending ? '저장 중…' : 'Save'}
+          </SaveButton>
         </ButtonRow>
       </Modal>
     </Overlay>

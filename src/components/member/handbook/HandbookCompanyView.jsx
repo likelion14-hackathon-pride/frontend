@@ -1,5 +1,7 @@
 import { useOutletContext } from 'react-router-dom';
 import styled from 'styled-components';
+
+import { EmptyState } from '../../common/AsyncStates';
 import HandbookHeader from './HandbookHeader';
 import RuleGroupHeader from './RuleGroupHeader';
 import RuleAccordionCard from './RuleAccordionCard';
@@ -61,13 +63,19 @@ const PromptButton = styled.button`
 `;
 
 export default function HandbookCompanyView() {
-  const { companyGroups, onGoToProject } = useOutletContext();
+  const { companyGroups, hasProjects, onGoToProject } = useOutletContext();
+
+  const isEmpty = companyGroups.every((group) => group.items.length === 0);
 
   return (
     <PageWrap>
       <HandbookHeader mode="company" />
 
       <Wrap>
+        {isEmpty && (
+          <EmptyState label="아직 확정된 회사 규칙이 없습니다. 대표님이 Day 0 질문에 답하면 여기에 쌓입니다." />
+        )}
+
         {companyGroups.map((group) => (
           <div key={group.id}>
             <RuleGroupHeader
@@ -76,29 +84,35 @@ export default function HandbookCompanyView() {
               count={`${group.items.length} items`}
             />
             <CardGroup>
-              {group.items.map((item) => (
-                <RuleAccordionCard
-                  key={item.id}
-                  title={item.title}
-                  sourceTag={item.sourceTag}
-                  desc={item.desc}
-                  quote={item.quote}
-                  sourceLine={item.sourceLine}
-                  sourceHref={item.sourceHref}
-                  defaultOpen={item.defaultOpen}
-                />
-              ))}
+              {group.items.length === 0 ? (
+                <EmptyState compact label="이 영역에는 아직 규칙이 없습니다" />
+              ) : (
+                group.items.map((item) => (
+                  <RuleAccordionCard
+                    key={item.id}
+                    title={item.title}
+                    sourceTag={item.sourceTag}
+                    desc={item.desc}
+                    quote={item.quote}
+                    sourceLine={item.sourceLine}
+                    sourceHref={item.sourceHref}
+                    defaultOpen={item.defaultOpen}
+                  />
+                ))
+              )}
             </CardGroup>
           </div>
         ))}
 
-        <PromptCard>
-          <PromptText>
-            These rules also apply inside every project. Open the project knowledge to see what only
-            holds there.
-          </PromptText>
-          <PromptButton onClick={onGoToProject}>Go to project knowledge →</PromptButton>
-        </PromptCard>
+        {hasProjects && (
+          <PromptCard>
+            <PromptText>
+              These rules also apply inside every project. Open the project knowledge to see what
+              only holds there.
+            </PromptText>
+            <PromptButton onClick={onGoToProject}>Go to project knowledge →</PromptButton>
+          </PromptCard>
+        )}
       </Wrap>
     </PageWrap>
   );

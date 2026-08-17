@@ -1,9 +1,13 @@
 import styled from 'styled-components';
 
+import { lookup } from '../../../../apis/constants';
+
 const STATUS_META = {
   waiting: { label: '답변 대기', bg: '#FFF6E8', color: '#9A6212' },
   pending_approval: { label: '승인 대기', bg: '#EEF3FF', color: '#1D4ED8' },
   saved: { label: '저장됨', bg: '#EAF6EF', color: '#1F7A45' },
+  discarded: { label: '저장 안 함', bg: '#F4F4F6', color: '#6B6B73' },
+  DEFAULT: { label: '알 수 없음', bg: '#F4F4F6', color: '#6B6B73' },
 };
 
 const Panel = styled.div`
@@ -118,11 +122,29 @@ const Badge = styled.span`
   white-space: nowrap;
 `;
 
+const EmptyBox = styled.div`
+  display: flex;
+  flex: 1 0 0;
+  align-items: center;
+  justify-content: center;
+  color: #a0a0a8;
+  font-family: 'Plus Jakarta Sans';
+  font-size: 12.5px;
+`;
+
 function QuestionList({ questions, selectedId, onSelect }) {
+  if (questions.length === 0) {
+    return (
+      <Panel>
+        <EmptyBox>아직 올라온 질문이 없습니다</EmptyBox>
+      </Panel>
+    );
+  }
+
   return (
     <Panel>
       {questions.map((q) => {
-        const meta = STATUS_META[q.status];
+        const meta = lookup(STATUS_META, q.status);
         return (
           <Row
             key={q.id}

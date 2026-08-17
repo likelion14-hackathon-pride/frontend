@@ -1,15 +1,18 @@
 import { useState } from 'react';
 import styled from 'styled-components';
 
+import { RISK_LEVEL } from '../../../../apis/constants';
+
+// 키는 백엔드 RiskKeyword.Level 값 그대로다(policy/models.py:5).
 const LEVEL_META = {
-  danger: {
+  DANGER: {
     label: '위험',
     color: '#DC2626',
     bg: '#FEF2F2',
     hoverBorder: '#F8DADA',
     hoverBg: '#FFFAFA',
   },
-  warning: {
+  CAUTION: {
     label: '주의',
     color: '#EA6A0A',
     bg: '#FFF7ED',
@@ -278,14 +281,15 @@ const SUGGESTED_KEYWORDS = [
   '환경변수',
 ];
 
-function RiskKeywordForm({ onAddKeyword, showSuggestions = true }) {
+function RiskKeywordForm({ onAddKeyword, showSuggestions = true, pending = false }) {
   const [value, setValue] = useState('');
-  const [level, setLevel] = useState('warning');
+  // 서버 기본값과 같게 둔다(RiskKeyword.level default=CAUTION).
+  const [level, setLevel] = useState(RISK_LEVEL.CAUTION);
 
   const handleSubmit = (event) => {
     event.preventDefault();
     const trimmed = value.trim();
-    if (!trimmed) return;
+    if (!trimmed || pending) return;
     onAddKeyword(trimmed, level);
     setValue('');
   };
@@ -304,8 +308,8 @@ function RiskKeywordForm({ onAddKeyword, showSuggestions = true }) {
           value={value}
           onChange={(event) => setValue(event.target.value)}
         />
-        <AddButton type="submit" disabled={!value.trim()}>
-          + 추가
+        <AddButton type="submit" disabled={!value.trim() || pending}>
+          {pending ? '추가 중…' : '+ 추가'}
         </AddButton>
       </InputRow>
 

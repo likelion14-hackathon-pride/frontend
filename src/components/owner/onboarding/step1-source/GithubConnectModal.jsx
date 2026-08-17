@@ -1,11 +1,13 @@
 import { useRef, useState } from 'react';
 import styled from 'styled-components';
+
+import * as sourcesApi from '../../../../apis/sources';
+import { toApiError } from '../../../../apis/errors';
 import githubIcon from '../../../../assets/owner/github.svg';
 import fileIcon from '../../../../assets/owner/file_trans.svg';
 import { colors, radii } from '../theme';
 
 const TOTAL_STEPS = 5;
-const CONNECT_DELAY_MS = 1400;
 const COPY_RESET_MS = 1500;
 
 const STEP_META = [
@@ -37,8 +39,9 @@ const STEP5_EVENTS = [
   'Pull request review comment',
 ];
 
-const WEBHOOK_URL = 'https://saisai.n-e.kr/api/github/events/';
-const WEBHOOK_SECRET = 'whsec_9f2c1ab74d5e0836ca77b1e4d90f';
+// 웹훅 주소와 시크릿은 연결 응답(GitHubConnectionResultSerializer)에 담겨 온다.
+// 서버가 알려 주기 전에는 화면에 값을 지어내지 않는다.
+const WEBHOOK_URL_FALLBACK = `${(import.meta.env.VITE_API_URL ?? '').replace(/\/+$/, '')}/api/github/events/`;
 
 const Overlay = styled.div`
   position: fixed;
@@ -773,7 +776,7 @@ const PrimaryButton = styled.button`
   cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
 `;
 
-function GithubConnectModal({ onClose, onConnected }) {
+function GithubConnectModal({ companyId, onClose, onConnected }) {
   const [step, setStep] = useState(1);
   const [appId, setAppId] = useState('');
   const [installationId, setInstallationId] = useState('');
@@ -781,7 +784,12 @@ function GithubConnectModal({ onClose, onConnected }) {
   const [urlCopied, setUrlCopied] = useState(false);
   const [secretCopied, setSecretCopied] = useState(false);
   const [connecting, setConnecting] = useState(false);
+  const [connection, setConnection] = useState(null);
+  const [connectError, setConnectError] = useState('');
   const fileInputRef = useRef(null);
+
+  const webhookUrl = connection?.webhookUrl ?? WEBHOOK_URL_FALLBACK;
+  const webhookSecret = connection?.webhookSecret ?? '';
 
   const goTo = (targetStep) => {
     if (targetStep >= step) return;
@@ -789,13 +797,14 @@ function GithubConnectModal({ onClose, onConnected }) {
   };
 
   const handleCopyUrl = () => {
-    navigator.clipboard?.writeText(WEBHOOK_URL);
+    navigator.clipboard?.writeText(webhookUrl);
     setUrlCopied(true);
     setTimeout(() => setUrlCopied(false), COPY_RESET_MS);
   };
 
   const handleCopySecret = () => {
-    navigator.clipboard?.writeText(WEBHOOK_SECRET);
+    if (!webhookSecret) return;
+    navigator.clipboard?.writeText(webhookSecret);
     setSecretCopied(true);
     setTimeout(() => setSecretCopied(false), COPY_RESET_MS);
   };
@@ -805,11 +814,24 @@ function GithubConnectModal({ onClose, onConnected }) {
     if (file) setPrivateKeyFile(file);
   };
 
-  const handleConfirmConnect = () => {
+  // 4단계에서 실제로 연결한다. 여기서 성공해야 5단계의 웹훅 값이 생긴다.
+  const handleConnect = async () => {
+    if (connecting) return;
     setConnecting(true);
-    setTimeout(() => {
-      onConnected();
-    }, CONNECT_DELAY_MS);
+    setConnectError('');
+    try {
+      const created = await sourcesApi.connectGithub(companyId, {
+        appId: appId.trim(),
+        installationId: installationId.trim(),
+        privateKeyFile,
+      });
+      setConnection(created);
+      setStep(5);
+    } catch (caught) {
+      setConnectError(toApiError(caught).message);
+    } finally {
+      setConnecting(false);
+    }
   };
 
   const canSubmitStep4 =
@@ -1116,7 +1138,7 @@ function GithubConnectModal({ onClose, onConnected }) {
                   <WebhookField>
                     <WebhookLabel>WEBHOOK URL</WebhookLabel>
                     <WebhookRow>
-                      <WebhookValue>{WEBHOOK_URL}</WebhookValue>
+                      <WebhookValue>{webhookUrl}</WebhookValue>
                       <CopyButton type="button" onClick={handleCopyUrl}>
                         {urlCopied ? '복사됨 ✓' : '복사'}
                       </CopyButton>
@@ -1126,8 +1148,10 @@ function GithubConnectModal({ onClose, onConnected }) {
                   <WebhookField>
                     <WebhookLabel>WEBHOOK SECRET</WebhookLabel>
                     <WebhookRow>
-                      <WebhookValue>{WEBHOOK_SECRET}</WebhookValue>
-                      <CopyButton type="button" onClick={handleCopySecret}>
+                      <WebhookValue>
+                        {webhookSecret || '연결이 끝나면 여기에 표시됩니다'}
+                      </WebhookValue>
+                      <CopyButton type="button" onClick={handleCopySecret} disabled={!webhookSecret}>
                         {secretCopied ? '복사됨 ✓' : '복사'}
                       </CopyButton>
                     </WebhookRow>
@@ -1201,12 +1225,14 @@ function GithubConnectModal({ onClose, onConnected }) {
 
         {step === 4 && !connecting && (
           <Footer>
-            <FooterHint>세 항목을 모두 입력하면 연결할 수 있습니다.</FooterHint>
+            <FooterHint>
+              {connectError || '세 항목을 모두 입력하면 연결할 수 있습니다.'}
+            </FooterHint>
             <FooterButtons>
               <GhostButton type="button" onClick={() => setStep(3)}>
                 이전
               </GhostButton>
-              <PrimaryButton type="button" disabled={!canSubmitStep4} onClick={() => setStep(5)}>
+              <PrimaryButton type="button" disabled={!canSubmitStep4} onClick={handleConnect}>
                 연결하기 →
               </PrimaryButton>
             </FooterButtons>
@@ -1216,16 +1242,13 @@ function GithubConnectModal({ onClose, onConnected }) {
         {step === 5 && !connecting && (
           <Footer>
             <FooterHint>
-              언제든지 연결을 해제할 수 있습니다. 5분 내로 들어오는 변경 사항이 자동으로 수집됩니다.
+              언제든지 연결을 해제할 수 있습니다. 수집할 레포는 설정의 소스 화면에서 고릅니다.
             </FooterHint>
             <FooterButtons>
-              <GhostButton type="button" onClick={() => setStep(4)}>
-                이전
-              </GhostButton>
               <GhostButton type="button" onClick={onClose}>
                 나중에 하기
               </GhostButton>
-              <PrimaryButton type="button" onClick={handleConfirmConnect}>
+              <PrimaryButton type="button" onClick={onConnected}>
                 연결 완료
               </PrimaryButton>
             </FooterButtons>

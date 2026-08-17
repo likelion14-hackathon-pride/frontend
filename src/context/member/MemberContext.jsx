@@ -1,265 +1,279 @@
-import { createContext, useContext, useMemo, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+import * as cardsApi from '../../apis/cards';
+import * as handbookApi from '../../apis/handbook';
+import {
+  ALLOWED_MOVES,
+  CARD_COLUMN,
+  CARD_COLUMN_LABEL,
+  CARD_COLUMN_ORDER,
+  CARD_STATUS,
+  JOB_ROLE_LABEL,
+  LOCATION_ZONE,
+  SCOPE_KIND,
+  WORK_LOCATION_LABEL,
+  lookup,
+} from '../../apis/constants';
+import { toApiError } from '../../apis/errors';
+import { useAuth } from '../AuthContext';
+import { useAsync } from '../../hooks/useAsync';
 
 const MemberContext = createContext(null);
 
-const DEFAULT_PROFILE = {
-  name: 'Minh',
-  locationId: 'hanoi',
-  role: 'Backend',
-};
+// 매 렌더마다 새 배열을 만들면 useMemo 가 매번 다시 돈다. 빈 값은 하나를 돌려 쓴다.
+const EMPTY = [];
 
-// Ready → In progress → Done / Answered → Done 매핑
-const CTA_NEXT_COLUMN = {
-  ready: 'inprogress',
-  inprogress: 'done',
-  answered: 'done',
-};
+function toBoardCard(card) {
+  const tags = [];
+  if (card.scopeName) tags.push({ label: card.scopeName, type: 'neutral' });
+  if (card.deadlineTextEn || card.deadlineText) {
+    tags.push({ label: card.deadlineTextEn || card.deadlineText, type: 'warn' });
+  }
+  if ((card.duplicateCount ?? 1) > 1) {
+    tags.push({ label: `repeated ${card.duplicateCount}×`, type: 'meta' });
+  }
+  if (card.openQuestionCount > 0) tags.push({ label: 'waiting on owner', type: 'warn' });
+  if (card.answeredQuestionCount > 0) tags.push({ label: 'reply arrived', type: 'positive' });
 
-function buildInitialColumns(goToHandbook) {
-  return [
-    {
-      id: 'ready',
-      name: 'Ready',
-      cards: [
-        {
-          id: 1,
-          title: 'Payment failure logs',
-          tags: [
-            { label: 'payment-api', type: 'neutral' },
-            { label: 'due today', type: 'warn' },
-          ],
-          people: ['김', 'M'],
-          source: '#payment-api · 김대표 · 09:41',
-          slackHref: undefined,
-          draggable: true,
-          ctaLabel: "I'll take this on",
-          type: 'main',
-          when: 'Today',
-          purpose: 'Find out why payment webhook retries are failing for #payment-api.',
-          output: 'Root cause + short summary',
-          deadline: 'Today 18:00',
-          steps: [
-            {
-              title: 'Check the webhook retry logs in Sentry',
-              src: 'payment-api/config/sentry.yml',
-              onClick: () => goToHandbook('project/payment-api'),
-            },
-            {
-              title: 'Confirm the timeout threshold',
-              src: 'CONTRIBUTING.md, line 24',
-              onClick: () => goToHandbook('project/payment-api'),
-            },
-          ],
-          resolved: false,
-          moveHint: 'Move this to In progress once you start.',
-        },
-      ],
-    },
-    {
-      id: 'inprogress',
-      name: 'In progress',
-      cards: [
-        {
-          id: 2,
-          title: 'Admin table sort bug',
-          tags: [{ label: 'admin-web', type: 'neutral' }],
-          people: ['지'],
-          source: '#admin-web · 지민 · 어제 17:02',
-          draggable: true,
-          type: 'main',
-          when: 'Today',
-          purpose:
-            'Fix the sort order on the admin users table — newest signups should show first.',
-          output: 'Fixed sort + short PR description',
-          deadline: 'Tomorrow 12:00',
-          steps: [
-            {
-              title: 'Check how sort order is set in the table config',
-              src: 'admin-web/components/UserTable.jsx, line 42',
-              onClick: () => goToHandbook('project/admin-web'),
-            },
-          ],
-          resolved: false,
-        },
-      ],
-    },
-    {
-      id: 'waiting',
-      name: 'Waiting',
-      cards: [
-        {
-          id: 8,
-          title: 'Two questions sent in Korean',
-          tags: [
-            { label: 'payment-api', type: 'neutral' },
-            { label: 'sent via SAI', type: 'warn' },
-          ],
-          people: ['김', 'M'],
-          source: '#payment-api · 나 (via SAI) · 09:48',
-          draggable: false,
-          type: 'main',
-          when: 'Today',
-          purpose: 'Find out why payment webhook retries are failing for #payment-api.',
-          output: 'Root cause + short summary',
-          deadline: 'Today 18:00',
-          steps: [],
-          resolved: false,
-          kicker: 'SENT VIA SAI · AWAITING REPLY',
-          kickerColor: '#FF8A3D',
-          en: 'Do we need tests for the retry logic, or is a root cause summary enough?',
-          body: '재시도 로직에 대한 테스트도 필요한가요, 아니면 원인 요약만으로 충분한가요?',
-        },
-      ],
-    },
-    {
-      id: 'answered',
-      name: 'Answered',
-      cards: [
-        {
-          id: 7,
-          title: 'Answer from 김대표 · scope confirmed',
-          tags: [{ label: 'reply arrived', type: 'positive' }],
-          people: ['김'],
-          type: 'message',
-          kicker: '김대표 ANSWERED',
-          kickerColor: '#3BA55C',
-          en: 'Write tests for core payment logic only. UI tests are not required yet.',
-          body: '핵심 로직만 테스트 붙여주세요. UI는 아직 안 해도 됩니다.',
-        },
-      ],
-    },
-    {
-      id: 'done',
-      name: 'Done',
-      cards: [
-        {
-          id: 5,
-          title: 'Root cause write-up',
-          tags: [{ label: 'payment-api', type: 'neutral' }],
-          people: ['M'],
-          draggable: false,
-          type: 'main',
-          when: 'Yesterday',
-          purpose: 'Summarize why the payment webhook retries were failing.',
-          output: 'Root cause + short summary',
-          deadline: 'Aug 15 18:00',
-          steps: [],
-          resolved: true,
-          isDone: true,
-          previousColumnId: 'inprogress',
-        },
-      ],
-    },
-  ];
+  const people = [];
+  if (card.assigneeName) people.push(card.assigneeName.trim().charAt(0).toUpperCase());
+  if (card.requestedBy) people.push(card.requestedBy.trim().charAt(0).toUpperCase());
+
+  return {
+    ...card,
+    title: card.purposeEn || card.purpose || '(제목 없음)',
+    tags,
+    people,
+    source: [card.sourceLabel, card.requestedBy].filter(Boolean).join(' · ') || null,
+    slackHref: card.permalink || undefined,
+  };
+}
+
+// 열 묶기. 서버가 모르는 column 값을 보내도 카드를 잃지 않도록 뒤에 따로 붙인다.
+function buildColumns(cards) {
+  const buckets = new Map(CARD_COLUMN_ORDER.map((id) => [id, []]));
+
+  cards.forEach((card) => {
+    const columnId = card.column ?? CARD_COLUMN.READY;
+    if (!buckets.has(columnId)) buckets.set(columnId, []);
+    buckets.get(columnId).push(toBoardCard(card));
+  });
+
+  return Array.from(buckets.entries()).map(([id, list]) => ({
+    id,
+    name: lookup(CARD_COLUMN_LABEL, id),
+    cards: list,
+  }));
 }
 
 export function MemberProvider({ children }) {
   const navigate = useNavigate();
-  const location = useLocation();
-
-  const [profile, setProfile] = useState(() => ({
-    ...DEFAULT_PROFILE,
-    ...(location.state?.profile ?? {}),
-  }));
+  const { companyId, user, applyMe } = useAuth();
 
   const [pendingQuestion, setPendingQuestion] = useState(null);
-  const [pendingQuestionTaskId, setPendingQuestionTaskId] = useState(null);
+  const [pendingQuestionCardId, setPendingQuestionCardId] = useState(null);
+  const [movingCardId, setMovingCardId] = useState(null);
+  const [moveError, setMoveError] = useState(null);
 
-  const goToHandbook = (path = 'company') => navigate(`/member/handbook/${path}`);
+  const enabled = Boolean(companyId);
 
-  const [columns, setColumns] = useState(() => buildInitialColumns(goToHandbook));
+  const cardsQuery = useAsync(
+    () => cardsApi.fetchAllCards(companyId),
+    [companyId],
+    { enabled, initialData: null }
+  );
 
-  function moveCard(cardId, fromColumnId, toColumnId) {
-    setColumns((prev) => {
-      const fromCol = prev.find((c) => c.id === fromColumnId);
-      const card = fromCol?.cards.find((c) => c.id === cardId);
-      if (!card) return prev;
+  const scopesQuery = useAsync(
+    () => handbookApi.fetchScopes(companyId),
+    [companyId],
+    { enabled, initialData: null }
+  );
 
-      const movedCard = {
-        ...card,
-        isDone: toColumnId === 'done',
-        previousColumnId: toColumnId === 'done' ? fromColumnId : card.previousColumnId,
-      };
+  // 홈 요약과 시차는 여러 화면(사이드바 · 상단바 · 홈 · 모달)이 같이 쓴다.
+  // 화면마다 부르면 같은 요청이 서너 번 나가므로 한 곳에서 받아 나눠 쓴다.
+  const homeQuery = useAsync(
+    () => cardsApi.fetchHome(companyId),
+    [companyId],
+    { enabled, initialData: null }
+  );
 
-      return prev.map((col) => {
-        if (col.id === fromColumnId) {
-          return { ...col, cards: col.cards.filter((c) => c.id !== cardId) };
-        }
-        if (col.id === toColumnId) {
-          return { ...col, cards: [...col.cards, movedCard] };
-        }
-        return col;
-      });
-    });
-  }
+  const timingQuery = useAsync(
+    () => cardsApi.fetchTiming(companyId),
+    [companyId],
+    { enabled, initialData: null }
+  );
 
-  function handleCtaClick(card, columnId) {
-    const nextColumnId = CTA_NEXT_COLUMN[columnId];
-    if (nextColumnId) {
-      moveCard(card.id, columnId, nextColumnId);
-    }
-  }
+  const cards = cardsQuery.data ?? EMPTY;
+  const columns = useMemo(() => buildColumns(cards), [cards]);
 
-  // Done 카드의 Reopen: done으로 넘어가기 직전에 있던 컬럼으로 되돌림
-  function handleReopen(card) {
-    const backTo = card.previousColumnId ?? 'inprogress';
-    moveCard(card.id, 'done', backTo);
-  }
+  const scopes = scopesQuery.data?.items ?? EMPTY;
+  const projectScopes = useMemo(
+    () => scopes.filter((scope) => scope.kind === SCOPE_KIND.PROJECT),
+    [scopes]
+  );
+  const companyScopes = useMemo(
+    () => scopes.filter((scope) => scope.kind === SCOPE_KIND.COMPANY),
+    [scopes]
+  );
 
-  // Ask SAI에서 답을 못 찾아 한국어 초안을 보낸 경우 → 관련 task를 waiting으로 자동 이동
-  function moveTaskToWaiting(taskId, draft) {
-    if (!taskId) return;
-    setColumns((prev) => {
-      const fromCol = prev.find((col) => col.cards.some((c) => c.id === taskId));
-      if (!fromCol || fromCol.id === 'waiting') return prev;
-      const card = fromCol.cards.find((c) => c.id === taskId);
+  const goToHandbook = useCallback(
+    (path = 'company') => navigate(`/member/handbook/${path}`),
+    [navigate]
+  );
 
-      const movedCard = {
-        ...card,
-        kicker: 'SENT VIA SAI · AWAITING REPLY',
-        kickerColor: '#FF8A3D',
-        en: draft?.en ?? card.en,
-        body: draft?.kr ?? card.body,
-      };
+  // 카드 이동. 어느 열에서 어떤 status 로 갈 수 있는지는 서버 규칙(ALLOWED_MOVES)을 그대로 따른다.
+  const moveCard = useCallback(
+    async (card, targetStatus) => {
+      if (!companyId || !card) return { ok: false };
+      const allowed = lookup(ALLOWED_MOVES, card.column);
+      if (!allowed.includes(targetStatus)) {
+        const error = { message: '지금 상태에서는 옮길 수 없습니다.' };
+        setMoveError(error);
+        return { ok: false, error };
+      }
 
-      return prev.map((col) => {
-        if (col.id === fromCol.id) {
-          return { ...col, cards: col.cards.filter((c) => c.id !== taskId) };
-        }
-        if (col.id === 'waiting') {
-          return { ...col, cards: [...col.cards, movedCard] };
-        }
-        return col;
-      });
-    });
-  }
+      setMovingCardId(card.id);
+      setMoveError(null);
+      try {
+        await cardsApi.updateCard(companyId, card.id, { status: targetStatus });
+        await cardsQuery.reload();
+        return { ok: true };
+      } catch (caught) {
+        const error = toApiError(caught);
+        setMoveError(error);
+        return { ok: false, error };
+      } finally {
+        setMovingCardId(null);
+      }
+    },
+    [companyId, cardsQuery]
+  );
+
+  const nextStatusFor = useCallback((columnId) => {
+    if (columnId === CARD_COLUMN.READY) return CARD_STATUS.IN_PROGRESS;
+    if (columnId === CARD_COLUMN.IN_PROGRESS) return CARD_STATUS.DONE;
+    if (columnId === CARD_COLUMN.ANSWERED) return CARD_STATUS.DONE;
+    if (columnId === CARD_COLUMN.WAITING) return CARD_STATUS.IN_PROGRESS;
+    if (columnId === CARD_COLUMN.DONE) return CARD_STATUS.IN_PROGRESS; // 되돌리기
+    return null;
+  }, []);
+
+  const handleCtaClick = useCallback(
+    (card, columnId) => {
+      const target = nextStatusFor(columnId ?? card?.column);
+      if (!target) return undefined;
+      return moveCard(card, target);
+    },
+    [moveCard, nextStatusFor]
+  );
+
+  const handleReopen = useCallback(
+    (card) => moveCard(card, CARD_STATUS.IN_PROGRESS),
+    [moveCard]
+  );
+
+  const profile = useMemo(
+    () => ({
+      name: user?.name ?? '',
+      email: user?.email ?? '',
+      location: user?.location ?? null,
+      locationLabel: lookup(WORK_LOCATION_LABEL, user?.location),
+      role: user?.role ?? null,
+      roleLabel: lookup(JOB_ROLE_LABEL, user?.role),
+      // 서버가 준 타임존이 먼저다. 없으면 위치에서 유추하고, 그것도 없으면 기본값.
+      timezone: user?.timezone ?? lookup(LOCATION_ZONE, user?.location),
+      locale: user?.locale ?? 'en',
+    }),
+    [user]
+  );
 
   const value = useMemo(
     () => ({
+      companyId,
+      profile,
+      applyMe,
+
       goToHome: () => navigate('/member/home'),
       goToAsk: () => navigate('/member/ask'),
-      goToAskWithQuestion: (text, taskId) => {
-        setPendingQuestion(text);
-        setPendingQuestionTaskId(taskId ?? null);
-        navigate('/member/ask');
-      },
       goToTasks: () => navigate('/member/tasks'),
       goToHandbook,
-      profile,
-      setProfile,
+      goToAskWithQuestion: (text, cardId) => {
+        setPendingQuestion(text);
+        setPendingQuestionCardId(cardId ?? null);
+        navigate('/member/ask');
+      },
       pendingQuestion,
-      pendingQuestionTaskId,
+      pendingQuestionCardId,
       clearPendingQuestion: () => {
         setPendingQuestion(null);
-        setPendingQuestionTaskId(null);
+        setPendingQuestionCardId(null);
       },
+
+      cards,
       columns,
+      cardsLoading: cardsQuery.loading,
+      cardsError: cardsQuery.error,
+      reloadCards: cardsQuery.reload,
+      movingCardId,
+      moveError,
+      clearMoveError: () => setMoveError(null),
+      moveCard,
       handleCtaClick,
       handleReopen,
-      moveTaskToWaiting,
+      nextStatusFor,
+
+      scopes,
+      projectScopes,
+      companyScopes,
+      scopesLoading: scopesQuery.loading,
+      scopesError: scopesQuery.error,
+      reloadScopes: scopesQuery.reload,
+
+      home: homeQuery.data,
+      homeLoading: homeQuery.loading,
+      homeError: homeQuery.error,
+      reloadHome: homeQuery.reload,
+
+      timing: timingQuery.data,
+      timingLoading: timingQuery.loading,
+      timingError: timingQuery.error,
+      reloadTiming: timingQuery.reload,
     }),
-    [navigate, profile, pendingQuestion, pendingQuestionTaskId, columns]
+    [
+      companyId,
+      profile,
+      applyMe,
+      navigate,
+      goToHandbook,
+      pendingQuestion,
+      pendingQuestionCardId,
+      cards,
+      columns,
+      cardsQuery.loading,
+      cardsQuery.error,
+      cardsQuery.reload,
+      movingCardId,
+      moveError,
+      moveCard,
+      handleCtaClick,
+      handleReopen,
+      nextStatusFor,
+      scopes,
+      projectScopes,
+      companyScopes,
+      scopesQuery.loading,
+      scopesQuery.error,
+      scopesQuery.reload,
+      homeQuery.data,
+      homeQuery.loading,
+      homeQuery.error,
+      homeQuery.reload,
+      timingQuery.data,
+      timingQuery.loading,
+      timingQuery.error,
+      timingQuery.reload,
+    ]
   );
 
   return <MemberContext.Provider value={value}>{children}</MemberContext.Provider>;

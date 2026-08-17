@@ -78,7 +78,7 @@ const ItemList = styled.div`
   gap: 8px;
 `;
 
-function HandbookCategoryGroup({ category, answers, onAnswerChange }) {
+function HandbookCategoryGroup({ category, answers, savingKey, onAnswerChange }) {
   const confirmedCount = category.questions.filter(
     (question) => getQuestionStatus(answers[question.id]) === 'confirmed'
   ).length;
@@ -101,6 +101,7 @@ function HandbookCategoryGroup({ category, answers, onAnswerChange }) {
             key={question.id}
             question={question}
             answer={answers[question.id] ?? EMPTY_ANSWER}
+            saving={savingKey === question.id}
             onChange={(patch) => onAnswerChange(question.id, patch)}
           />
         ))}

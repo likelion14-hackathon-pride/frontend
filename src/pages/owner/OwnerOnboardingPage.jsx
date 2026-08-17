@@ -1,180 +1,175 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+
+import * as companiesApi from '../../apis/companies';
+import * as onboardingApi from '../../apis/onboarding';
+import * as policyApi from '../../apis/policy';
+import * as sourcesApi from '../../apis/sources';
+import { ONBOARDING_STEP } from '../../apis/constants';
 import OnboardingLayout from '../../components/owner/onboarding/OnboardingLayout';
 import OnboardingHeader from '../../components/owner/onboarding/OnboardingHeader';
 import SourceConnectStep from '../../components/owner/onboarding/step1-source/SourceConnectStep';
 import HandbookReviewStep from '../../components/owner/onboarding/step2-handbook/HandbookReviewStep';
 import RiskKeywordStep from '../../components/owner/onboarding/step3-risk/RiskKeywordStep';
 import CompletionStep from '../../components/owner/onboarding/step4-complete/CompletionStep';
-import {
-  HANDBOOK_CATEGORIES,
-  PROJECT_QUESTION_TEMPLATE,
-  EMPTY_ANSWER,
-  TOTAL_HANDBOOK_QUESTIONS,
-  countConfirmed,
-} from '../../components/owner/onboarding/step2-handbook/handbookData';
-
-const INITIAL_RISK_KEYWORDS = [
-  { id: 'risk-1', label: '프로덕션 DB', level: 'danger' },
-  { id: 'risk-2', label: '배포', level: 'danger' },
-  { id: 'risk-3', label: '삭제', level: 'warning' },
-];
-
-const INITIAL_HANDBOOK_ANSWERS = {
-  'dc-1': {
-    selected: 'custom',
-    customText: '원격 개발자가 사수 없이도 같은 기준으로 판단하게 만드는 것',
-    customSaved: true,
-  },
-  'dc-2': {
-    selected: 'custom',
-    customText: '초기 지표 달성 (신속한 기능 배포 및 매출 확보)',
-    customSaved: true,
-  },
-  'dc-3': { selected: 1, customText: '', customSaved: false },
-  'dc-4': {
-    selected: 'custom',
-    customText: '즉시 공개 소통 채널에 서면으로 전체 상황 공유',
-    customSaved: true,
-  },
-};
-
-// 백엔드 발급 API가 준비되면 이 값을 대체하세요.
-const MOCK_COMPANY_CODE = 'LIMA-9976';
+import { ErrorState, InlineError, LoadingState } from '../../components/common/AsyncStates';
+import { useAuth } from '../../context/AuthContext';
+import { useAsync, useMutation } from '../../hooks/useAsync';
 
 function OwnerOnboardingPage() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { companyId, company, refreshMe } = useAuth();
+
+  // 가입 응답에만 담겨 오는 회사 코드. 없으면 회사 조회로 채운다.
+  const [companyCode, setCompanyCode] = useState(location.state?.companyCode ?? company?.code ?? '');
+
   const [currentStep, setCurrentStep] = useState(1);
-  const [connectedSources, setConnectedSources] = useState(new Set());
-  const [handbookAnswers, setHandbookAnswers] = useState(INITIAL_HANDBOOK_ANSWERS);
-  const [projects, setProjects] = useState([]);
-  const [riskKeywords, setRiskKeywords] = useState(INITIAL_RISK_KEYWORDS);
+  const [stepError, setStepError] = useState(null);
+  const [summary, setSummary] = useState(null);
+
+  const companyQuery = useAsync(
+    () => companiesApi.fetchCompany(companyId),
+    [companyId],
+    { enabled: Boolean(companyId) && !companyCode }
+  );
+
+  useEffect(() => {
+    if (companyQuery.data?.code) setCompanyCode(companyQuery.data.code);
+  }, [companyQuery.data]);
+
+  // 서버가 기억하는 진행 단계에서 이어 한다. 0(시작 전)이면 1단계부터.
+  const onboardingQuery = useAsync(
+    () => onboardingApi.fetchOnboarding(companyId),
+    [companyId],
+    { enabled: Boolean(companyId) }
+  );
+
+  useEffect(() => {
+    const step = onboardingQuery.data?.onboardingStep;
+    if (step == null) return;
+    setCurrentStep(Math.min(Math.max(step || 1, ONBOARDING_STEP.MIN), ONBOARDING_STEP.MAX));
+  }, [onboardingQuery.data]);
+
+  const connectionsQuery = useAsync(
+    () => sourcesApi.fetchConnections(companyId),
+    [companyId],
+    { enabled: Boolean(companyId) }
+  );
+
+  const keywordsQuery = useAsync(
+    () => policyApi.fetchRiskKeywords(companyId),
+    [companyId],
+    { enabled: Boolean(companyId) }
+  );
+
+  const saveStep = useMutation((step) => onboardingApi.updateOnboardingStep(companyId, step));
+  const complete = useMutation(() => onboardingApi.completeOnboarding(companyId));
+  const addKeyword = useMutation((payload) => policyApi.createRiskKeyword(companyId, payload));
+  const removeKeyword = useMutation((id) => policyApi.deleteRiskKeyword(companyId, id));
+
+  async function goToStep(step) {
+    setStepError(null);
+    setCurrentStep(step);
+    // 진행 단계를 서버에도 남긴다. 중간에 나갔다 와도 이어서 할 수 있다.
+    const result = await saveStep.mutate(step);
+    if (!result.ok) setStepError(result.error);
+  }
 
   const handleStepClick = (stepId) => {
-    if (stepId < currentStep) setCurrentStep(stepId);
+    if (stepId < currentStep) goToStep(stepId);
   };
 
-  const handleToggleSource = (key) => {
-    setConnectedSources((prev) => {
-      const next = new Set(prev);
-      if (next.has(key)) {
-        next.delete(key);
-      } else {
-        next.add(key);
-      }
-      return next;
-    });
-  };
-
-  const handleAnswerQuestion = (questionId, patch) => {
-    setHandbookAnswers((prev) => ({
-      ...prev,
-      [questionId]: { ...EMPTY_ANSWER, ...prev[questionId], ...patch },
-    }));
-  };
-
-  const handleAddProject = (name) => {
-    setProjects((prev) => [
-      ...prev,
-      { id: `project-${Date.now()}`, name, expanded: true, answers: {} },
-    ]);
-  };
-
-  const handleToggleProjectExpand = (projectId) => {
-    setProjects((prev) =>
-      prev.map((project) =>
-        project.id === projectId ? { ...project, expanded: !project.expanded } : project
-      )
-    );
-  };
-
-  const handleProjectAnswerChange = (projectId, questionId, patch) => {
-    setProjects((prev) =>
-      prev.map((project) =>
-        project.id !== projectId
-          ? project
-          : {
-              ...project,
-              answers: {
-                ...project.answers,
-                [questionId]: { ...EMPTY_ANSWER, ...project.answers[questionId], ...patch },
-              },
-            }
-      )
-    );
-  };
-
-  const handleSkipProjectToCompanyRules = (projectId) => {
-    setProjects((prev) =>
-      prev.map((project) => {
-        if (project.id !== projectId) return project;
-        const answers = {};
-        PROJECT_QUESTION_TEMPLATE.forEach((question) => {
-          answers[question.id] = { ...EMPTY_ANSWER, selected: 'skip' };
-        });
-        return { ...project, answers, expanded: false };
-      })
-    );
-  };
-
-  const handleAddRiskKeyword = (label, level) => {
-    setRiskKeywords((prev) => [...prev, { id: `risk-${Date.now()}`, label, level }]);
-  };
-
-  const handleRemoveRiskKeyword = (id) => {
-    setRiskKeywords((prev) => prev.filter((keyword) => keyword.id !== id));
-  };
+  async function handleFinishRisk() {
+    const result = await complete.mutate();
+    if (!result.ok) {
+      setStepError(result.error);
+      return;
+    }
+    setSummary(result.data?.summary ?? null);
+    setCurrentStep(4);
+    // onboardingStatus 가 COMPLETED 로 바뀌었으니 세션도 새로 받는다.
+    refreshMe();
+  }
 
   const handleCopyCode = () => {
-    navigator.clipboard?.writeText(MOCK_COMPANY_CODE);
+    if (companyCode) navigator.clipboard?.writeText(companyCode);
   };
 
-  const allHandbookQuestions = HANDBOOK_CATEGORIES.flatMap((category) => category.questions);
-  const handbookConfirmedCount = countConfirmed(allHandbookQuestions, handbookAnswers);
+  const connections = connectionsQuery.data?.items ?? [];
+  const keywords = keywordsQuery.data ?? [];
+
+  if (!companyId) {
+    return (
+      <OnboardingLayout>
+        <LoadingState label="회사 정보를 확인하는 중…" />
+      </OnboardingLayout>
+    );
+  }
+
+  if (onboardingQuery.loading && !onboardingQuery.data) {
+    return (
+      <OnboardingLayout>
+        <LoadingState label="온보딩 진행 상황을 불러오는 중…" />
+      </OnboardingLayout>
+    );
+  }
+
+  if (onboardingQuery.error && !onboardingQuery.data) {
+    return (
+      <OnboardingLayout>
+        <ErrorState error={onboardingQuery.error} onRetry={onboardingQuery.reload} />
+      </OnboardingLayout>
+    );
+  }
 
   return (
     <OnboardingLayout>
       <OnboardingHeader currentStep={currentStep} onStepClick={handleStepClick} />
 
+      <InlineError error={stepError} />
+
       {currentStep === 1 && (
         <SourceConnectStep
-          connectedSources={connectedSources}
-          onToggleSource={handleToggleSource}
-          onCreateDraft={() => setCurrentStep(2)}
+          companyId={companyId}
+          connections={connections}
+          loading={connectionsQuery.loading}
+          error={connectionsQuery.error}
+          onReload={connectionsQuery.reload}
+          onCreateDraft={() => goToStep(2)}
         />
       )}
 
       {currentStep === 2 && (
-        <HandbookReviewStep
-          handbookAnswers={handbookAnswers}
-          onAnswerChange={handleAnswerQuestion}
-          projects={projects}
-          onAddProject={handleAddProject}
-          onToggleProjectExpand={handleToggleProjectExpand}
-          onProjectAnswerChange={handleProjectAnswerChange}
-          onSkipProjectToCompanyRules={handleSkipProjectToCompanyRules}
-          onFinish={() => setCurrentStep(3)}
-        />
+        <HandbookReviewStep companyId={companyId} onFinish={() => goToStep(3)} />
       )}
 
       {currentStep === 3 && (
         <RiskKeywordStep
-          keywords={riskKeywords}
-          onAddKeyword={handleAddRiskKeyword}
-          onRemoveKeyword={handleRemoveRiskKeyword}
-          onFinish={() => setCurrentStep(4)}
+          keywords={keywords}
+          loading={keywordsQuery.loading}
+          error={keywordsQuery.error}
+          onReload={keywordsQuery.reload}
+          pending={addKeyword.pending || removeKeyword.pending || complete.pending}
+          actionError={addKeyword.error || removeKeyword.error}
+          onAddKeyword={async (keyword, severity) => {
+            const result = await addKeyword.mutate({ keyword, severity });
+            if (result.ok) keywordsQuery.reload();
+          }}
+          onRemoveKeyword={async (id) => {
+            const result = await removeKeyword.mutate(id);
+            if (result.ok) keywordsQuery.reload();
+          }}
+          onFinish={handleFinishRisk}
         />
       )}
 
       {currentStep === 4 && (
         <CompletionStep
-          connectedSourcesCount={connectedSources.size}
-          handbookConfirmedCount={handbookConfirmedCount}
-          handbookTotal={TOTAL_HANDBOOK_QUESTIONS}
-          riskKeywordCount={riskKeywords.length}
-          companyCode={MOCK_COMPANY_CODE}
-          onReviewSettings={() => setCurrentStep(1)}
-          onOpenHandbook={() => {
-            // TODO: 핸드북 페이지 라우트가 생기면 이동 처리로 교체
-          }}
+          summary={summary}
+          companyCode={companyCode}
+          onReviewSettings={() => goToStep(1)}
+          onOpenHandbook={() => navigate('/owner')}
           onCopyCode={handleCopyCode}
         />
       )}

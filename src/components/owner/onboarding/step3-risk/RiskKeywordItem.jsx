@@ -1,15 +1,25 @@
 import styled from 'styled-components';
+
+import { lookup } from '../../../../apis/constants';
 import exclamationIcon from '../../../../assets/icons/exclamation.svg';
 import exclamationTriangleIcon from '../../../../assets/icons/exclamation_triangle.svg';
 
+// 키는 백엔드 RiskKeyword.Level 값 그대로다(policy/models.py:5).
 const LEVEL_META = {
-  danger: {
+  DANGER: {
     color: '#DC2626',
     tagBg: '#FEF2F2',
     icon: exclamationIcon,
     label: '위험',
   },
-  warning: {
+  CAUTION: {
+    color: '#EA6A0A',
+    tagBg: '#FFF7ED',
+    icon: exclamationTriangleIcon,
+    label: '주의',
+  },
+  // 서버가 모르는 값을 보내도 화면이 죽지 않도록.
+  DEFAULT: {
     color: '#EA6A0A',
     tagBg: '#FFF7ED',
     icon: exclamationTriangleIcon,
@@ -137,7 +147,7 @@ const RemoveGlyph = styled.span`
 `;
 
 function RiskKeywordItem({ label, level, onRemove }) {
-  const meta = LEVEL_META[level];
+  const meta = lookup(LEVEL_META, level);
 
   return (
     <Row>

@@ -1,70 +1,55 @@
-export const QUESTION_STATS = {
-  waitingCount: 2,
-  waitingFootnote: '가장 오래된 질문 18시간 경과',
-  approvalCount: 2,
-  approvalFootnote: '답변에서 만들어진 항목 제안',
-  weeklySaved: 7,
-  weeklySavedFootnote: '질문-답변 1쌍당 항목 1개',
+// 서버 상태(qna/models.py:Escalation.Status)와 화면 상태의 대응:
+//   DRAFT     팀원이 초안만 만든 상태          → 답변 대기
+//   SENT      슬랙으로 보냈고 답을 기다리는 중  → 답변 대기
+//   ANSWERED  대표 답장을 회수해 판정까지 끝남  → 승인 대기
+//   APPROVED  핸드북 규칙으로 승격됨            → 저장됨
+//   DISMISSED 대표가 물린 질문                  → 저장 안 함
+
+import { ESCALATION_STATUS } from '../../../../apis/constants';
+import { formatRelativeKo, formatShortKo } from '../../../../utils/time';
+
+export const UI_STATUS = {
+  WAITING: 'waiting',
+  PENDING_APPROVAL: 'pending_approval',
+  SAVED: 'saved',
+  DISCARDED: 'discarded',
 };
 
-export const INITIAL_QUESTIONS = [
-  {
-    id: 'q-1',
-    employee: 'Minh',
-    text: '장애 시 에스컬레이션 순서가 있나요?',
-    project: '공통 규칙',
-    time: '08.06 14:45',
-    status: 'waiting',
-  },
-  {
-    id: 'q-2',
-    employee: 'Minh',
-    text: '핫픽스일 때 제가 배포해도 되나요?',
-    project: 'payment-api',
-    time: '08.06 21:40',
-    status: 'waiting',
-    declined: true,
-  },
-  {
-    id: 'q-3',
-    employee: 'Linh',
-    text: 'PR 리뷰어는 누구로 지정하나요?',
-    project: 'payment-api',
-    time: '08.07 10:30',
-    status: 'pending_approval',
-    queueNumber: 3,
-    relativeTime: '2시간 전',
-    ownerReply: '결제 쪽은 지훈님을 리뷰어로 넣어주세요. 지훈님 부재면 저 태그하시면 됩니다.',
-    suggestion: {
-      tag: '프로젝트',
-      title: 'payment-api PR 리뷰어는 지훈, 부재 시 대표',
-      en: 'Assign 지훈 as the reviewer on payment-api pull requests. If unavailable, tag the CEO instead.',
-      source: 'slack #payment · 08.07 11:02',
-    },
-  },
-  {
-    id: 'q-4',
-    employee: 'Minh',
-    text: '테스트도 작성해야 하나요?',
-    project: 'payment-api',
-    time: '08.07 09:20',
-    status: 'pending_approval',
-    queueNumber: 4,
-    relativeTime: '4시간 전',
-    ownerReply: '유닛 테스트는 필수는 아니고, 결제 관련 로직만 작성해주세요.',
-    suggestion: {
-      tag: '프로젝트',
-      title: 'payment-api는 결제 로직만 테스트 작성',
-      en: 'Unit tests are not required except for payment logic in payment-api.',
-      source: 'slack #payment · 08.07 09:41',
-    },
-  },
-  {
-    id: 'q-5',
-    employee: 'Minh',
-    text: '장비 반납은 어떻게 하나요?',
-    project: '공통 규칙',
-    time: '08.05 16:50',
-    status: 'saved',
-  },
-];
+const STATUS_MAP = {
+  [ESCALATION_STATUS.DRAFT]: UI_STATUS.WAITING,
+  [ESCALATION_STATUS.SENT]: UI_STATUS.WAITING,
+  [ESCALATION_STATUS.ANSWERED]: UI_STATUS.PENDING_APPROVAL,
+  [ESCALATION_STATUS.APPROVED]: UI_STATUS.SAVED,
+  [ESCALATION_STATUS.DISMISSED]: UI_STATUS.DISCARDED,
+  DEFAULT: UI_STATUS.WAITING,
+};
+
+export function uiStatusOf(status) {
+  return STATUS_MAP[status] ?? STATUS_MAP.DEFAULT;
+}
+
+export function toQuestionRow(escalation) {
+  return {
+    id: escalation.id,
+    employee: escalation.askedByName || '팀원',
+    // 화면에 띄우는 질문 문구. 보낸 원문이 있으면 그것이 대표가 실제로 본 문장이다.
+    text: escalation.sentText || escalation.draftKo || escalation.questionEn || '(질문 없음)',
+    questionEn: escalation.questionEn,
+    draftKo: escalation.draftKo,
+    project: escalation.scopeName || '공통 규칙',
+    time: formatShortKo(escalation.createdAt),
+    relativeTime: formatRelativeKo(escalation.sentAt || escalation.createdAt),
+    createdAt: escalation.createdAt ?? '',
+    status: uiStatusOf(escalation.status),
+    serverStatus: escalation.status,
+    // 판정이 '답이 아니다' 로 났을 때. 회피성 답변이라 상태가 그대로 남는다.
+    declined: escalation.answerIsAnswer === false,
+    answerReason: escalation.answerReason,
+    ownerReply: escalation.answerKo || escalation.answerEn || null,
+    sentAt: escalation.sentAt,
+    answeredAt: escalation.answeredAt,
+    proposedEntryId: escalation.proposedEntryId,
+    // 보내기 전(DRAFT)에는 스레드가 아직 없다.
+    slackThreadRef: escalation.slackThreadRef,
+  };
+}

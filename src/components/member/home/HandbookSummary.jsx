@@ -159,15 +159,20 @@ const SubCount = styled.span`
   text-align: right;
 `;
 
+const EmptyHint = styled.div`
+  padding: 10px 4px 0 30px;
+  font-size: 12px;
+  color: #b4b4bc;
+`;
+
 export default function HandbookSummaryCard({
-  totalEntries = 12,
-  companyRuleCount = 12,
-  projects = [
-    { id: 'payment-api', label: 'payment-api', meta: 'This project', count: 3, active: true },
-    { id: 'admin-web', label: 'admin-web', meta: 'Another project', count: 2, active: false },
-  ],
+  totalEntries = 0,
+  companyRuleCount = 0,
+  projects = [],
 }) {
   const { goToHandbook } = useMemberNavigation();
+  const projectRuleCount = projects.reduce((sum, p) => sum + (p.count ?? 0), 0);
+  const firstProjectId = projects[0]?.id;
 
   return (
     <Card>
@@ -185,24 +190,33 @@ export default function HandbookSummaryCard({
           <NavArrow>→</NavArrow>
         </NavButton>
 
-        <NavButton $spaced onClick={() => goToHandbook(`project/${projects[0]?.id ?? ''}`)}>
+        {/* 프로젝트가 하나도 없으면 갈 곳이 없다. 버튼을 눌러도 빈 주소로 보내지 않는다. */}
+        <NavButton
+          $spaced
+          disabled={!firstProjectId}
+          onClick={() => firstProjectId && goToHandbook(`project/${firstProjectId}`)}
+        >
           <img src={linkIcon} alt="" width={15} height={15} />
           <NavLabel>By project</NavLabel>
-          <NavCount>{projects.reduce((sum, p) => sum + p.count, 0)} rules</NavCount>
+          <NavCount>{projectRuleCount} rules</NavCount>
           <NavArrow>→</NavArrow>
         </NavButton>
 
-        <SubList>
-          {projects.map((p) => (
-            <SubButton key={p.id} onClick={() => goToHandbook(`project/${p.id}`)}>
-              <TreeLine />
-              <Dot $active={p.active} />
-              <SubLabel $active={p.active}>{p.label}</SubLabel>
-              <SubMeta>{p.meta}</SubMeta>
-              <SubCount>{p.count}</SubCount>
-            </SubButton>
-          ))}
-        </SubList>
+        {projects.length === 0 ? (
+          <EmptyHint>아직 프로젝트 지식공간이 없습니다</EmptyHint>
+        ) : (
+          <SubList>
+            {projects.map((p) => (
+              <SubButton key={p.id} onClick={() => goToHandbook(`project/${p.id}`)}>
+                <TreeLine />
+                <Dot $active={p.active} />
+                <SubLabel $active={p.active}>{p.label}</SubLabel>
+                <SubMeta>{p.meta}</SubMeta>
+                <SubCount>{p.count}</SubCount>
+              </SubButton>
+            ))}
+          </SubList>
+        )}
       </Body>
     </Card>
   );

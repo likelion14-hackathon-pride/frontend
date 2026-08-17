@@ -1,13 +1,36 @@
 import { useState } from 'react';
 import styled from 'styled-components';
+
+import * as cardsApi from '../../../apis/cards';
+import * as qnaApi from '../../../apis/qna';
+import {
+  CARD_COLUMN,
+  ESCALATION_STATUS,
+  RISK_LEVEL,
+  URGENCY_LABEL,
+  lookup,
+} from '../../../apis/constants';
+import { useAsync, useMutation } from '../../../hooks/useAsync';
+import { formatDateTime } from '../../../utils/time';
+import { ErrorState, InlineError, LoadingState } from '../../common/AsyncStates';
 import { useMemberNavigation } from '../../../context/member/MemberContext';
 import chatBubbleIcon from '../../../assets/icons/chat-org.svg';
 import bookIcon from '../../../assets/icons/book-org.svg';
 
+// 열마다 CTA 문구가 다르다. 옮길 수 있는 상태는 constants.ALLOWED_MOVES 가 정한다.
 const CTA_LABEL = {
-  ready: "I'll take this on",
-  inprogress: 'Mark as done',
-  answered: 'Mark as done',
+  [CARD_COLUMN.READY]: "I'll take this on",
+  [CARD_COLUMN.IN_PROGRESS]: 'Mark as done',
+  [CARD_COLUMN.ANSWERED]: 'Mark as done',
+  [CARD_COLUMN.WAITING]: 'Keep working on it',
+  [CARD_COLUMN.DONE]: 'Reopen',
+  DEFAULT: null,
+};
+
+const MOVE_HINT = {
+  [CARD_COLUMN.READY]: '시작하면 In progress 로 옮겨집니다.',
+  [CARD_COLUMN.WAITING]: '대표의 답을 기다리는 중에도 다른 단계는 진행할 수 있습니다.',
+  DEFAULT: null,
 };
 
 const Overlay = styled.div`
@@ -106,72 +129,6 @@ const Body = styled.div`
   gap: 12px;
 `;
 
-const NeutralCard = styled.div`
-  background: #fff;
-  border-radius: 18px;
-  box-shadow: 0 1px 2px rgba(17, 17, 20, 0.05);
-  padding: 22px 24px;
-`;
-
-const NeutralTitle = styled.div`
-  font-size: 14.5px;
-  font-weight: 800;
-`;
-
-const NeutralDesc = styled.div`
-  font-size: 14.5px;
-  color: #8a8a93;
-  line-height: 1.7;
-  margin-top: 7px;
-`;
-
-const MessageCard = styled.div`
-  background: #fff;
-  border-radius: 18px;
-  box-shadow:
-    0px 1px 20px 0px #0000002e,
-    0 1px 0 rgba(255, 96, 0, 0.04);
-  padding: 20px 22px;
-`;
-
-const KickerRow = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-`;
-
-const KickerDot = styled.div`
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: ${(props) => props.$color ?? '#8A8A93'};
-`;
-
-const Kicker = styled.span`
-  flex: 1;
-  min-width: 0;
-  font-size: 12px;
-  font-weight: 700;
-  color: #a0a0a8;
-  letter-spacing: 0.08em;
-`;
-
-const MessageEn = styled.div`
-  font-size: 21px;
-  font-weight: 800;
-  letter-spacing: -0.4px;
-  line-height: 1.35;
-  margin-top: 10px;
-`;
-
-const MessageBody = styled.div`
-  font-size: 14px;
-  color: #8a8a93;
-  margin-top: 9px;
-  font-family: 'IBM Plex Mono', monospace;
-  line-height: 1.6;
-`;
-
 const MainCard = styled.div`
   background: #ff6000;
   border-radius: 18px;
@@ -221,6 +178,14 @@ const Purpose = styled.div`
   letter-spacing: -0.5px;
   line-height: 1.3;
   color: #fff;
+`;
+
+const PurposeKo = styled.div`
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.82);
+  margin-top: 8px;
+  line-height: 1.6;
+  font-family: 'IBM Plex Mono', monospace;
 `;
 
 const MetaRow = styled.div`
@@ -275,7 +240,7 @@ const DueValue = styled.div`
   white-space: nowrap;
 `;
 
-const StepsCard = styled.div`
+const Card = styled.div`
   background: #fff;
   border-radius: 18px;
   box-shadow:
@@ -284,7 +249,7 @@ const StepsCard = styled.div`
   padding: 18px 20px;
 `;
 
-const StepsHeader = styled.div`
+const CardHeader = styled.div`
   display: flex;
   align-items: center;
   gap: 9px;
@@ -301,74 +266,64 @@ const IconBadge = styled.span`
   justify-content: center;
 `;
 
-const StepsTitle = styled.span`
+const CardTitle = styled.span`
   flex: 1;
   min-width: 0;
   font-size: 14.5px;
   font-weight: 800;
 `;
 
-const SearchableTag = styled.span`
+const Tag = styled.span`
   flex: none;
   white-space: nowrap;
   font-size: 11.5px;
   font-weight: 700;
-  color: #c97a22;
-  background: #fdf1e4;
+  color: ${({ $tone }) => ($tone === 'danger' ? '#B03A3A' : '#C97A22')};
+  background: ${({ $tone }) => ($tone === 'danger' ? '#FBEAEA' : '#FDF1E4')};
   padding: 3px 8px;
   border-radius: 6px;
 `;
 
-const StepList = styled.div`
+const List = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
   margin-top: 12px;
 `;
 
-const StepRow = styled.button`
-  width: 100%;
+const ItemRow = styled.div`
   display: flex;
   align-items: flex-start;
   gap: 11px;
-  text-align: left;
   background: #fafafb;
   border: 1px solid #efeff1;
   padding: 12px 14px;
   border-radius: 11px;
-  cursor: pointer;
-  transition: 0.15s;
-
-  &:hover {
-    border-color: #ffc49b;
-    background: #fff;
-    box-shadow: 0 6px 16px rgba(17, 17, 20, 0.07);
-  }
 `;
 
-const StepDot = styled.span`
+const ItemDot = styled.span`
   flex: none;
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #ff8a3d;
+  background: ${({ $tone }) => ($tone === 'danger' ? '#DC2626' : '#FF8A3D')};
   margin-top: 8px;
 `;
 
-const StepTextBlock = styled.span`
+const ItemTextBlock = styled.span`
   flex: 1;
   min-width: 0;
   line-height: 1.45;
 `;
 
-const StepTitle = styled.span`
+const ItemTitle = styled.span`
   display: block;
   font-size: 14.5px;
   font-weight: 600;
   color: #17171b;
 `;
 
-const StepSrc = styled.span`
+const ItemSrc = styled.span`
   display: block;
   font-size: 12px;
   color: #a0a0a8;
@@ -376,33 +331,39 @@ const StepSrc = styled.span`
   font-family: 'IBM Plex Mono', monospace;
 `;
 
-const StepArrow = styled.span`
+const SmallButton = styled.button`
   flex: none;
   align-self: center;
-  font-size: 13px;
-  color: #c8c8d0;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  background: #17171b;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 9px;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
 `;
 
-const AskCard = styled.div`
-  background: #fff;
-  border-radius: 18px;
-  box-shadow:
-    0px 1px 20px 0px #0000002e,
-    0 1px 0 rgba(255, 96, 0, 0.04);
-  padding: 18px 20px;
+const AnswerBlock = styled.div`
+  margin-top: 8px;
+  background: #f7f7f8;
+  border-radius: 10px;
+  padding: 11px 12px;
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: #3a3a42;
 `;
 
-const AskHeader = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 9px;
-`;
-
-const AskTitle = styled.span`
-  flex: 1;
-  min-width: 0;
-  font-size: 14.5px;
-  font-weight: 800;
+const AnswerMeta = styled.div`
+  font-size: 11.5px;
+  color: #a0a0a8;
+  margin-top: 6px;
 `;
 
 const AskInputRow = styled.div`
@@ -446,40 +407,6 @@ const AskButton = styled.button`
   }
 `;
 
-const ResolvedBanner = styled.div`
-  display: flex;
-  gap: 12px;
-  background: linear-gradient(135deg, rgba(255, 96, 0, 0.07), rgba(255, 138, 61, 0.03));
-  border: 1px solid rgba(255, 96, 0, 0.16);
-  border-radius: 13px;
-  padding: 14px 15px;
-  margin-bottom: 14px;
-`;
-
-const ResolvedIcon = styled.div`
-  width: 26px;
-  height: 26px;
-  flex: none;
-  border-radius: 9px;
-  background: linear-gradient(135deg, #ff6000 0%, #ff8a3d 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 5px 14px rgba(255, 96, 0, 0.28);
-`;
-
-const ResolvedTitle = styled.div`
-  font-size: 14.5px;
-  font-weight: 800;
-`;
-
-const ResolvedDesc = styled.div`
-  font-size: 14px;
-  color: #6b6b73;
-  line-height: 1.65;
-  margin-top: 5px;
-`;
-
 const StatusCard = styled.div`
   background: #fff;
   border-radius: 18px;
@@ -517,60 +444,67 @@ const StatusHint = styled.div`
   margin-top: 9px;
 `;
 
-const DoneRow = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 9px;
-`;
-
-const DoneCheck = styled.span`
-  width: 22px;
-  height: 22px;
-  flex: none;
-  border-radius: 7px;
-  background: #3ba55c;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const DoneLabel = styled.span`
-  flex: 1;
-  min-width: 0;
-  font-size: 14.5px;
-  font-weight: 800;
-`;
-
-const DoneButton = styled.button`
-  flex: none;
-  white-space: nowrap;
-  font-size: 13px;
-  font-weight: 700;
+const SourceLink = styled.a`
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 12px;
   color: #6b6b73;
-  border: 1px solid #eaeaee;
-  padding: 8px 13px;
-  border-radius: 10px;
-  background: none;
-  cursor: pointer;
-
-  &:hover {
-    box-shadow: inset 0 0 0 999px rgba(23, 23, 27, 0.045);
-  }
 `;
 
-export default function TaskDetailPanel({ task, isWide, onToggleWide, onClose, onMoveAction }) {
-  const { goToAskWithQuestion } = useMemberNavigation();
+export default function TaskDetailPanel({ card, isWide, onToggleWide, onClose, onMoveAction }) {
+  const { companyId, goToAskWithQuestion, reloadCards } = useMemberNavigation();
   const [askDraft, setAskDraft] = useState('');
 
-  if (!task) return null;
+  const cardId = card?.id ?? null;
 
-  const columnId = task.columnId;
-  const ctaLabel = CTA_LABEL[columnId];
+  // 상세는 목록에 없는 것(수행 단계·미정 항목·근거 규칙·위험 경고)을 담고 있다.
+  // 여는 순간 서버가 읽음으로 표시한다.
+  const detailQuery = useAsync(
+    () => cardsApi.fetchCard(companyId, cardId),
+    [companyId, cardId],
+    { enabled: Boolean(companyId && cardId) }
+  );
+
+  const escalate = useMutation((blankId) =>
+    qnaApi.createEscalation(companyId, { blankId })
+  );
+  const acknowledge = useMutation((escalationId) =>
+    qnaApi.acknowledgeEscalation(companyId, escalationId)
+  );
+
+  if (!card) return null;
+
+  const detail = detailQuery.data;
+  const columnId = card.columnId ?? card.column;
+  const ctaLabel = lookup(CTA_LABEL, columnId);
+  const moveHint = lookup(MOVE_HINT, columnId);
 
   function handleAskSend() {
     if (!askDraft.trim()) return;
-    goToAskWithQuestion(askDraft.trim(), task.id);
+    goToAskWithQuestion(askDraft.trim(), card.id);
   }
+
+  async function handleEscalate(blankId) {
+    const result = await escalate.mutate(blankId);
+    if (result.ok) {
+      detailQuery.reload();
+      reloadCards();
+    }
+  }
+
+  async function handleAcknowledge(escalationId) {
+    const result = await acknowledge.mutate(escalationId);
+    if (result.ok) {
+      detailQuery.reload();
+      reloadCards();
+    }
+  }
+
+  const steps = detail?.steps ?? [];
+  const blanks = detail?.blanks ?? [];
+  const relatedRules = detail?.relatedRules ?? [];
+  const riskWarnings = detail?.riskWarnings ?? [];
+  const questions = detail?.questions ?? [];
 
   return (
     <Overlay $wide={isWide}>
@@ -584,183 +518,232 @@ export default function TaskDetailPanel({ task, isWide, onToggleWide, onClose, o
       </Header>
 
       <Body>
-        {task.type === 'plain' && (
-          <NeutralCard>
-            <NeutralTitle>Nothing to do here</NeutralTitle>
-            <NeutralDesc>Context, not a task.</NeutralDesc>
-          </NeutralCard>
+        <MainCard>
+          <MainCardTop>
+            <MainCardDot />
+            <MainCardKicker>WHAT YOU NEED TO DO</MainCardKicker>
+            <MainCardWhen>{lookup(URGENCY_LABEL, card.urgency)}</MainCardWhen>
+          </MainCardTop>
+          <MainCardBody>
+            <Purpose>{card.purposeEn || card.purpose}</Purpose>
+            {/* 영어가 본문이고 한국어는 대조용이다(cards/models.py 주석). */}
+            {card.purposeEn && card.purpose && card.purposeEn !== card.purpose && (
+              <PurposeKo>{card.purpose}</PurposeKo>
+            )}
+            <MetaRow>
+              <DeliverableBox>
+                <MetaLabel>DELIVERABLE</MetaLabel>
+                <DeliverableValue>
+                  {card.deliverableEn || card.deliverable || '따로 정해지지 않았습니다'}
+                </DeliverableValue>
+              </DeliverableBox>
+              <DueBox>
+                <DueLabel>DUE</DueLabel>
+                <DueValue>
+                  {card.deadlineTextEn ||
+                    card.deadlineText ||
+                    formatDateTime(card.deadlineAt, { fallback: '기한 없음' })}
+                </DueValue>
+              </DueBox>
+            </MetaRow>
+            {card.permalink && (
+              <SourceLink href={card.permalink} target="_blank" rel="noreferrer">
+                원문 열기 ↗
+              </SourceLink>
+            )}
+          </MainCardBody>
+        </MainCard>
+
+        <InlineError error={escalate.error || acknowledge.error} />
+
+        {detailQuery.loading && !detail && <LoadingState compact label="카드 상세를 불러오는 중…" />}
+        {detailQuery.error && !detail && (
+          <ErrorState error={detailQuery.error} onRetry={detailQuery.reload} compact />
         )}
 
-        {task.isDone ? (
+        {detail && (
           <>
-            {task.type === 'message' && (
-              <MessageCard>
-                <KickerRow>
-                  <KickerDot $color={task.kickerColor ?? '#8A8A93'} />
-                  <Kicker>{task.kicker}</Kicker>
-                </KickerRow>
-                <MessageEn>{task.en}</MessageEn>
-                <MessageBody>{task.body}</MessageBody>
-              </MessageCard>
+            {riskWarnings.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>대표가 등록한 위험 작업</CardTitle>
+                  <Tag $tone="danger">{riskWarnings.length}</Tag>
+                </CardHeader>
+                <List>
+                  {riskWarnings.map((warning) => (
+                    <ItemRow key={`${warning.keyword}-${warning.level}`}>
+                      <ItemDot $tone="danger" />
+                      <ItemTextBlock>
+                        <ItemTitle>{warning.keyword}</ItemTitle>
+                        <ItemSrc>
+                          {warning.level === RISK_LEVEL.DANGER ? '위험' : '주의'} ·{' '}
+                          {warning.note || '대표님께 먼저 확인하세요'}
+                        </ItemSrc>
+                      </ItemTextBlock>
+                    </ItemRow>
+                  ))}
+                </List>
+              </Card>
             )}
 
-            {task.type === 'main' && (
-              <MainCard>
-                <MainCardTop>
-                  <MainCardDot />
-                  <MainCardKicker>WHAT YOU NEED TO DO</MainCardKicker>
-                  <MainCardWhen>{task.when}</MainCardWhen>
-                </MainCardTop>
-                <MainCardBody>
-                  <Purpose>{task.purpose}</Purpose>
-                  <MetaRow>
-                    <DeliverableBox>
-                      <MetaLabel>DELIVERABLE</MetaLabel>
-                      <DeliverableValue>{task.output}</DeliverableValue>
-                    </DeliverableBox>
-                    <DueBox>
-                      <DueLabel>DUE</DueLabel>
-                      <DueValue>{task.deadline}</DueValue>
-                    </DueBox>
-                  </MetaRow>
-                </MainCardBody>
-              </MainCard>
+            {steps.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <IconBadge>
+                    <img src={bookIcon} alt="" width={15} height={15} />
+                  </IconBadge>
+                  <CardTitle>How to do it</CardTitle>
+                </CardHeader>
+                <List>
+                  {steps.map((step) => (
+                    <ItemRow key={step.id}>
+                      <ItemDot />
+                      <ItemTextBlock>
+                        <ItemTitle>{step.textEn || step.text}</ItemTitle>
+                        {/* entryId 가 있으면 그 규칙이 근거다. 없으면 근거가 없다는 뜻. */}
+                        <ItemSrc>
+                          {step.entryId ? `근거 · ${step.entryTitle}` : '근거로 삼을 규칙 없음'}
+                        </ItemSrc>
+                      </ItemTextBlock>
+                    </ItemRow>
+                  ))}
+                </List>
+              </Card>
             )}
 
-            <StatusCard>
-              <DoneRow>
-                <DoneCheck>
-                  <svg
-                    width="11"
-                    height="11"
-                    viewBox="0 0 10 10"
-                    fill="none"
-                    stroke="#fff"
-                    strokeWidth="1.9"
-                  >
-                    <path d="M2 5.2l2 2L8 3" />
-                  </svg>
-                </DoneCheck>
-                <DoneLabel>Done</DoneLabel>
-                <DoneButton onClick={onMoveAction}>{task.undoLabel ?? 'Reopen'}</DoneButton>
-              </DoneRow>
-            </StatusCard>
+            {blanks.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>확인이 필요한 것</CardTitle>
+                  <Tag>{blanks.filter((blank) => blank.needsOwner).length} 대기</Tag>
+                </CardHeader>
+                <List>
+                  {blanks.map((blank) => (
+                    <ItemRow key={blank.id}>
+                      <ItemDot $tone={blank.needsOwner ? 'danger' : 'default'} />
+                      <ItemTextBlock>
+                        <ItemTitle>{blank.questionEn}</ItemTitle>
+                        {blank.answeredBy ? (
+                          <>
+                            <AnswerBlock>{blank.saiAnswerEn || blank.saiAnswerKo}</AnswerBlock>
+                            <AnswerMeta>
+                              {blank.answeredBy === 'SAI'
+                                ? 'SAI 가 핸드북에서 찾은 답'
+                                : '대표가 준 답'}
+                            </AnswerMeta>
+                          </>
+                        ) : (
+                          <ItemSrc>
+                            {blank.escalationId
+                              ? '대표에게 물어봤습니다. 답을 기다리는 중입니다.'
+                              : '아직 아무도 답하지 않았습니다.'}
+                          </ItemSrc>
+                        )}
+                      </ItemTextBlock>
+                      {blank.needsOwner && !blank.escalationId && (
+                        <SmallButton
+                          type="button"
+                          disabled={escalate.pending}
+                          onClick={() => handleEscalate(blank.id)}
+                        >
+                          대표에게 묻기
+                        </SmallButton>
+                      )}
+                    </ItemRow>
+                  ))}
+                </List>
+              </Card>
+            )}
+
+            {questions.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>대표에게 보낸 질문</CardTitle>
+                </CardHeader>
+                <List>
+                  {questions.map((question) => (
+                    <ItemRow key={question.escalationId}>
+                      <ItemDot />
+                      <ItemTextBlock>
+                        <ItemTitle>{question.questionEn}</ItemTitle>
+                        <ItemSrc>{question.draftKo}</ItemSrc>
+                        {question.answerEn || question.answerKo ? (
+                          <AnswerBlock>{question.answerEn || question.answerKo}</AnswerBlock>
+                        ) : null}
+                        <AnswerMeta>
+                          {question.status}
+                          {question.sentAt
+                            ? ` · 보냄 ${formatDateTime(question.sentAt, { fallback: '' })}`
+                            : ''}
+                        </AnswerMeta>
+                      </ItemTextBlock>
+                      {/* 답을 읽었다고 표시해야 카드가 Answered 열에서 빠진다. */}
+                      {question.status === ESCALATION_STATUS.ANSWERED &&
+                        !question.acknowledgedAt && (
+                          <SmallButton
+                            type="button"
+                            disabled={acknowledge.pending}
+                            onClick={() => handleAcknowledge(question.escalationId)}
+                          >
+                            확인함
+                          </SmallButton>
+                        )}
+                    </ItemRow>
+                  ))}
+                </List>
+              </Card>
+            )}
+
+            {relatedRules.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <IconBadge>
+                    <img src={bookIcon} alt="" width={15} height={15} />
+                  </IconBadge>
+                  <CardTitle>Handbook rules for this task</CardTitle>
+                </CardHeader>
+                <List>
+                  {relatedRules.map((rule) => (
+                    <ItemRow key={rule.entryId}>
+                      <ItemDot />
+                      <ItemTextBlock>
+                        <ItemTitle>{rule.title}</ItemTitle>
+                        <ItemSrc>
+                          {[rule.scopeName, rule.source?.label].filter(Boolean).join(' · ')}
+                        </ItemSrc>
+                      </ItemTextBlock>
+                    </ItemRow>
+                  ))}
+                </List>
+              </Card>
+            )}
+
+            <Card>
+              <CardHeader>
+                <IconBadge>
+                  <img src={chatBubbleIcon} alt="" width={15} height={15} />
+                </IconBadge>
+                <CardTitle>Unclear? Ask SAI first.</CardTitle>
+              </CardHeader>
+              <AskInputRow>
+                <AskInput
+                  value={askDraft}
+                  onChange={(e) => setAskDraft(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleAskSend()}
+                  placeholder="Ask something about this task…"
+                />
+                <AskButton onClick={handleAskSend}>Ask</AskButton>
+              </AskInputRow>
+            </Card>
           </>
-        ) : (
-          <>
-            {task.type === 'message' && (
-              <MessageCard>
-                <KickerRow>
-                  <KickerDot $color={task.kickerColor ?? '#8A8A93'} />
-                  <Kicker>{task.kicker}</Kicker>
-                </KickerRow>
-                <MessageEn>{task.en}</MessageEn>
-                <MessageBody>{task.body}</MessageBody>
-              </MessageCard>
-            )}
+        )}
 
-            {task.type === 'main' && (
-              <>
-                <MainCard>
-                  <MainCardTop>
-                    <MainCardDot />
-                    <MainCardKicker>WHAT YOU NEED TO DO</MainCardKicker>
-                    <MainCardWhen>{task.when}</MainCardWhen>
-                  </MainCardTop>
-                  <MainCardBody>
-                    <Purpose>{task.purpose}</Purpose>
-                    <MetaRow>
-                      <DeliverableBox>
-                        <MetaLabel>DELIVERABLE</MetaLabel>
-                        <DeliverableValue>{task.output}</DeliverableValue>
-                      </DeliverableBox>
-                      <DueBox>
-                        <DueLabel>DUE</DueLabel>
-                        <DueValue>{task.deadline}</DueValue>
-                      </DueBox>
-                    </MetaRow>
-                  </MainCardBody>
-                </MainCard>
-
-                {columnId === 'inprogress' && task.steps?.length > 0 && (
-                  <StepsCard>
-                    <StepsHeader>
-                      <IconBadge>
-                        <img src={bookIcon} alt="" width={15} height={15} />
-                      </IconBadge>
-                      <StepsTitle>Handbook rules for this task</StepsTitle>
-                      <SearchableTag>searchable</SearchableTag>
-                    </StepsHeader>
-
-                    <StepList>
-                      {task.steps.map((st, i) => (
-                        <StepRow key={i} onClick={st.onClick}>
-                          <StepDot />
-                          <StepTextBlock>
-                            <StepTitle>{st.title}</StepTitle>
-                            <StepSrc>{st.src}</StepSrc>
-                          </StepTextBlock>
-                          <StepArrow>→</StepArrow>
-                        </StepRow>
-                      ))}
-                    </StepList>
-                  </StepsCard>
-                )}
-
-                {columnId === 'inprogress' && (
-                  <AskCard>
-                    {task.resolved && (
-                      <ResolvedBanner>
-                        <ResolvedIcon>
-                          <img src={chatBubbleIcon} alt="" width={13} height={13} />
-                        </ResolvedIcon>
-                        <div>
-                          <ResolvedTitle>Nice — you are clear to start.</ResolvedTitle>
-                          <ResolvedDesc>Ask any time — I will handle the Korean.</ResolvedDesc>
-                        </div>
-                      </ResolvedBanner>
-                    )}
-
-                    <AskHeader>
-                      <IconBadge>
-                        <img src={chatBubbleIcon} alt="" width={15} height={15} />
-                      </IconBadge>
-                      <AskTitle>Unclear? Ask SAI first.</AskTitle>
-                    </AskHeader>
-
-                    <AskInputRow>
-                      <AskInput
-                        value={askDraft}
-                        onChange={(e) => setAskDraft(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && handleAskSend()}
-                        placeholder="Ask something else…"
-                      />
-                      <AskButton onClick={handleAskSend}>Ask</AskButton>
-                    </AskInputRow>
-                  </AskCard>
-                )}
-
-                {columnId === 'waiting' && (
-                  <MessageCard>
-                    <KickerRow>
-                      <KickerDot $color={task.kickerColor ?? '#FF8A3D'} />
-                      <Kicker>{task.kicker}</Kicker>
-                    </KickerRow>
-                    <MessageEn>{task.en}</MessageEn>
-                    <MessageBody>{task.body}</MessageBody>
-                  </MessageCard>
-                )}
-              </>
-            )}
-
-            {ctaLabel && (
-              <StatusCard>
-                <StatusLabel>TASK STATUS</StatusLabel>
-                <StatusButton onClick={onMoveAction}>{ctaLabel}</StatusButton>
-                {task.moveHint && <StatusHint>{task.moveHint}</StatusHint>}
-              </StatusCard>
-            )}
-          </>
+        {ctaLabel && (
+          <StatusCard>
+            <StatusLabel>TASK STATUS</StatusLabel>
+            <StatusButton onClick={onMoveAction}>{ctaLabel}</StatusButton>
+            {moveHint && <StatusHint>{moveHint}</StatusHint>}
+          </StatusCard>
         )}
       </Body>
     </Overlay>
