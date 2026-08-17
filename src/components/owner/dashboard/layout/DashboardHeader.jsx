@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import { JOB_ROLE_LABEL, ROLE, lookup } from '../../../../apis/constants';
+import { ROLE } from '../../../../apis/constants';
 import { useZoneTime } from '../../../../hooks/member/useZoneTime';
 import NavTabs from './NavTabs';
 import symbol from '../../../../assets/owner/symbol.svg';
@@ -187,7 +187,6 @@ function PresencePerson({ member }) {
       <NameGroup>
         <Dot $online={member?.role === ROLE.OWNER} />
         <PersonName>{member?.user?.name || '이름 없음'}</PersonName>
-        <PersonStatus>{lookup(JOB_ROLE_LABEL, member?.user?.role)}</PersonStatus>
       </NameGroup>
       <TimeText>
         {cityOf(timezone)} {time}
