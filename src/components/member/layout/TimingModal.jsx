@@ -7,7 +7,7 @@ import { EmptyState, ErrorState, LoadingState } from '../../common/AsyncStates';
 import { useMemberNavigation } from '../../../context/member/MemberContext';
 
 const Overlay = styled.div`
-  position: absolute;
+  position: fixed;
   inset: 0;
   z-index: 60;
   background: rgba(23, 23, 27, 0.42);
@@ -27,6 +27,7 @@ const Modal = styled.div`
   border-radius: 22px;
   box-shadow: 0 30px 80px rgba(17, 17, 20, 0.35);
   padding: 26px 28px;
+  transform: scale(${(props) => props.$scale ?? 1});
 `;
 
 const Header = styled.div`
@@ -233,7 +234,7 @@ function PersonClock({ label, person, muted }) {
   );
 }
 
-export default function TimingModal({ onClose, onGoTaskCard }) {
+export default function TimingModal({ onClose, onGoTaskCard, scale = 1 }) {
   const { timing, timingLoading, timingError, reloadTiming, profile } = useMemberNavigation();
 
   const hours = timing?.workingHours;
@@ -268,7 +269,7 @@ export default function TimingModal({ onClose, onGoTaskCard }) {
 
   return (
     <Overlay onClick={onClose}>
-      <Modal onClick={(e) => e.stopPropagation()}>
+      <Modal $scale={scale} onClick={(e) => e.stopPropagation()}>
         <Header>
           <HeaderText>
             <Title>Timing</Title>

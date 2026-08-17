@@ -224,19 +224,19 @@ const ChannelSelect = styled.select`
   outline: none;
 `;
 
+const OwnerNote = styled.div`
+  flex: 1;
+  min-width: 0;
+  font-size: 12.5px;
+  color: #a0a0a8;
+  line-height: 1.5;
+`;
+
 const FooterRow = styled.div`
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 8px;
-  padding-top: 11px;
-  border-top: 1px solid #f2f2f4;
-`;
-
-const OwnerNote = styled.span`
-  flex: 1;
-  min-width: 0;
-  font-size: 12px;
-  color: #b4b4bc;
 `;
 
 const CancelButton = styled.button`

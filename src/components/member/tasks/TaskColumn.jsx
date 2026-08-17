@@ -66,12 +66,16 @@ const ColumnName = styled.span`
 
 const CountBadge = styled.span`
   flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
   font-size: 12px;
   font-weight: 700;
   color: ${(props) => props.$theme.color};
   background: ${(props) => props.$theme.countBg};
-  padding: 2px 9px;
-  border-radius: 20px;
+  border-radius: 50%;
 `;
 
 export default function TaskColumn({ id, name, cards = [], onCardClick, onCtaClick }) {

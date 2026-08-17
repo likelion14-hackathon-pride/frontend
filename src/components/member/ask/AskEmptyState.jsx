@@ -13,7 +13,8 @@ const Wrap = styled.div`
   justify-content: center;
   gap: 18px;
   text-align: center;
-  padding-bottom: 30px;
+  padding: 20px 0 30px;
+  overflow-y: auto;
 `;
 
 const Icon = styled.img`

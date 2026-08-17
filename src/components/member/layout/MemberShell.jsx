@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import MemberTopBar from './MemberTopBar';
 import TimingModal from './TimingModal';
@@ -9,13 +9,23 @@ import logoWordmark from '../../../assets/logo-wordmark.png';
 import { useAuth } from '../../../context/AuthContext';
 import { useMemberNavigation } from '../../../context/member/MemberContext';
 
-const Page = styled.div`
-  display: flex;
-  width: 100%;
-  height: 100vh;
-  padding: 34px;
-  justify-content: center;
-  align-items: center;
+const DESIGN_WIDTH = 1440;
+const DESIGN_HEIGHT = 1024;
+const SIDE_PADDING = 34; // Page 좌우 padding과 반드시 같은 값
+const TOP_BOTTOM_PADDING = 24; // Page 상하 padding과 반드시 같은 값
+
+function computeScale() {
+  const availableWidth = window.innerWidth - SIDE_PADDING * 2;
+  const availableHeight = window.innerHeight - TOP_BOTTOM_PADDING * 2;
+  const widthScale = availableWidth / DESIGN_WIDTH;
+  const heightScale = availableHeight / DESIGN_HEIGHT;
+  return Math.min(1, widthScale, heightScale);
+}
+
+const PageBackground = styled.div`
+  position: fixed;
+  inset: 0;
+  z-index: -1;
   background:
     radial-gradient(
       77.78% 62.5% at 88% 4%,
@@ -31,13 +41,35 @@ const Page = styled.div`
     linear-gradient(127deg, #ffe7d4 0%, #fff2e8 46%, #ffdcc2 100%);
 `;
 
-const Shell = styled.div`
+const Page = styled.div`
   position: relative;
   display: flex;
   width: 100%;
-  max-width: 1440px;
-  align-self: stretch;
-  max-height: 1024px;
+  height: 100vh;
+  padding: ${TOP_BOTTOM_PADDING}px ${SIDE_PADDING}px;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+`;
+
+// Shell을 scale()로 줄이면 실제 차지하는 자리(footprint)는 원래 크기 그대로라서,
+// 줄어든 실제 크기만큼만 공간을 차지하도록 감싸는 바깥 박스
+const StageOuter = styled.div`
+  position: relative;
+  flex: none;
+  width: ${(props) => props.$width}px;
+  height: ${(props) => props.$height}px;
+`;
+
+const Shell = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  width: ${DESIGN_WIDTH}px;
+  height: ${DESIGN_HEIGHT}px;
+  transform: scale(${(props) => props.$scale});
+  transform-origin: top left;
   overflow: hidden;
   border-radius: 24px;
   background:
@@ -140,14 +172,29 @@ const Content = styled.div`
 
 export default function MemberShell({ screenTitle, children }) {
   const [isTzOpen, setIsTzOpen] = useState(false);
+  const [scale, setScale] = useState(computeScale);
   const { profile, goToTasks, home } = useMemberNavigation();
   const { logout } = useAuth();
   // GET /home 의 readToday. 오늘 들어온 원문 수 / 그중 카드가 된 수 / 내가 기다리는 질문 수.
   const readToday = home?.readToday;
 
+  useEffect(() => {
+    function updateScale() {
+      setScale(computeScale());
+    }
+    window.addEventListener('resize', updateScale);
+    return () => window.removeEventListener('resize', updateScale);
+  }, []);
+
+  const scaledWidth = DESIGN_WIDTH * scale;
+  const scaledHeight = DESIGN_HEIGHT * scale;
+
   return (
-    <Page>
-      <Shell>
+  <Page>
+    <PageBackground />
+
+    <StageOuter $width={scaledWidth} $height={scaledHeight}>
+      <Shell $scale={scale}>
         <Sidebar>
           <Logo>
             <MascotImg src={logoMascot} alt="SAI" />
@@ -173,17 +220,19 @@ export default function MemberShell({ screenTitle, children }) {
           <MemberTopBar screenTitle={screenTitle} onOpenTiming={() => setIsTzOpen(true)} />
           <Content>{children}</Content>
         </Main>
-
-        {isTzOpen && (
-          <TimingModal
-            onClose={() => setIsTzOpen(false)}
-            onGoTaskCard={() => {
-              setIsTzOpen(false);
-              goToTasks();
-            }}
-          />
-        )}
       </Shell>
-    </Page>
-  );
+    </StageOuter>
+
+    {isTzOpen && (
+      <TimingModal
+        scale={scale}
+        onClose={() => setIsTzOpen(false)}
+        onGoTaskCard={() => {
+          setIsTzOpen(false);
+          goToTasks();
+        }}
+      />
+    )}
+  </Page>
+);
 }

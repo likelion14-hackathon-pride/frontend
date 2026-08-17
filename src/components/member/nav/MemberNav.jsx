@@ -20,6 +20,7 @@ export default function MemberNav() {
   const { goToHandbook, columns, companyScopes, projectScopes } = useMemberNavigation();
   const isHandbookActive = pathname.startsWith('/member/handbook');
   const isHandbookOpen = isHandbookActive;
+  const isTasksActive = pathname.startsWith('/member/tasks');
   const [isProjectOpen, setIsProjectOpen] = useState(
     pathname.startsWith('/member/handbook/project')
   );
@@ -45,14 +46,10 @@ export default function MemberNav() {
         )}
       </NavItem>
 
-      <NavItem to="/member/tasks" style={({ isActive }) => (isActive ? activeStyle : undefined)}>
-        {({ isActive }) => (
-          <>
-            <IconImg src={tasksIcon} alt="" width={15} height={15} $active={isActive} />
-            <span>Tasks</span>
-            <Badge>{taskCount}</Badge>
-          </>
-        )}
+      <NavItem to="/member/tasks" $active={isTasksActive}>
+        <IconImg src={tasksIcon} alt="" width={15} height={15} $active={isTasksActive} />
+        <span>Tasks</span>
+        <Badge $active={isTasksActive}>{taskCount}</Badge>
       </NavItem>
 
       <NavItem to="/member/ask" style={({ isActive }) => (isActive ? activeStyle : undefined)}>
@@ -137,6 +134,18 @@ const NavWrap = styled.div`
 
 const NavItem = styled(NavLink)`
   ${itemStyles}
+
+  ${(props) =>
+    props.$active &&
+    css`
+      background: linear-gradient(135deg, #ff6000 0%, #ff8a3d 100%);
+      color: #fff;
+      box-shadow: 0 14px 34px -14px rgba(23, 44, 90, 0.22);
+
+      &:hover {
+        box-shadow: 0 18px 38px -14px rgba(23, 44, 90, 0.3);
+      }
+    `}
 `;
 
 const ToggleItem = styled.button`
@@ -161,15 +170,31 @@ const IconImg = styled.img`
 
 const Badge = styled.span`
   margin-left: auto;
-  background: linear-gradient(135deg, #ff6000 0%, #ff8a3d 100%);
-  color: #fff;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
   font-size: 11.5px;
   font-weight: 700;
-  padding: 1px 6px;
-  border-radius: 20px;
-  box-shadow:
-    0 6px 16px rgba(255, 96, 0, 0.28),
-    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  border-radius: 50%;
+  transition: 0.15s;
+
+  ${(props) =>
+    props.$active
+      ? css`
+          background: rgba(255, 255, 255, 0.28);
+          color: #fff;
+          box-shadow: none;
+        `
+      : css`
+          background: linear-gradient(135deg, #ff6000 0%, #ff8a3d 100%);
+          color: #fff;
+          box-shadow:
+            0 6px 16px rgba(255, 96, 0, 0.28),
+            inset 0 1px 0 rgba(255, 255, 255, 0.25);
+        `}
 `;
 
 const Caret = styled.span`

@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { colors } from './theme';
 import chatBubbleIcon from '../../../assets/icons/chat-bubble.svg';
@@ -6,12 +7,23 @@ import logoWordmark from '../../../assets/logo-wordmark.png';
 import mascotHiIcon from '../../../assets/mascot-hi.png';
 import welcomeImage from '../../../assets/welcome.png';
 
-const PageWrapper = styled.div`
-  display: flex;
-  min-height: 100vh;
-  padding: 100px 40px;
-  justify-content: center;
-  align-items: center;
+const DESIGN_WIDTH = 1000;
+const DESIGN_HEIGHT = 778;
+const SIDE_PADDING = 40;
+const TOP_BOTTOM_PADDING = 60;
+
+function computeScale() {
+  const availableWidth = window.innerWidth - SIDE_PADDING * 2;
+  const availableHeight = window.innerHeight - TOP_BOTTOM_PADDING * 2;
+  const widthScale = availableWidth / DESIGN_WIDTH;
+  const heightScale = availableHeight / DESIGN_HEIGHT;
+  return Math.min(1, widthScale, heightScale);
+}
+
+const PageBackground = styled.div`
+  position: fixed;
+  inset: 0;
+  z-index: -1;
   background:
     radial-gradient(
       77.78% 62.5% at 88% 4%,
@@ -25,32 +37,41 @@ const PageWrapper = styled.div`
       rgba(255, 138, 61, 0) 70%
     ),
     linear-gradient(127deg, #ffe7d4 0%, #fff2e8 46%, #ffdcc2 100%);
+`;
 
-  @media (max-width: 900px) {
-    padding: 0;
-    align-items: stretch;
-  }
+const Page = styled.div`
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  padding: ${TOP_BOTTOM_PADDING}px ${SIDE_PADDING}px;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+`;
+
+const StageOuter = styled.div`
+  position: relative;
+  flex: none;
+  width: ${(props) => props.$width}px;
+  height: ${(props) => props.$height}px;
 `;
 
 const Content = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
   display: flex;
-  width: 100%;
-  max-width: 1000px;
-  height: 778px;
-  min-height: 700px;
+  width: ${DESIGN_WIDTH}px;
+  height: ${DESIGN_HEIGHT}px;
+  transform: scale(${(props) => props.$scale});
+  transform-origin: top left;
   border-radius: 24px;
   background: #fff;
   box-shadow:
     0 30px 80px 0 rgba(120, 55, 10, 0.18),
     0 2px 6px 0 rgba(120, 55, 10, 0.06);
   overflow: hidden;
-
-  @media (max-width: 900px) {
-    height: auto;
-    min-height: 100vh;
-    border-radius: 0;
-    box-shadow: none;
-  }
 `;
 
 //왼쪽 카드
@@ -71,10 +92,6 @@ const LeftPanel = styled.div`
       rgba(255, 138, 61, 0) 74%
     ),
     linear-gradient(165deg, #fff6ef 0%, #fff 62%);
-
-  @media (max-width: 900px) {
-    display: none;
-  }
 `;
 
 const Highlight = styled.span`
@@ -197,11 +214,6 @@ const RightPanel = styled.div`
   justify-content: center;
   align-items: center;
   gap: 22px;
-
-  @media (max-width: 900px) {
-    padding: 40px 24px;
-    width: 100%;
-  }
 `;
 
 const FormWrapper = styled.div`
@@ -252,56 +264,73 @@ export default function AuthLayout({
   heroDescriptionLine1,
   heroDescriptionLine2,
 }) {
+  const [scale, setScale] = useState(computeScale);
+
+  useEffect(() => {
+    function updateScale() {
+      setScale(computeScale());
+    }
+    window.addEventListener('resize', updateScale);
+    return () => window.removeEventListener('resize', updateScale);
+  }, []);
+
+  const scaledWidth = DESIGN_WIDTH * scale;
+  const scaledHeight = DESIGN_HEIGHT * scale;
+
   return (
-    <PageWrapper>
-      <Content>
-        <LeftPanel>
-          <HeroBlock>
-            <LeftLogoGroup>
-              <MascotImg src={logoMascot} alt="SAI mascot" width={104} height={108} />
-              <img src={logoWordmark} alt="SAI" width={120} height={52} />
-            </LeftLogoGroup>
+    <Page>
+      <PageBackground />
 
-            <TitleContainer>
-              <TitleBlock>
-                <Title>{heroTitle}</Title>
-                <Description>
-                  {renderLine(heroDescriptionLine1)}
-                  <br />
-                  {renderLine(heroDescriptionLine2)}
-                </Description>
-              </TitleBlock>
-              <ListWrapper>
-                {checklist.map((item, i) => (
-                  <TextList key={i}>
-                    <IconBadge>
-                      <img src={chatBubbleIcon} alt="" width={12} height={12} />
-                    </IconBadge>
-                    {item}
-                  </TextList>
-                ))}
-              </ListWrapper>
-            </TitleContainer>
-          </HeroBlock>
+      <StageOuter $width={scaledWidth} $height={scaledHeight}>
+        <Content $scale={scale}>
+          <LeftPanel>
+            <HeroBlock>
+              <LeftLogoGroup>
+                <MascotImg src={logoMascot} alt="SAI mascot" width={104} height={108} />
+                <img src={logoWordmark} alt="SAI" width={120} height={52} />
+              </LeftLogoGroup>
 
-          <LanguageRow>
-            <LanguageOption $active={lang === 'ko'} onClick={() => onLangChange?.('ko')}>
-              한국어
-            </LanguageOption>
-            <LanguageOption $active={lang === 'en'} onClick={() => onLangChange?.('en')}>
-              English
-            </LanguageOption>
-          </LanguageRow>
-        </LeftPanel>
+              <TitleContainer>
+                <TitleBlock>
+                  <Title>{heroTitle}</Title>
+                  <Description>
+                    {renderLine(heroDescriptionLine1)}
+                    <br />
+                    {renderLine(heroDescriptionLine2)}
+                  </Description>
+                </TitleBlock>
+                <ListWrapper>
+                  {checklist.map((item, i) => (
+                    <TextList key={i}>
+                      <IconBadge>
+                        <img src={chatBubbleIcon} alt="" width={12} height={12} />
+                      </IconBadge>
+                      {item}
+                    </TextList>
+                  ))}
+                </ListWrapper>
+              </TitleContainer>
+            </HeroBlock>
 
-        <RightPanel>
-          <RightBrandRow>
-            <MascotHiImg src={mascotHiIcon} alt="" />
-            <WelcomeImg src={welcomeImage} alt={brandWelcome} />
-          </RightBrandRow>
-          <FormWrapper>{children}</FormWrapper>
-        </RightPanel>
-      </Content>
-    </PageWrapper>
+            <LanguageRow>
+              <LanguageOption $active={lang === 'ko'} onClick={() => onLangChange?.('ko')}>
+                한국어
+              </LanguageOption>
+              <LanguageOption $active={lang === 'en'} onClick={() => onLangChange?.('en')}>
+                English
+              </LanguageOption>
+            </LanguageRow>
+          </LeftPanel>
+
+          <RightPanel>
+            <RightBrandRow>
+              <MascotHiImg src={mascotHiIcon} alt="" />
+              <WelcomeImg src={welcomeImage} alt={brandWelcome} />
+            </RightBrandRow>
+            <FormWrapper>{children}</FormWrapper>
+          </RightPanel>
+        </Content>
+      </StageOuter>
+    </Page>
   );
 }
