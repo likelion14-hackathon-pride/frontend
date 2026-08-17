@@ -46,6 +46,10 @@ const Title = styled.span`
   letter-spacing: -0.2px;
   line-height: 1.35;
   color: #17171b;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 `;
 
 const MoreDots = styled.span`

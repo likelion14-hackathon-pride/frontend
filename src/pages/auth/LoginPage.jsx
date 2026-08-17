@@ -10,9 +10,10 @@ import OwnerSignupForm from '../../components/auth/OwnerSignupForm';
 import MemberSignupForm from '../../components/auth/MemberSignupForm';
 import MemberSetupForm from '../../components/auth/MemberSetupForm';
 import { translations } from '../../components/auth/translations';
-
 import mailIcon from '../../assets/icons/mail.svg';
 import lockIcon from '../../assets/icons/lock.svg';
+
+
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -22,7 +23,6 @@ export default function LoginPage() {
   const [mode, setMode] = useState('signup');
   const [role, setRole] = useState('owner');
 
-  // 팀원 가입 2단계(1: 기본 정보, 2: 회원 설정)
   const [memberStep, setMemberStep] = useState(1);
 
   const [name, setName] = useState('');
@@ -30,6 +30,8 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [inviteCode, setInviteCode] = useState('');
+  
+  
 
   // 팀원 2단계(회원 설정) 전용 필드
   const [workLocation, setWorkLocation] = useState('');
@@ -45,16 +47,14 @@ export default function LoginPage() {
     setMemberStep(1);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (mode === 'login') {
       if (!email || !password) {
         alert(t.errorLoginRequired);
         return;
       }
-      // 로그인 API 호출 → 응답에 담긴 역할(오너/팀원 여부)로 이동 경로 분기
-      // 오너 이메일인지 판별하는 로직은 백엔드에서 처리하고, 응답의 role 값을 그대로 사용
-      // const { role: loggedInRole, ...profile } = await loginApi({ email, password });
-      const loggedInRole = 'member'; // TODO: 실제 로그인 API 응답 값으로 교체
+      
+      const loggedInRole = 'member'; 
       navigate(loggedInRole === 'owner' ? '/owner' : '/member');
       return;
     }

@@ -38,10 +38,8 @@ const EmptyButton = styled.button`
 const Grid = styled.div`
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 12px;
+  gap: 10px;
   align-items: start;
-  overflow-x: auto;
-  padding: 4px 4px 30px;
 `;
 
 export default function TaskBoard({

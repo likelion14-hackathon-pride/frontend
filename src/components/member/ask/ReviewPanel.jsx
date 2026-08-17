@@ -200,17 +200,10 @@ const Hint = styled.div`
 const FooterRow = styled.div`
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 8px;
-  padding-top: 11px;
-  border-top: 1px solid #f2f2f4;
 `;
 
-const OwnerNote = styled.span`
-  flex: 1;
-  min-width: 0;
-  font-size: 12px;
-  color: #b4b4bc;
-`;
 
 const CancelButton = styled.button`
   flex: none;
@@ -306,7 +299,6 @@ export default function ReviewPanel({ enText, krText, hint, ownerNote, onCancel,
       {hint && <Hint>{hint}</Hint>}
 
       <FooterRow>
-        <OwnerNote>{ownerNote}</OwnerNote>
         <CancelButton onClick={onCancel}>Cancel</CancelButton>
         <SendButton onClick={() => onSend(addedItems)}>Send in Slack</SendButton>
       </FooterRow>

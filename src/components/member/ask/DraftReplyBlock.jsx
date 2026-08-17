@@ -105,10 +105,7 @@ export default function DraftReplyBlock({
       )}
 
       {view === 'sent' && (
-        <SentConfirmation
-          label={sentLabel ?? "Sent to 김대표's thread in #payment-api"}
-          onClose={onCancelReview}
-        />
+        <SentConfirmation label={sentLabel ?? "Sent to message in #payment-api"}/>
       )}
     </Box>
   );

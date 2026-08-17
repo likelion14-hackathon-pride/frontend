@@ -424,8 +424,8 @@ const AskInput = styled.input`
   outline: none;
 
   &:focus {
-    border-color: #ff6000;
-    box-shadow: 0 0 0 3px rgba(255, 96, 0, 0.12);
+    border-color: #dddbd9;
+    box-shadow: 0 0 0 3px rgba(213, 213, 213, 0.12);
   }
 `;
 

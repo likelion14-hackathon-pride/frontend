@@ -29,21 +29,7 @@ const Label = styled.span`
   color: #2e7d46;
 `;
 
-const CloseButton = styled.button`
-  flex: none;
-  font-size: 12.5px;
-  font-weight: 700;
-  color: #8a8a93;
-  cursor: pointer;
-  background: transparent;
-  border: none;
-
-  &:hover {
-    color: #17171b;
-  }
-`;
-
-export default function SentConfirmation({ label, onClose }) {
+export default function SentConfirmation({ label }) {
   return (
     <Box>
       <CheckIcon>
@@ -52,7 +38,6 @@ export default function SentConfirmation({ label, onClose }) {
         </svg>
       </CheckIcon>
       <Label>{label}</Label>
-      <CloseButton onClick={onClose}>Close</CloseButton>
     </Box>
   );
 }
