@@ -350,7 +350,7 @@ export default function ReviewPanel({
       {hint && <Hint>{hint}</Hint>}
 
       <ChannelRow>
-        <ChannelLabel>보낼 채널</ChannelLabel>
+        <ChannelLabel>Sent to</ChannelLabel>
         <ChannelSelect
           value={itemId ?? ''}
           onChange={(event) => setItemId(Number(event.target.value))}
@@ -364,7 +364,7 @@ export default function ReviewPanel({
       </ChannelRow>
 
       <FooterRow>
-        <OwnerNote>보내면 대표님 슬랙 채널에 한국어로 올라갑니다.</OwnerNote>
+        <OwnerNote>Sent to the owner's Slack channel in Korean.</OwnerNote>
         <CancelButton onClick={onCancel} disabled={pending}>
           Cancel
         </CancelButton>

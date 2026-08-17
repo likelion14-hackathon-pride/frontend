@@ -166,7 +166,7 @@ export default function MemberAskPage() {
                 onEscalated={() => {}}
               />
             ))}
-            {sending && <LoadingState compact label="SAI 가 핸드북을 뒤지는 중…" />}
+            {sending && <LoadingState compact label="SAI 가 핸드북을 확인하고 있어요..." />}
           </MessageList>
         )}
 

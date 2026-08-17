@@ -45,6 +45,13 @@ const HeaderTitle = styled.span`
   font-weight: 700;
 `;
 
+const HeaderNote = styled.span`
+  font-size: 11px;
+  font-weight: 400;
+  color: #a0a0a8;
+  margin-left: 6px;
+`;
+
 const CountBadge = styled.span`
   flex: none;
   white-space: nowrap;
@@ -264,7 +271,9 @@ export default function TodoBoard() {
     <Board>
       <Header>
         <img src={sharpIcon} alt="" width={15} height={15} />
-        <HeaderTitle>TO DO</HeaderTitle>
+        <HeaderTitle>
+          TO DO <HeaderNote> Resets once a day</HeaderNote>
+        </HeaderTitle>
         <CountBadge>{remainingCount} remaining</CountBadge>
       </Header>
 

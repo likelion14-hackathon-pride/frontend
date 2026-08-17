@@ -48,7 +48,7 @@ const Subtitle = styled.div`
 `;
 
 export default function HandbookHeader({ mode = 'company', projectName }) {
-  const title = mode === 'company' ? 'Company system' : projectName || 'Project';
+  const title = mode === 'company' ? 'Company system' : 'By project';
   const subtitle =
     mode === 'company' ? 'Applies across the whole company' : 'Applies to this project only';
 

@@ -6,6 +6,7 @@ import searchIcon from '../../../assets/icons/search.svg';
 const Card = styled.div`
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 14px;
   flex: 1 1 320px;
   min-width: 280px;
@@ -106,29 +107,6 @@ const EnterChip = styled.span`
   font-family: 'IBM Plex Mono', monospace;
 `;
 
-const ChipRow = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 21px;
-`;
-
-const Chip = styled.button`
-  font-size: 13.5px;
-  font-weight: 600;
-  color: #7a3b12;
-  background: rgba(255, 255, 255, 0.34);
-  border: 1px solid rgba(255, 255, 255, 0.55);
-  padding: 8px 13px;
-  border-radius: 20px;
-  cursor: pointer;
-`;
-
-const QUICK_QUESTIONS = [
-  'How fast am I expected to reply?',
-  "What is company's goal?",
-  'Who runs the deploy?',
-];
-
 export default function AskCard() {
   const { goToAsk } = useMemberNavigation();
 
@@ -153,14 +131,6 @@ export default function AskCard() {
         </SearchPlaceholder>
         <EnterChip>Enter ↵</EnterChip>
       </SearchButton>
-
-      <ChipRow>
-        {QUICK_QUESTIONS.map((q) => (
-          <Chip key={q} onClick={goToAsk}>
-            {q}
-          </Chip>
-        ))}
-      </ChipRow>
     </Card>
   );
 }
