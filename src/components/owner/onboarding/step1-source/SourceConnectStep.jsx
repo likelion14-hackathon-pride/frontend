@@ -282,6 +282,18 @@ function SourceConnectStep({ companyId, connections, loading, error, onReload, o
         body: file,
       });
       if (!response.ok) throw new Error('upload failed');
+
+      // 온보딩에서 올린 파일은 다음 단계의 핸드북 초안이 되어야 한다.
+      // 추출을 걸어 두지 않으면 2단계에 아무것도 뜨지 않는다.
+      try {
+        await sourcesApi.startIngestion(companyId, {
+          provider: CONNECTION_KIND.LOCAL,
+          itemIds: [created.sourceFile.id],
+        });
+      } catch {
+        // 파일은 이미 올라갔다. 스케줄러가 대신 처리하므로 여기서 막지 않는다.
+      }
+
       onReload();
     } catch (caught) {
       setUploadError(
