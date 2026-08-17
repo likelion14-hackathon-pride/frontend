@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 
-import { ESCALATION_STATUS, ESCALATION_STATUS_LABEL, lookup } from '../../../../apis/constants';
 import { formatShortKo } from '../../../../utils/time';
 
 const Panel = styled.div`
@@ -194,14 +193,6 @@ function PendingApprovalPanel({ waitingQuestions, onViewAll }) {
                     .join(' · ')}
                 </MetaText>
               </TextGroup>
-              <CheckButton
-                type="button"
-                $resolved={question.status === ESCALATION_STATUS.DRAFT}
-                title={lookup(ESCALATION_STATUS_LABEL, question.status)}
-                aria-label={lookup(ESCALATION_STATUS_LABEL, question.status)}
-              >
-                <CheckIcon />
-              </CheckButton>
             </Row>
           ))
         )}
