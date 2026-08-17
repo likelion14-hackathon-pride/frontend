@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import { formatShortKo } from '../../../../utils/time';
@@ -227,6 +227,11 @@ const EmptyPanel = styled.div`
 function HandbookDetailPanel({ item, pending = false, onSave, onDelete }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState('');
+
+  // 수정 중 다른 문항으로 넘어가면 수정 상태를 유지하지 않고 바로 그 문항을 보여준다.
+  useEffect(() => {
+    setEditing(false);
+  }, [item?.id]);
 
   if (!item) {
     return (

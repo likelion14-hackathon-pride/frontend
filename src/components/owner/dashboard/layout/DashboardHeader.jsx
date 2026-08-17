@@ -5,7 +5,7 @@ import { useZoneTime } from '../../../../hooks/member/useZoneTime';
 import NavTabs from './NavTabs';
 import symbol from '../../../../assets/owner/symbol.svg';
 import wordmark from '../../../../assets/owner/wordmark.svg';
-import bellIcon from '../../../../assets/owner/bell.svg';
+import logoutIcon from '../../../../assets/owner/logout.svg';
 
 const Bar = styled.header`
   box-sizing: border-box;
@@ -131,7 +131,7 @@ const TimeText = styled.span`
   line-height: 15px;
 `;
 
-const BellButton = styled.button`
+const LogoutButton = styled.button`
   display: flex;
   width: 36px;
   height: 36px;
@@ -145,9 +145,9 @@ const BellButton = styled.button`
   cursor: pointer;
 `;
 
-const BellIcon = styled.img`
+const LogoutIcon = styled.img`
   width: 15px;
-  height: 15px;
+  height: 15px; 
   flex-shrink: 0;
 `;
 
@@ -168,7 +168,7 @@ const Avatar = styled.div`
   font-weight: 700;
   line-height: 128%;
   border: none;
-  cursor: pointer;
+  cursor: default;
 `;
 
 function cityOf(timezone) {
@@ -225,11 +225,11 @@ function DashboardHeader({ activeTab, onTabChange, members = [], userName, onLog
           </PresenceList>
         </TimezonePanel>
 
-        <BellButton type="button" aria-label="알림">
-          <BellIcon src={bellIcon} alt="" />
-        </BellButton>
+        <LogoutButton type="button" onClick={onLogout} aria-label="로그아웃" title="로그아웃">
+          <LogoutIcon src={logoutIcon} alt="" />
+        </LogoutButton>
 
-        <Avatar as="button" type="button" onClick={onLogout} title="로그아웃">
+        <Avatar as="button" type="button">
           {userInitial}
         </Avatar>
       </RightGroup>

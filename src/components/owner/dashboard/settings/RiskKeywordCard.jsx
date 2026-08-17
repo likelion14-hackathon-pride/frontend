@@ -60,6 +60,7 @@ const ChipWrap = styled.div`
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
+  align-content: flex-start;
   gap: 10px;
   flex: 1 0 0;
 `;
