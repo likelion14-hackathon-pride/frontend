@@ -19,7 +19,6 @@ import { colors } from '../theme';
 import githubIcon from '../../../../assets/owner/github.svg';
 import slackIcon from '../../../../assets/owner/slack.svg';
 import localFileIcon from '../../../../assets/owner/local-file.svg';
-import nextArrowTrans from '../../../../assets/owner/next_arrow_trans.svg';
 import nextArrowBlack from '../../../../assets/owner/next_arrow_black.svg';
 
 const GithubIconCrop = styled.span`
@@ -387,7 +386,7 @@ function SourceConnectStep({ companyId, connections, loading, error, onReload, o
           </CtaTextGroup>
           <CtaButton type="button" onClick={onCreateDraft}>
             <CtaButtonLabel>기본 규칙 정하기</CtaButtonLabel>
-            <img src={connectedCount === 0 ? nextArrowTrans : nextArrowBlack} alt="" />
+            <img src={nextArrowBlack} alt="" />
           </CtaButton>
         </CtaBar>
       </StepContent>
