@@ -59,21 +59,15 @@ const CardRow = styled.div`
 `;
 
 function SettingsTab({ companyId }) {
-  const keywordsQuery = useAsync(
-    () => policyApi.fetchRiskKeywords(companyId),
-    [companyId],
-    { enabled: Boolean(companyId) }
-  );
-  const settingsQuery = useAsync(
-    () => companiesApi.fetchCompanySettings(companyId),
-    [companyId],
-    { enabled: Boolean(companyId) }
-  );
-  const companyQuery = useAsync(
-    () => companiesApi.fetchCompany(companyId),
-    [companyId],
-    { enabled: Boolean(companyId) }
-  );
+  const keywordsQuery = useAsync(() => policyApi.fetchRiskKeywords(companyId), [companyId], {
+    enabled: Boolean(companyId),
+  });
+  const settingsQuery = useAsync(() => companiesApi.fetchCompanySettings(companyId), [companyId], {
+    enabled: Boolean(companyId),
+  });
+  const companyQuery = useAsync(() => companiesApi.fetchCompany(companyId), [companyId], {
+    enabled: Boolean(companyId),
+  });
 
   const addKeyword = useMutation((payload) => policyApi.createRiskKeyword(companyId, payload));
   const removeKeyword = useMutation((id) => policyApi.deleteRiskKeyword(companyId, id));
@@ -125,7 +119,9 @@ function SettingsTab({ companyId }) {
       </HeaderTextGroup>
 
       <InlineError
-        error={addKeyword.error || removeKeyword.error || updateSettings.error || keywordsQuery.error}
+        error={
+          addKeyword.error || removeKeyword.error || updateSettings.error || keywordsQuery.error
+        }
         onRetry={keywordsQuery.error ? keywordsQuery.reload : undefined}
       />
 

@@ -80,15 +80,8 @@ function greetingFor(date = new Date()) {
 }
 
 export default function MemberHomePage() {
-  const {
-    profile,
-    home,
-    homeLoading,
-    homeError,
-    reloadHome,
-    goToTasks,
-    scopes,
-  } = useMemberNavigation();
+  const { profile, home, homeLoading, homeError, reloadHome, goToTasks, scopes } =
+    useMemberNavigation();
 
   const resolution = home?.resolution;
   // 분모가 0이면 비율을 낼 수 없다. 카드가 'No data yet' 을 그리도록 null 을 넘긴다.

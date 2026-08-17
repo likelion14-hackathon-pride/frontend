@@ -142,8 +142,6 @@ const MetaText = styled.span`
   white-space: nowrap;
 `;
 
-
-
 const EmptyRow = styled.div`
   display: flex;
   align-items: center;

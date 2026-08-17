@@ -126,14 +126,17 @@ function HandbookReviewStep({ companyId, onFinish }) {
   const createScope = useMutation((name) => handbookApi.createProjectScope(companyId, { name }));
 
   const categories = useMemo(
-    () => groupByCategory(company.questions.map((question) => ({
-      templateKey: question.id,
-      category: question.category,
-      question: question.text,
-      title: question.title,
-      options: question.options,
-      placeholder: question.placeholder,
-    }))),
+    () =>
+      groupByCategory(
+        company.questions.map((question) => ({
+          templateKey: question.id,
+          category: question.category,
+          question: question.text,
+          title: question.title,
+          options: question.options,
+          placeholder: question.placeholder,
+        }))
+      ),
     [company.questions]
   );
 

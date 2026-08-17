@@ -111,7 +111,8 @@ export function AsyncSection({
   children,
 }) {
   if (loading && data == null) return <LoadingState compact={compact} label={loadingLabel} />;
-  if (error && data == null) return <ErrorState error={error} onRetry={onRetry} compact={compact} />;
+  if (error && data == null)
+    return <ErrorState error={error} onRetry={onRetry} compact={compact} />;
   return children;
 }
 

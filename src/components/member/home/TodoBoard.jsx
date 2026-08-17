@@ -207,11 +207,9 @@ const AddCircle = styled.button`
 export default function TodoBoard() {
   const { companyId, reloadHome } = useMemberNavigation();
 
-  const tasksQuery = useAsync(
-    () => cardsApi.fetchTasks(companyId),
-    [companyId],
-    { enabled: Boolean(companyId) }
-  );
+  const tasksQuery = useAsync(() => cardsApi.fetchTasks(companyId), [companyId], {
+    enabled: Boolean(companyId),
+  });
 
   const [isAdding, setIsAdding] = useState(false);
   const [draft, setDraft] = useState('');
@@ -273,7 +271,9 @@ export default function TodoBoard() {
       <Body>
         <InlineError error={toggle.error || create.error} />
 
-        {tasksQuery.loading && !tasksQuery.data && <LoadingState compact label="할 일을 불러오는 중…" />}
+        {tasksQuery.loading && !tasksQuery.data && (
+          <LoadingState compact label="할 일을 불러오는 중…" />
+        )}
         {tasksQuery.error && !tasksQuery.data && (
           <ErrorState error={tasksQuery.error} onRetry={tasksQuery.reload} compact />
         )}

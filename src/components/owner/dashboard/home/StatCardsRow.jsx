@@ -57,9 +57,7 @@ function StatCardsRow({ resolution, answerReuse, ownerTimeSaved, handbook }) {
         value={handbook.totalCount}
         delta={`이번 주 +${handbook.thisWeekCount}`}
         months={toBars(handbook.monthlyTrend)}
-        footnote={
-          handbook.lastConfirmedAt ? '누적 확정 규칙 수' : '아직 확정된 규칙이 없습니다'
-        }
+        footnote={handbook.lastConfirmedAt ? '누적 확정 규칙 수' : '아직 확정된 규칙이 없습니다'}
       />
     </Row>
   );

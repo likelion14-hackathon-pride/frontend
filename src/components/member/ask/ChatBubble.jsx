@@ -105,17 +105,12 @@ export default function ChatBubble({ message, channels = [] }) {
   const citations = message.citations ?? [];
   const warnings = message.warnings ?? [];
   const needsOwner = message.resultType === ASK_RESULT_TYPE.NEEDS_OWNER;
-  const bodyText =
-    message.body ||
-    EMPTY_ANSWER_TEXT[message.verdict] ||
-    EMPTY_ANSWER_TEXT.DEFAULT;
+  const bodyText = message.body || EMPTY_ANSWER_TEXT[message.verdict] || EMPTY_ANSWER_TEXT.DEFAULT;
 
   // 근거는 규칙(entryId)일 수도, 과거 대화(chunkId)일 수도 있다. 화면은 한 가지로만 그린다.
   const sources = citations.map((citation) => ({
     kr: citation.title ?? '(제목 없음)',
-    line: [citation.scopeName, citation.permalink ? '원문 보기' : null]
-      .filter(Boolean)
-      .join(' · '),
+    line: [citation.scopeName, citation.permalink ? '원문 보기' : null].filter(Boolean).join(' · '),
     href: citation.permalink,
   }));
 

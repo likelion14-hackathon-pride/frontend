@@ -26,8 +26,7 @@ export const ENDPOINTS = {
   onboarding: {
     root: (companyId) => `${co(companyId)}/onboarding`,
     complete: (companyId) => `${co(companyId)}/onboarding/complete`,
-    question: (companyId, templateKey) =>
-      `${co(companyId)}/onboarding/questions/${templateKey}`,
+    question: (companyId, templateKey) => `${co(companyId)}/onboarding/questions/${templateKey}`,
   },
   riskKeywords: {
     list: (companyId) => `${co(companyId)}/risk-keywords`,
@@ -38,17 +37,14 @@ export const ENDPOINTS = {
     entries: (companyId) => `${co(companyId)}/handbook/entries`,
     reviewAll: (companyId) => `${co(companyId)}/handbook/entries/review-all`,
     entry: (companyId, entryId) => `${co(companyId)}/handbook/entries/${entryId}`,
-    entryEvidence: (companyId, entryId) =>
-      `${co(companyId)}/handbook/entries/${entryId}/evidence`,
-    entryReview: (companyId, entryId) =>
-      `${co(companyId)}/handbook/entries/${entryId}/review`,
+    entryEvidence: (companyId, entryId) => `${co(companyId)}/handbook/entries/${entryId}/evidence`,
+    entryReview: (companyId, entryId) => `${co(companyId)}/handbook/entries/${entryId}/review`,
   },
   sources: {
     channels: (companyId) => `${co(companyId)}/channels`,
     channelMessages: (companyId, itemId) => `${co(companyId)}/channels/${itemId}/messages`,
     connections: (companyId) => `${co(companyId)}/source-connections`,
-    connection: (companyId, connectionId) =>
-      `${co(companyId)}/source-connections/${connectionId}`,
+    connection: (companyId, connectionId) => `${co(companyId)}/source-connections/${connectionId}`,
     files: (companyId) => `${co(companyId)}/source-files`,
     file: (companyId, itemId) => `${co(companyId)}/source-files/${itemId}`,
     connectionChannels: (companyId, connectionId) =>
@@ -68,12 +64,10 @@ export const ENDPOINTS = {
   },
   qna: {
     ask: (companyId) => `${co(companyId)}/ask`,
-    threadMessages: (companyId, threadId) =>
-      `${co(companyId)}/qna/threads/${threadId}/messages`,
+    threadMessages: (companyId, threadId) => `${co(companyId)}/qna/threads/${threadId}/messages`,
     questions: (companyId) => `${co(companyId)}/questions`,
     question: (companyId, escalationId) => `${co(companyId)}/questions/${escalationId}`,
-    questionSend: (companyId, escalationId) =>
-      `${co(companyId)}/questions/${escalationId}/send`,
+    questionSend: (companyId, escalationId) => `${co(companyId)}/questions/${escalationId}/send`,
     questionCheckAnswer: (companyId, escalationId) =>
       `${co(companyId)}/questions/${escalationId}/check-answer`,
     questionApprove: (companyId, escalationId) =>

@@ -154,7 +154,13 @@ const AddChip = styled.button`
   }
 `;
 
-function RiskKeywordCard({ keywords, loading = false, pending = false, onAddKeyword, onRemoveKeyword }) {
+function RiskKeywordCard({
+  keywords,
+  loading = false,
+  pending = false,
+  onAddKeyword,
+  onRemoveKeyword,
+}) {
   const [modalOpen, setModalOpen] = useState(false);
 
   return (

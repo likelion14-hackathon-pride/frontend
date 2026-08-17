@@ -459,15 +459,11 @@ export default function TaskDetailPanel({ card, isWide, onToggleWide, onClose, o
 
   // 상세는 목록에 없는 것(수행 단계·미정 항목·근거 규칙·위험 경고)을 담고 있다.
   // 여는 순간 서버가 읽음으로 표시한다.
-  const detailQuery = useAsync(
-    () => cardsApi.fetchCard(companyId, cardId),
-    [companyId, cardId],
-    { enabled: Boolean(companyId && cardId) }
-  );
+  const detailQuery = useAsync(() => cardsApi.fetchCard(companyId, cardId), [companyId, cardId], {
+    enabled: Boolean(companyId && cardId),
+  });
 
-  const escalate = useMutation((blankId) =>
-    qnaApi.createEscalation(companyId, { blankId })
-  );
+  const escalate = useMutation((blankId) => qnaApi.createEscalation(companyId, { blankId }));
   const acknowledge = useMutation((escalationId) =>
     qnaApi.acknowledgeEscalation(companyId, escalationId)
   );
@@ -556,7 +552,9 @@ export default function TaskDetailPanel({ card, isWide, onToggleWide, onClose, o
 
         <InlineError error={escalate.error || acknowledge.error} />
 
-        {detailQuery.loading && !detail && <LoadingState compact label="카드 상세를 불러오는 중…" />}
+        {detailQuery.loading && !detail && (
+          <LoadingState compact label="카드 상세를 불러오는 중…" />
+        )}
         {detailQuery.error && !detail && (
           <ErrorState error={detailQuery.error} onRetry={detailQuery.reload} compact />
         )}

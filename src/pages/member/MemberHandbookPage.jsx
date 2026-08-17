@@ -26,9 +26,7 @@ function toRuleItem(entry, index) {
     id: entry.id,
     title: entry.ruleEn || entry.title,
     // 접힌 줄에도 출처가 보인다. 근거가 없으면 어디서 만들어졌는지라도 보여 준다.
-    sourceTag:
-      source?.label ??
-      lookup(ENTRY_ORIGIN_LABEL, entry.sourceType),
+    sourceTag: source?.label ?? lookup(ENTRY_ORIGIN_LABEL, entry.sourceType),
     desc: entry.ruleEn && entry.ruleEn !== entry.title ? entry.title : null,
     quote: entry.originalKo,
     sourceLine: source
@@ -71,9 +69,7 @@ export default function MemberHandbookPage() {
     ];
 
     return ordered.map((scope) => {
-      const items = entries
-        .filter((entry) => entry.scopeId === scope.id)
-        .map(toRuleItem);
+      const items = entries.filter((entry) => entry.scopeId === scope.id).map(toRuleItem);
       return {
         id: scope.id,
         name: scope.name || lookup(AREA_KEY_LABEL, scope.areaKey),

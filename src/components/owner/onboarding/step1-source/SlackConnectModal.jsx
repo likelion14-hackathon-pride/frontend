@@ -1821,7 +1821,12 @@ settings:
             <ContentDescription style={{ margin: '8px 0 0' }}>
               채널마다 최근 대화를 가져옵니다. 슬랙 무료 플랜은 90일 이전 기록을 제공하지 않습니다.
             </ContentDescription>
-            {channelsLoading && <StatusRow><Spinner /><StatusTitle>채널 목록을 받는 중…</StatusTitle></StatusRow>}
+            {channelsLoading && (
+              <StatusRow>
+                <Spinner />
+                <StatusTitle>채널 목록을 받는 중…</StatusTitle>
+              </StatusRow>
+            )}
             {channelsError && (
               <ErrorRow>
                 <ErrorIcon>!</ErrorIcon>

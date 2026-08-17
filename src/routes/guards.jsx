@@ -64,15 +64,16 @@ const Button = styled.button`
 // 세션 부트스트랩이 네트워크나 5xx 로 실패했을 때는 로그인 화면으로 보내지 않는다.
 // 서버가 잠깐 죽었다고 토큰을 버리면 복구할 방법이 없기 때문이다.
 export function RequireAuth() {
-  const { isAuthenticated, isLoading, bootstrapError, retryBootstrap, setSessionNotice } = useAuth();
+  const { isAuthenticated, isLoading, bootstrapError, retryBootstrap, setSessionNotice } =
+    useAuth();
   const location = useLocation();
 
   const blocked = !isAuthenticated && !isLoading && !bootstrapError;
 
   useEffect(() => {
     if (blocked) {
-      setSessionNotice((prev) =>
-        prev ?? { reason: null, tone: 'warn', text: '로그인이 필요합니다.' }
+      setSessionNotice(
+        (prev) => prev ?? { reason: 'GUARD', tone: 'warn', text: '로그인이 필요합니다.' }
       );
     }
   }, [blocked, setSessionNotice]);
@@ -83,9 +84,7 @@ export function RequireAuth() {
         <Card>
           <Title>서버에 연결하지 못했습니다</Title>
           <ErrorState error={bootstrapError} onRetry={retryBootstrap} compact />
-          <Body>
-            로그인 정보는 그대로 두었습니다. 연결이 돌아오면 다시 시도해 주세요.
-          </Body>
+          <Body>로그인 정보는 그대로 두었습니다. 연결이 돌아오면 다시 시도해 주세요.</Body>
         </Card>
       </Screen>
     );

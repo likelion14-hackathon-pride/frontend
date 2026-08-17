@@ -15,7 +15,10 @@ export function createProjectScope(companyId, { name, description }) {
   });
 }
 
-export function fetchEntries(companyId, { scopeId, scopeKind, status, reviewStatus, cursor, limit } = {}) {
+export function fetchEntries(
+  companyId,
+  { scopeId, scopeKind, status, reviewStatus, cursor, limit } = {}
+) {
   return api.get(ENDPOINTS.handbook.entries(companyId), {
     params: { scopeId, scopeKind, status, reviewStatus, cursor, limit },
   });

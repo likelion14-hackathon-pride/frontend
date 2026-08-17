@@ -324,10 +324,6 @@ const GhostButton = styled.button`
   white-space: nowrap;
 `;
 
-
-
-
-
 const StatusBanner = styled.div`
   display: flex;
   flex-direction: column;
