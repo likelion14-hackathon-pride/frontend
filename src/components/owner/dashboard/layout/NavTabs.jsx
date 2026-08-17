@@ -49,6 +49,7 @@ const Tab = styled.button`
 
   background: ${({ $active }) => ($active ? '#2563eb' : 'transparent')};
   color: ${({ $active }) => ($active ? '#fff' : '#3c3c44')};
+  box-shadow: ${({ $active }) => ($active ? '0 5px 10px 0 rgba(37, 99, 235, 0.40)' : 'none')};
 
   &:hover {
     color: ${({ $active }) => ($active ? '#fff' : '#17171b')};
