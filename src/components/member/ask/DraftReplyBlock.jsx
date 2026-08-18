@@ -119,8 +119,8 @@ export default function DraftReplyBlock({
             </ButtonRow>
           ) : (
             <NoChannelNote>
-              보낼 슬랙 채널이 아직 없습니다. 대표님이 소스 연결에서 채널을 추가해야 보낼 수
-              있습니다.
+              No Slack channel is connected yet. The owner needs to add one under Source connections
+              before this can be sent.
             </NoChannelNote>
           )}
         </>

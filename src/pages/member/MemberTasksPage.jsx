@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 
 import MemberShell from '../../components/member/layout/MemberShell';
@@ -39,6 +39,24 @@ export default function MemberTasksPage() {
   const [activeProject, setActiveProject] = useState('all');
   const [selectedCard, setSelectedCard] = useState(null);
   const [isPanelWide, setIsPanelWide] = useState(false);
+
+  // Slack 답변이 반영되면 card.column 이 바뀐다. 이 화면에 머무는 동안엔
+  // 12초마다, 그리고 다른 탭/창 갔다가 이 화면으로 돌아왔을 때(focus) 다시 불러온다.
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      reloadCards();
+    }, 12000);
+
+    function handleFocus() {
+      reloadCards();
+    }
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      clearInterval(intervalId);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [reloadCards]);
 
   const filteredColumns = useMemo(
     () =>

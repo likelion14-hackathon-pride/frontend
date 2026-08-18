@@ -20,7 +20,7 @@ const CTA_LABEL = {
 };
 
 const MOVE_HINT = {
-  [CARD_COLUMN.READY]: '시작하면 In progress 로 옮겨집니다.',
+  [CARD_COLUMN.READY]: 'Starting this will move it to In progress.',
   DEFAULT: null,
 };
 
@@ -591,7 +591,7 @@ export default function TaskDetailPanel({ card, isWide, onToggleWide, onClose, o
                 <DeliverableBox>
                   <MetaLabel>DELIVERABLE</MetaLabel>
                   <DeliverableValue>
-                    {card.deliverableEn || card.deliverable || '따로 정해지지 않았습니다'}
+                    {card.deliverableEn || card.deliverable || 'Not specified yet'}
                   </DeliverableValue>
                 </DeliverableBox>
                 <DueBox>
@@ -599,13 +599,13 @@ export default function TaskDetailPanel({ card, isWide, onToggleWide, onClose, o
                   <DueValue>
                     {card.deadlineTextEn ||
                       card.deadlineText ||
-                      formatDateTime(card.deadlineAt, { fallback: '기한 없음' })}
+                      formatDateTime(card.deadlineAt, { fallback: 'No deadline' })}
                   </DueValue>
                 </DueBox>
               </MetaRow>
               {card.permalink && (
                 <SourceLink href={card.permalink} target="_blank" rel="noreferrer">
-                  원문 열기 ↗
+                  Open source ↗
                 </SourceLink>
               )}
             </MainCardBody>
@@ -626,9 +626,9 @@ export default function TaskDetailPanel({ card, isWide, onToggleWide, onClose, o
                   <MessageKo>{question.answerKo}</MessageKo>
                 )}
               <AnswerMeta>
-                물어본 것: {question.questionEn}
+                Asked: {question.questionEn}
                 {question.sentAt
-                  ? ` · 보냄 ${formatDateTime(question.sentAt, { fallback: '' })}`
+                  ? ` · Sent ${formatDateTime(question.sentAt, { fallback: '' })}`
                   : ''}
               </AnswerMeta>
               {!question.acknowledgedAt && (
@@ -638,7 +638,7 @@ export default function TaskDetailPanel({ card, isWide, onToggleWide, onClose, o
                   onClick={() => handleAcknowledge(question.escalationId)}
                   style={{ marginTop: 10 }}
                 >
-                  확인함
+                  Noted
                 </SmallButton>
               )}
             </Card>
@@ -658,9 +658,7 @@ export default function TaskDetailPanel({ card, isWide, onToggleWide, onClose, o
 
         <InlineError error={acknowledge.error} />
 
-        {detailQuery.loading && !detail && (
-          <LoadingState compact label="카드 상세를 불러오는 중…" />
-        )}
+        {detailQuery.loading && !detail && <LoadingState compact label="Loading task details…" />}
         {detailQuery.error && !detail && (
           <ErrorState error={detailQuery.error} onRetry={detailQuery.reload} compact />
         )}

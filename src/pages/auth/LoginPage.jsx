@@ -54,7 +54,7 @@ export default function LoginPage() {
   const [lang, setLang] = useState('ko');
   const t = translations[lang];
 
-  const [mode, setMode] = useState('signup');
+  const [mode, setMode] = useState('login');
   const [role, setRole] = useState('owner');
 
   const [memberStep, setMemberStep] = useState(1);

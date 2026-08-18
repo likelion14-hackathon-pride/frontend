@@ -30,11 +30,11 @@ export default function ModeToggle({
 }) {
   return (
     <Wrapper>
-      <Option type="button" $active={value === 'signup'} onClick={() => onChange('signup')}>
-        {signupLabel}
-      </Option>
       <Option type="button" $active={value === 'login'} onClick={() => onChange('login')}>
         {loginLabel}
+      </Option>
+      <Option type="button" $active={value === 'signup'} onClick={() => onChange('signup')}>
+        {signupLabel}
       </Option>
     </Wrapper>
   );
