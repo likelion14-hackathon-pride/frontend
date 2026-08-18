@@ -280,9 +280,7 @@ export default function TodoBoard() {
       <Body>
         <InlineError error={toggle.error || create.error} />
 
-        {tasksQuery.loading && !tasksQuery.data && (
-          <LoadingState compact label="Loading tasks…" />
-        )}
+        {tasksQuery.loading && !tasksQuery.data && <LoadingState compact label="Loading tasks…" />}
         {tasksQuery.error && !tasksQuery.data && (
           <ErrorState error={tasksQuery.error} onRetry={tasksQuery.reload} compact />
         )}
@@ -290,10 +288,7 @@ export default function TodoBoard() {
         {tasksQuery.data && (
           <TaskList>
             {tasks.length === 0 ? (
-              <EmptyState
-                compact
-                label="No tasks yet. You can add one below."
-              />
+              <EmptyState compact label="No tasks yet. You can add one below." />
             ) : (
               tasks.map((task) => (
                 <Row

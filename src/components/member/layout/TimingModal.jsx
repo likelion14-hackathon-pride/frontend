@@ -342,7 +342,9 @@ export default function TimingModal({ onClose, onGoTaskCard, scale = 1 }) {
                       <ListItemSrc>
                         {[
                           item.scopeName,
-                          item.escalationStatus ? `Question ${item.escalationStatus}` : 'Not sent yet',
+                          item.escalationStatus
+                            ? `Question ${item.escalationStatus}`
+                            : 'Not sent yet',
                         ]
                           .filter(Boolean)
                           .join(' · ')}

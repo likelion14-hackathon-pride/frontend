@@ -75,7 +75,7 @@ const OutOfScope = styled.div`
 // verdict 별로 답이 없는 이유가 다르다. 빈 말풍선을 띄우지 않도록 문장을 정해 둔다.
 const EMPTY_ANSWER_TEXT = {
   [VERDICT.NO_SOURCE]: 'No basis found in the handbook, so no answer was given.',
-  [VERDICT.NEEDS_DECISION]: "This needs a decision, not a rule lookup.",
+  [VERDICT.NEEDS_DECISION]: 'This needs a decision, not a rule lookup.',
   [VERDICT.OUT_OF_SCOPE]: "This doesn't seem related to this team's rules.",
   DEFAULT: 'Could not generate an answer.',
 };

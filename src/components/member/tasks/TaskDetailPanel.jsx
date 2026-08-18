@@ -627,7 +627,9 @@ export default function TaskDetailPanel({ card, isWide, onToggleWide, onClose, o
                 )}
               <AnswerMeta>
                 Asked: {question.questionEn}
-                {question.sentAt ? ` · Sent ${formatDateTime(question.sentAt, { fallback: '' })}` : ''}
+                {question.sentAt
+                  ? ` · Sent ${formatDateTime(question.sentAt, { fallback: '' })}`
+                  : ''}
               </AnswerMeta>
               {!question.acknowledgedAt && (
                 <SmallButton
@@ -656,9 +658,7 @@ export default function TaskDetailPanel({ card, isWide, onToggleWide, onClose, o
 
         <InlineError error={acknowledge.error} />
 
-        {detailQuery.loading && !detail && (
-          <LoadingState compact label="Loading task details…" />
-        )}
+        {detailQuery.loading && !detail && <LoadingState compact label="Loading task details…" />}
         {detailQuery.error && !detail && (
           <ErrorState error={detailQuery.error} onRetry={detailQuery.reload} compact />
         )}
