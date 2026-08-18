@@ -55,10 +55,16 @@ const LabelRow = styled.div`
   height: 14.667px;
   justify-content: space-between;
   align-items: flex-start;
+  gap: 8px;
   flex-shrink: 0;
 `;
 
 const LabelText = styled.span`
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   color: #6b6b73;
   font-family: 'Plus Jakarta Sans';
   font-size: 11px;
@@ -68,6 +74,8 @@ const LabelText = styled.span`
 `;
 
 const CountText = styled.span`
+  flex-shrink: 0;
+  white-space: nowrap;
   color: #17171b;
   font-family: 'IBM Plex Mono';
   font-size: 10.5px;

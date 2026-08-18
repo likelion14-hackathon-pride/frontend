@@ -66,8 +66,6 @@ const RightColumn = styled.div`
   flex-direction: column;
   flex: 1 1 320px;
   min-width: 0;
-  max-height: 100%;
-  overflow-y: auto;
 `;
 
 function toItem(entry) {

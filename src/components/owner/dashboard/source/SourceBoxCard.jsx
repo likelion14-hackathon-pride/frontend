@@ -179,6 +179,31 @@ const RowMeta = styled.span`
   line-height: 128%;
 `;
 
+const CollectButton = styled.button`
+  display: flex;
+  height: 24px;
+  padding: 0 10px;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  border: 0.667px solid #dbe4fc;
+  border-radius: 8px;
+  cursor: pointer;
+  background: #eef3ff;
+  color: #2563eb;
+  text-align: center;
+  font-family: 'Plus Jakarta Sans';
+  font-size: 10.5px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 121%;
+  white-space: nowrap;
+
+  &:hover {
+    background: #dbe4fc;
+  }
+`;
+
 const FooterRow = styled.div`
   display: flex;
   align-items: center;
@@ -266,6 +291,7 @@ function SourceBoxCard({
   extractedCount = 0,
   lastSync,
   onAddItem,
+  onCollectItem,
 }) {
   const [adding, setAdding] = useState(false);
   const [value, setValue] = useState('');
@@ -321,6 +347,9 @@ function SourceBoxCard({
               <Dot />
               <RowName>{item.name}</RowName>
               <RowMeta>{item.meta}</RowMeta>
+              <CollectButton type="button" onClick={() => onCollectItem?.(item)}>
+                수집
+              </CollectButton>
             </Row>
           ))
         )}

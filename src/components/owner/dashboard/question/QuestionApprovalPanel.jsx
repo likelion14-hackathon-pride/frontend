@@ -540,7 +540,7 @@ function QuestionApprovalPanel({
                       value={draftScopeId}
                       onChange={(e) => setDraftScopeId(e.target.value)}
                     >
-                      <option value="">{proposal.scopeName ?? '기본 지식공간'}</option>
+                      <option value="">회사 규칙 (SAI가 자동 분류)</option>
                       {scopes.map((scope) => (
                         <option key={scope.id} value={scope.id}>
                           {scope.name}

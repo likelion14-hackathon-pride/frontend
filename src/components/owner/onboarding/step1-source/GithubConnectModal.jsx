@@ -1045,8 +1045,8 @@ function GithubConnectModal({ companyId, onClose, onConnected }) {
                   <InstructionText
                     style={{ marginLeft: 28, color: colors.textMuted, fontSize: 12 }}
                   >
-                    예시: <Chip>github.com/settings/installations/154030988</Chip> → Installation
-                    ID: <Chip>154030988</Chip>
+                    예시: <Chip>github.com/settings/installations/154030202</Chip> → Installation
+                    ID: <Chip>154030202</Chip>
                   </InstructionText>
                 </InstructionBox>
 
@@ -1064,7 +1064,7 @@ function GithubConnectModal({ companyId, onClose, onConnected }) {
                     <FieldLabel>Installation ID</FieldLabel>
                     <FieldHint>설치 화면 주소의 마지막 숫자입니다.</FieldHint>
                     <TextInput
-                      placeholder="154030988"
+                      placeholder="154030202"
                       value={installationId}
                       onChange={(event) => setInstallationId(event.target.value)}
                     />

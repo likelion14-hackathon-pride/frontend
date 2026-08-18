@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 
 import * as sourcesApi from '../../../../apis/sources';
+import * as handbookApi from '../../../../apis/handbook';
 import {
   CONNECTION_KIND,
   LOCAL_FILE_EXTENSIONS,
@@ -9,6 +10,7 @@ import {
   LOCAL_FILE_MIME_TYPES,
   LOCAL_FILE_STATUS,
   LOCAL_FILE_STATUS_LABEL,
+  SCOPE_KIND,
   lookup,
 } from '../../../../apis/constants';
 import { toApiError } from '../../../../apis/errors';
@@ -16,6 +18,7 @@ import { ErrorState, InlineError, LoadingState } from '../../../common/AsyncStat
 import { useAsync, useMutation } from '../../../../hooks/useAsync';
 import { formatRelativeKo } from '../../../../utils/time';
 import SourceBoxCard from './SourceBoxCard';
+import CollectScopeModal from './CollectScopeModal';
 import { SOURCE_CONFIG, SOURCE_ORDER, formatBytes } from './sourceTabData';
 import githubIcon from '../../../../assets/owner/github.svg';
 import slackIcon from '../../../../assets/owner/slack.svg';
@@ -112,11 +115,21 @@ const FILE_IN_FLIGHT_STATUSES = [LOCAL_FILE_STATUS.PENDING_UPLOAD, LOCAL_FILE_ST
 
 function SourceTab({ companyId }) {
   const [actionError, setActionError] = useState(null);
+  const [collectTarget, setCollectTarget] = useState(null);
   const fileInputRef = useRef(null);
 
   const connectionsQuery = useAsync(() => sourcesApi.fetchConnections(companyId), [companyId], {
     enabled: Boolean(companyId),
   });
+
+  // 수집 대상 선택창에 "프로젝트" 목록을 보여주려고 부른다. 회사 규칙 4개 영역은
+  // AI 가 알아서 분류하므로 여기서는 프로젝트만 고르면 된다.
+  const scopesQuery = useAsync(() => handbookApi.fetchScopes(companyId), [companyId], {
+    enabled: Boolean(companyId),
+  });
+  const projects = (scopesQuery.data?.items ?? [])
+    .filter((scope) => scope.kind === SCOPE_KIND.PROJECT)
+    .map((scope) => ({ key: scope.id, label: scope.name }));
 
   const connections = connectionsQuery.data?.items ?? [];
   const byKind = new Map(connections.map((connection) => [connection.provider, connection]));
@@ -154,6 +167,34 @@ function SourceTab({ companyId }) {
   const addChannel = useMutation((externalId) =>
     sourcesApi.addChannel(companyId, slack.id, externalId)
   );
+
+  // 로컬 파일은 수집 요청 한 번에 scopeId 를 같이 보낸다(scopeId 없으면 회사 규칙으로 보고
+  // 서버가 영역을 스스로 분류한다). 레포·채널은 먼저 지식공간을 박아 두고 수집을 건다.
+  const collectItem = useMutation(async ({ kind, item, scopeId }) => {
+    if (kind === CONNECTION_KIND.LOCAL) {
+      return sourcesApi.collectFile(companyId, item.id, scopeId);
+    }
+    if (scopeId) {
+      if (kind === CONNECTION_KIND.GITHUB) {
+        await sourcesApi.setRepositoryScope(companyId, github.id, item.id, scopeId);
+      } else if (kind === CONNECTION_KIND.SLACK) {
+        await sourcesApi.setChannelScope(companyId, slack.id, item.id, scopeId);
+      }
+    }
+    return sourcesApi.startIngestion(companyId, { provider: kind, itemIds: [item.id] });
+  });
+
+  const handleCollect = async (scopeId) => {
+    if (!collectTarget) return;
+    const result = await collectItem.mutate({ ...collectTarget, scopeId });
+    if (result.ok) {
+      setCollectTarget(null);
+      reposQuery.reload();
+      channelsQuery.reload();
+      filesQuery.reload();
+      connectionsQuery.reload();
+    }
+  };
 
   // 처리 중인 파일이 남아 있는 동안만 목록을 다시 부른다. 개수가 줄면 타이머를
   // 새로 걸어 남은 파일에 다시 5분을 준다.
@@ -273,6 +314,7 @@ function SourceTab({ companyId }) {
           connectionsQuery.reload();
         }
       },
+      onCollectItem: (item) => setCollectTarget({ kind: CONNECTION_KIND.GITHUB, item }),
     },
     [CONNECTION_KIND.SLACK]: {
       connection: slack,
@@ -293,6 +335,7 @@ function SourceTab({ companyId }) {
           connectionsQuery.reload();
         }
       },
+      onCollectItem: (item) => setCollectTarget({ kind: CONNECTION_KIND.SLACK, item }),
     },
     [CONNECTION_KIND.LOCAL]: {
       connection: byKind.get(CONNECTION_KIND.LOCAL),
@@ -305,6 +348,7 @@ function SourceTab({ companyId }) {
       })),
       available: null, // 파일은 목록에서 고르는 것이 아니라 올린다.
       onAdd: () => fileInputRef.current?.click(),
+      onCollectItem: (item) => setCollectTarget({ kind: CONNECTION_KIND.LOCAL, item }),
     },
   };
 
@@ -315,7 +359,9 @@ function SourceTab({ companyId }) {
         <Subheading>팀이 이미 쓰는 도구에서 핸드북이 자동으로 모입니다</Subheading>
       </HeaderTextGroup>
 
-      <InlineError error={actionError || addRepository.error || addChannel.error} />
+      <InlineError
+        error={actionError || addRepository.error || addChannel.error || collectItem.error}
+      />
 
       <Grid>
         {SOURCE_ORDER.map((kind) => {
@@ -337,6 +383,7 @@ function SourceTab({ companyId }) {
                   : '아직 수집한 적 없음'
               }
               onAddItem={source.onAdd}
+              onCollectItem={source.onCollectItem}
             />
           );
         })}
@@ -349,6 +396,16 @@ function SourceTab({ companyId }) {
         accept={LOCAL_FILE_EXTENSIONS.join(',')}
         onChange={handleUploadFile}
       />
+
+      {collectTarget && (
+        <CollectScopeModal
+          itemName={collectTarget.item.name}
+          projects={projects}
+          pending={collectItem.pending}
+          onCollect={handleCollect}
+          onClose={() => setCollectTarget(null)}
+        />
+      )}
     </TabContent>
   );
 }
