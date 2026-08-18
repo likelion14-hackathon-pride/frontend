@@ -245,9 +245,9 @@ export default function TimingModal({ onClose, onGoTaskCard, scale = 1 }) {
   const ownerState = timing?.owner?.state;
   const noteTitle = (() => {
     if (!timing) return '';
-    if (ownerState === WORK_STATE.WORKING) return `대표 근무시간입니다 (${hoursLabel})`;
-    if (ownerState === WORK_STATE.OFF_HOURS) return `대표 근무시간 밖입니다 (${hoursLabel})`;
-    return '이 회사는 근무시간을 쓰지 않습니다';
+    if (ownerState === WORK_STATE.WORKING) return `Owner is currently working (${hoursLabel})`;
+    if (ownerState === WORK_STATE.OFF_HOURS) return `Outside owner's working hours (${hoursLabel})`;
+    return 'This company does not use working hours';
   })();
 
   const replyAt = formatDateTime(timing?.replyExpected?.at, {
@@ -258,10 +258,10 @@ export default function TimingModal({ onClose, onGoTaskCard, scale = 1 }) {
   const noteDesc = (() => {
     if (!timing) return '';
     if (basis === REPLY_BASIS.HISTORY) {
-      return `지금 보내면 ${replyAt}쯤 답이 올 것으로 보입니다. 실제 답변 이력 ${timing.replyExpected.sampleSize}건의 중앙값 기준입니다.`;
+      return `If you send now, expect a reply around ${replyAt}. Based on the median of ${timing.replyExpected.sampleSize} past replies.`;
     }
     // WORKING_HOURS: 표본이 모자라 다음 근무 시작 시각을 그대로 쓴 것이다.
-    return `지금 보내면 다음 근무 시작인 ${replyAt}쯤 확인됩니다. 답변 이력이 아직 ${timing?.replyExpected?.sampleSize ?? 0}건뿐이라 근무시간 기준으로 잡았습니다.`;
+    return `If you send now, expect a reply around the next working start at ${replyAt}. Only ${timing?.replyExpected?.sampleSize ?? 0} past replies so far, so this is based on working hours.`;
   })();
 
   const canDo = timing?.canDo ?? [];
@@ -277,14 +277,14 @@ export default function TimingModal({ onClose, onGoTaskCard, scale = 1 }) {
               {hours
                 ? hours.enabled
                   ? `Owner hours ${hoursLabel}`
-                  : '근무시간을 쓰지 않는 회사입니다'
-                : '근무시간 정보를 불러오는 중'}
+                  : 'This company does not use working hours'
+                : 'Loading working hours…'}
             </Subtitle>
           </HeaderText>
           <CloseButton onClick={onClose}>✕</CloseButton>
         </Header>
 
-        {timingLoading && !timing && <LoadingState label="시차 정보를 불러오는 중…" />}
+        {timingLoading && !timing && <LoadingState label="Loading timing info…" />}
         {timingError && !timing && <ErrorState error={timingError} onRetry={reloadTiming} />}
 
         {timing && (
@@ -306,10 +306,10 @@ export default function TimingModal({ onClose, onGoTaskCard, scale = 1 }) {
               <ListCard>
                 <ListCardTitle>You can move on these now</ListCardTitle>
                 <ListCardSubtitle>
-                  대표의 답을 기다리지 않는 단계입니다. 핸드북에 근거가 있는 것부터 나옵니다.
+                  Steps that don't need the owner's reply. Ones with handbook backing show first.
                 </ListCardSubtitle>
                 {canDo.length === 0 ? (
-                  <EmptyState compact label="지금 바로 할 수 있는 단계가 없습니다" />
+                  <EmptyState compact label="Nothing to move on right now" />
                 ) : (
                   canDo.map((item) => (
                     <ListItem key={`${item.cardId}-${item.stepId}`}>
@@ -317,24 +317,24 @@ export default function TimingModal({ onClose, onGoTaskCard, scale = 1 }) {
                       <ListItemSrc>
                         {/* entryId 가 있으면 그 규칙이 근거, 없으면 근거로 삼을 규칙이 없다는 뜻. */}
                         {item.entryId
-                          ? `근거 · ${item.entryTitle}${item.scopeName ? ` · ${item.scopeName}` : ''}`
-                          : '근거로 삼을 규칙 없음'}
+                          ? `Based on · ${item.entryTitle}${item.scopeName ? ` · ${item.scopeName}` : ''}`
+                          : 'No rule to base this on'}
                       </ListItemSrc>
                     </ListItem>
                   ))
                 )}
                 {timing.canDoTotal > TIMING_BUCKET_LIMIT && (
                   <MoreNote>
-                    전체 {timing.canDoTotal}건 중 {canDo.length}건만 표시
+                    Showing {canDo.length} of {timing.canDoTotal}
                   </MoreNote>
                 )}
               </ListCard>
 
               <ListCard>
                 <ListCardTitle>These need a person</ListCardTitle>
-                <ListCardSubtitle>대표의 답이 있어야 풀리는 미정 항목입니다.</ListCardSubtitle>
+                <ListCardSubtitle>Unresolved items that need the owner's answer.</ListCardSubtitle>
                 {needsPerson.length === 0 ? (
-                  <EmptyState compact label="대표를 기다리는 항목이 없습니다" />
+                  <EmptyState compact label="Nothing waiting on the owner" />
                 ) : (
                   needsPerson.map((item) => (
                     <ListItem key={`${item.cardId}-${item.blankId}`}>
@@ -342,9 +342,7 @@ export default function TimingModal({ onClose, onGoTaskCard, scale = 1 }) {
                       <ListItemSrc>
                         {[
                           item.scopeName,
-                          item.escalationStatus
-                            ? `질문 ${item.escalationStatus}`
-                            : '아직 보내지 않음',
+                          item.escalationStatus ? `Question ${item.escalationStatus}` : 'Not sent yet',
                         ]
                           .filter(Boolean)
                           .join(' · ')}
@@ -354,7 +352,7 @@ export default function TimingModal({ onClose, onGoTaskCard, scale = 1 }) {
                 )}
                 {timing.needsPersonTotal > TIMING_BUCKET_LIMIT && (
                   <MoreNote>
-                    전체 {timing.needsPersonTotal}건 중 {needsPerson.length}건만 표시
+                    Showing {needsPerson.length} of {timing.needsPersonTotal}
                   </MoreNote>
                 )}
                 <TaskButton onClick={onGoTaskCard}>Open the related task card</TaskButton>

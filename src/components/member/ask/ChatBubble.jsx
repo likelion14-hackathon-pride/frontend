@@ -74,10 +74,10 @@ const OutOfScope = styled.div`
 
 // verdict 별로 답이 없는 이유가 다르다. 빈 말풍선을 띄우지 않도록 문장을 정해 둔다.
 const EMPTY_ANSWER_TEXT = {
-  [VERDICT.NO_SOURCE]: '핸드북에 근거가 없어 답하지 않았습니다.',
-  [VERDICT.NEEDS_DECISION]: '규칙이 아니라 판단이 필요한 질문입니다.',
-  [VERDICT.OUT_OF_SCOPE]: '이 팀의 규칙과 관계없는 질문으로 보입니다.',
-  DEFAULT: '답을 만들지 못했습니다.',
+  [VERDICT.NO_SOURCE]: 'No basis found in the handbook, so no answer was given.',
+  [VERDICT.NEEDS_DECISION]: "This needs a decision, not a rule lookup.",
+  [VERDICT.OUT_OF_SCOPE]: "This doesn't seem related to this team's rules.",
+  DEFAULT: 'Could not generate an answer.',
 };
 
 export default function ChatBubble({ message, channels = [] }) {
@@ -142,7 +142,7 @@ export default function ChatBubble({ message, channels = [] }) {
     if (!result.ok) return;
 
     const channelName = channels.find((channel) => channel.id === targetItemId)?.label ?? '슬랙';
-    setSentLabel(`${channelName} 채널로 보냈습니다`);
+    setSentLabel(`Sent to ${channelName}`);
     setEscalation(result.data);
     setView('sent');
     // 카드에서 올라온 질문이면 보드의 열이 바뀐다.
@@ -158,14 +158,14 @@ export default function ChatBubble({ message, channels = [] }) {
         {warnings.map((warning) => (
           <WarningBox key={warning.keyword} $danger={warning.level === RISK_LEVEL.DANGER}>
             <WarningKeyword>{warning.keyword}</WarningKeyword>
-            <span>{warning.note || '대표님께 먼저 확인하세요.'}</span>
+            <span>{warning.note || 'Please check with the owner first.'}</span>
           </WarningBox>
         ))}
 
         {sources.length > 0 && <SourceDetails sources={sources} />}
 
         {message.verdict === VERDICT.OUT_OF_SCOPE && (
-          <OutOfScope>회사 규칙과 무관한 질문이라 대표님께 보내지 않았습니다.</OutOfScope>
+          <OutOfScope>Not sent to the owner — unrelated to this team's rules.</OutOfScope>
         )}
 
         <InlineError error={create.error || send.error} />
