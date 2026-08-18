@@ -205,19 +205,23 @@ function HandbookHeaderControls({
 
       <ControlsGroup>
         <TierTrack>
-          <TierTab type="button" $active={activeTier === 'all'} onClick={() => onTierChange('all')}>
+          <TierTab
+            type="button"
+            $active={!archiveOpen && activeTier === 'all'}
+            onClick={() => onTierChange('all')}
+          >
             전체
           </TierTab>
           <TierTab
             type="button"
-            $active={activeTier === 'company'}
+            $active={!archiveOpen && activeTier === 'company'}
             onClick={() => onTierChange('company')}
           >
             회사 규칙
           </TierTab>
           <TierTab
             type="button"
-            $active={activeTier === 'project'}
+            $active={!archiveOpen && activeTier === 'project'}
             onClick={() => onTierChange('project')}
           >
             프로젝트
