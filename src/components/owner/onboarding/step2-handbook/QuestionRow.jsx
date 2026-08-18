@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import styled from 'styled-components';
+import ChevronIcon from './ChevronIcon';
 import { getQuestionStatus, getAnswerPreviewText } from './handbookData';
 
 const STATUS_META = {
@@ -103,10 +104,8 @@ const StatusBadge = styled.span`
   color: ${({ $status }) => STATUS_META[$status].color};
 `;
 
-const Chevron = styled.span`
+const Chevron = styled(ChevronIcon)`
   flex-shrink: 0;
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 13px;
   color: #b4b4bc;
   transform: rotate(${({ $expanded }) => ($expanded ? '180deg' : '0deg')});
   transition: transform 0.15s ease;
@@ -337,7 +336,7 @@ function QuestionRow({ question, answer, saving = false, onChange }) {
           <StatusBadge $status={status}>
             {saving ? '저장 중…' : STATUS_META[status].label}
           </StatusBadge>
-          <Chevron $expanded={expanded}>⌄</Chevron>
+          <Chevron $expanded={expanded} />
         </RightGroup>
       </Header>
 

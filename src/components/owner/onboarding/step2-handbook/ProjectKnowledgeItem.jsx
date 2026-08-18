@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { useOnboardingQuestions } from '../../../../hooks/owner/useOnboardingQuestions';
 import { ErrorState, InlineError, LoadingState } from '../../../common/AsyncStates';
 import QuestionRow from './QuestionRow';
+import ChevronIcon from './ChevronIcon';
 import { EMPTY_ANSWER, countConfirmed } from './handbookData';
 
 const Card = styled.div`
@@ -60,6 +61,9 @@ const Name = styled.span`
 `;
 
 const Summary = styled.span`
+  /* 펼쳤을 땐 DividerLine 이 오른쪽으로 밀어주지만, 접혔을 땐 그게 없어서
+     이 텍스트가 직접 남는 공간을 채워야 화살표가 오른쪽 끝에 붙는다. */
+  flex: ${({ $expanded }) => ($expanded ? '0 0 auto' : '1 1 auto')};
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -87,10 +91,8 @@ const Fraction = styled.span`
   white-space: nowrap;
 `;
 
-const Chevron = styled.span`
+const Chevron = styled(ChevronIcon)`
   flex-shrink: 0;
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 13px;
   color: #b4b4bc;
   transform: rotate(${({ $expanded }) => ($expanded ? '180deg' : '0deg')});
   transition: transform 0.15s ease;
@@ -137,7 +139,7 @@ function ProjectKnowledgeItem({ companyId, project, index, expanded, onToggleExp
       <Header type="button" $expanded={expanded} onClick={onToggleExpand}>
         <Number $expanded={expanded}>{index + 1}</Number>
         <Name>{project.name}</Name>
-        <Summary>{summary}</Summary>
+        <Summary $expanded={expanded}>{summary}</Summary>
         {expanded && total > 0 && (
           <>
             <DividerLine />
@@ -146,7 +148,7 @@ function ProjectKnowledgeItem({ companyId, project, index, expanded, onToggleExp
             </Fraction>
           </>
         )}
-        <Chevron $expanded={expanded}>⌄</Chevron>
+        <Chevron $expanded={expanded} />
       </Header>
 
       {expanded && (
