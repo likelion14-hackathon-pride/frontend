@@ -245,11 +245,11 @@ export const ENTRY_ORIGIN = {
 export const ENTRY_ORIGIN_LABEL = {
   SLACK: 'Slack',
   GITHUB: 'GitHub',
-  FILE: '업로드 파일',
-  ONBOARDING: 'Day 0 기본 규칙',
-  ESCALATION: '대표 확인 답변',
-  DIRECT_ENTRY: '대표 직접 작성',
-  DEFAULT: '출처 미상',
+  FILE: 'Uploaded file',
+  ONBOARDING: 'Day 0 default rule',
+  ESCALATION: 'Confirmed by owner',
+  DIRECT_ENTRY: 'Written by owner',
+  DEFAULT: 'Unknown source',
 };
 
 // HandbookEntry.Confidence — handbook/models.py:59
