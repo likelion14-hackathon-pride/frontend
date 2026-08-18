@@ -117,7 +117,10 @@ function HandbookTab({ companyId }) {
   );
 
   const waitingItems = items.filter((item) => item.status !== 'confirmed');
-  const selectedItem = items.find((item) => item.id === selectedItemId) ?? items[0] ?? null;
+  // 오른쪽 상세 박스는 왼쪽 핸드북 트리(확정 항목)에 있는 것만 보여준다. 보관함의 초안은 대상이 아니다.
+  const confirmedItems = items.filter((item) => item.status === 'confirmed');
+  const selectedItem =
+    confirmedItems.find((item) => item.id === selectedItemId) ?? confirmedItems[0] ?? null;
 
   const reload = () => {
     entriesQuery.reload();
@@ -228,7 +231,7 @@ function HandbookTab({ companyId }) {
         />
       )}
 
-      {archiveOpen && (
+      {archiveOpen ? (
         <ConfirmInboxPanel
           items={waitingItems}
           pending={review.pending || reviewAll.pending || deleteEntry.pending}
@@ -237,27 +240,27 @@ function HandbookTab({ companyId }) {
           onDelete={handleDeleteItem}
           onClose={() => setArchiveOpen(false)}
         />
+      ) : (
+        <Body>
+          <LeftColumn>
+            <HandbookTierTree
+              activeTier={activeTier}
+              items={items}
+              selectedItemId={selectedItem?.id ?? null}
+              onSelect={setSelectedItemId}
+              projects={projects}
+            />
+          </LeftColumn>
+          <RightColumn>
+            <HandbookDetailPanel
+              item={selectedItem}
+              pending={updateEntry.pending || deleteEntry.pending}
+              onSave={handleUpdateItemText}
+              onDelete={handleDeleteItem}
+            />
+          </RightColumn>
+        </Body>
       )}
-
-      <Body>
-        <LeftColumn>
-          <HandbookTierTree
-            activeTier={activeTier}
-            items={items}
-            selectedItemId={selectedItem?.id ?? null}
-            onSelect={setSelectedItemId}
-            projects={projects}
-          />
-        </LeftColumn>
-        <RightColumn>
-          <HandbookDetailPanel
-            item={selectedItem}
-            pending={updateEntry.pending || deleteEntry.pending}
-            onSave={handleUpdateItemText}
-            onDelete={handleDeleteItem}
-          />
-        </RightColumn>
-      </Body>
     </TabContent>
   );
 }
