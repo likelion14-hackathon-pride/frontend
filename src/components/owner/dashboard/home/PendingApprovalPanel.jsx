@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 
 import { formatShortKo } from '../../../../utils/time';
 
@@ -101,12 +101,26 @@ const IconBox = styled.span`
   background: rgba(255, 255, 255, 0.12);
 `;
 
+// 시차 패널의 온라인/오프라인 점과 같은 느낌으로, 대표 확인을 기다리는 중임을
+// 초록 불이 들어왔다 나갔다 하는 것처럼 계속 깜빡여서 보여준다.
+const blink = keyframes`
+  0%,
+  100% {
+    background: #1f7a45;
+    box-shadow: 0 0 0 3px rgba(31, 122, 69, 0.25);
+  }
+  50% {
+    background: #d8d8de;
+    box-shadow: 0 0 0 0 rgba(31, 122, 69, 0);
+  }
+`;
+
 const IconShape = styled.span`
-  width: 9px;
-  height: 9px;
+  width: 8px;
+  height: 8px;
   flex-shrink: 0;
-  border-radius: 2px;
-  border: 1.333px solid rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+  animation: ${blink} 2.2s ease-in-out infinite;
 `;
 
 const TextGroup = styled.div`

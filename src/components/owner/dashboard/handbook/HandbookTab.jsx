@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 
 import * as handbookApi from '../../../../apis/handbook';
@@ -10,22 +10,35 @@ import ConfirmInboxPanel from './ConfirmInboxPanel';
 import AddItemPanel from './AddItemPanel';
 import HandbookTierTree from './HandbookTierTree';
 import HandbookDetailPanel from './HandbookDetailPanel';
+import ScrollArea from '../../../common/ScrollArea';
 import { displayStatusOf } from './handbookTabData';
 
 const TabContent = styled.div`
   display: flex;
   width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: flex-start;
   gap: 18px;
+`;
+
+const FillArea = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
 `;
 
 const Body = styled.div`
   display: flex;
   width: 100%;
+  height: 100%;
+  min-height: 0;
   flex-wrap: wrap;
-  align-items: flex-start;
+  align-items: stretch;
   gap: 16px;
 `;
 
@@ -37,6 +50,8 @@ const LeftColumn = styled.div`
   gap: 12px;
   flex: 1.15 1 380px;
   min-width: 0;
+  max-height: 100%;
+  overflow: hidden;
   padding: 14.667px 14.667px 22.667px 14.667px;
   border-radius: 22px;
   border: 0.667px solid #efeff1;
@@ -51,8 +66,8 @@ const RightColumn = styled.div`
   flex-direction: column;
   flex: 1 1 320px;
   min-width: 0;
-  position: sticky;
-  top: 16px;
+  max-height: 100%;
+  overflow-y: auto;
 `;
 
 function toItem(entry) {
@@ -79,6 +94,31 @@ function HandbookTab({ companyId }) {
   const [selectedItemId, setSelectedItemId] = useState(null);
   const [addPanelOpen, setAddPanelOpen] = useState(false);
   const [archiveOpen, setArchiveOpen] = useState(false);
+
+  // 트리·보관함 카드의 남는 높이를 실측해서 고정한다. flex 만으로는 여러 단계 아래까지
+  // "확정된 높이"가 안 내려가서 내부 스크롤이 안 걸리는 경우가 있어 직접 잰다.
+  const fillRef = useRef(null);
+  const [fillHeight, setFillHeight] = useState(null);
+
+  useEffect(() => {
+    const el = fillRef.current;
+    if (!el) return undefined;
+
+    const measure = () => {
+      const top = el.getBoundingClientRect().top;
+      // Background 하단 padding(48px)만큼 아래도 비워서 위 여백과 맞춘다.
+      setFillHeight(Math.max(240, window.innerHeight - top - 48));
+    };
+
+    measure();
+    window.addEventListener('resize', measure);
+    const observer = new ResizeObserver(measure);
+    observer.observe(document.body);
+    return () => {
+      window.removeEventListener('resize', measure);
+      observer.disconnect();
+    };
+  }, [addPanelOpen, archiveOpen]);
 
   // 대표는 확정·초안·빈칸을 모두 본다. 보관(ARCHIVED)은 거절한 것이라 목록에서 뺀다.
   const entriesQuery = useAsync(() => handbookApi.fetchAllEntries(companyId), [companyId], {
@@ -231,36 +271,40 @@ function HandbookTab({ companyId }) {
         />
       )}
 
-      {archiveOpen ? (
-        <ConfirmInboxPanel
-          items={waitingItems}
-          pending={review.pending || reviewAll.pending || deleteEntry.pending}
-          onConfirm={handleConfirm}
-          onConfirmAll={handleConfirmAll}
-          onDelete={handleDeleteItem}
-          onClose={() => setArchiveOpen(false)}
-        />
-      ) : (
-        <Body>
-          <LeftColumn>
-            <HandbookTierTree
-              activeTier={activeTier}
-              items={items}
-              selectedItemId={selectedItem?.id ?? null}
-              onSelect={setSelectedItemId}
-              projects={projects}
-            />
-          </LeftColumn>
-          <RightColumn>
-            <HandbookDetailPanel
-              item={selectedItem}
-              pending={updateEntry.pending || deleteEntry.pending}
-              onSave={handleUpdateItemText}
-              onDelete={handleDeleteItem}
-            />
-          </RightColumn>
-        </Body>
-      )}
+      <FillArea ref={fillRef} style={fillHeight ? { height: fillHeight } : undefined}>
+        {archiveOpen ? (
+          <ConfirmInboxPanel
+            items={waitingItems}
+            pending={review.pending || reviewAll.pending || deleteEntry.pending}
+            onConfirm={handleConfirm}
+            onConfirmAll={handleConfirmAll}
+            onDelete={handleDeleteItem}
+            onClose={() => setArchiveOpen(false)}
+          />
+        ) : (
+          <Body>
+            <LeftColumn style={fillHeight ? { height: fillHeight } : undefined}>
+              <ScrollArea>
+                <HandbookTierTree
+                  activeTier={activeTier}
+                  items={items}
+                  selectedItemId={selectedItem?.id ?? null}
+                  onSelect={setSelectedItemId}
+                  projects={projects}
+                />
+              </ScrollArea>
+            </LeftColumn>
+            <RightColumn style={fillHeight ? { height: fillHeight } : undefined}>
+              <HandbookDetailPanel
+                item={selectedItem}
+                pending={updateEntry.pending || deleteEntry.pending}
+                onSave={handleUpdateItemText}
+                onDelete={handleDeleteItem}
+              />
+            </RightColumn>
+          </Body>
+        )}
+      </FillArea>
     </TabContent>
   );
 }

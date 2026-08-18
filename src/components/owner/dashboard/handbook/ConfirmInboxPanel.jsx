@@ -1,17 +1,19 @@
 import { useState } from 'react';
 import styled from 'styled-components';
+import ScrollArea from '../../../common/ScrollArea';
 import { getGroupLabel } from './handbookTabData';
 
 const Panel = styled.div`
   box-sizing: border-box;
   display: flex;
   width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
   padding: 16.667px;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
   gap: 10px;
-  flex-shrink: 0;
   border-radius: 16px;
   border: 0.667px solid #f3e4c6;
   background: #fffdf7;
@@ -335,45 +337,47 @@ function ConfirmInboxPanel({ items, pending = false, onConfirm, onConfirmAll, on
           <EmptyText>확인 대기 항목이 없습니다</EmptyText>
         </EmptyRow>
       ) : (
-        <List>
-          {items.map((item) => (
-            <ItemGroup key={item.id}>
-              <Row>
-                <LeadingDot />
-                <TextGroup type="button" onClick={() => toggleExpanded(item.id)}>
-                  <ItemText>{item.text || '(내용 없음)'}</ItemText>
-                  <SourceText>
-                    {item.groupLabel || getGroupLabel(item.groupKey)} · {item.sourceLabel}
-                  </SourceText>
-                </TextGroup>
-                <DeleteButton type="button" onClick={() => onDelete(item.id)} disabled={pending}>
-                  삭제
-                </DeleteButton>
-                {/* 내용이 없는 BLANK 항목은 서버가 승인을 거절한다(cannot_approve_blank). */}
-                <ConfirmButton
-                  type="button"
-                  onClick={() => onConfirm(item.id)}
-                  disabled={pending || item.status === 'empty'}
-                >
-                  저장
-                </ConfirmButton>
-              </Row>
+        <ScrollArea accentColor="#9A6212">
+          <List>
+            {items.map((item) => (
+              <ItemGroup key={item.id}>
+                <Row>
+                  <LeadingDot />
+                  <TextGroup type="button" onClick={() => toggleExpanded(item.id)}>
+                    <ItemText>{item.text || '(내용 없음)'}</ItemText>
+                    <SourceText>
+                      {item.groupLabel || getGroupLabel(item.groupKey)} · {item.sourceLabel}
+                    </SourceText>
+                  </TextGroup>
+                  <DeleteButton type="button" onClick={() => onDelete(item.id)} disabled={pending}>
+                    삭제
+                  </DeleteButton>
+                  {/* 내용이 없는 BLANK 항목은 서버가 승인을 거절한다(cannot_approve_blank). */}
+                  <ConfirmButton
+                    type="button"
+                    onClick={() => onConfirm(item.id)}
+                    disabled={pending || item.status === 'empty'}
+                  >
+                    저장
+                  </ConfirmButton>
+                </Row>
 
-              {expandedId === item.id && item.koSource && (
-                <QuoteBox>
-                  <QuoteText>{item.koSource}</QuoteText>
-                  {item.sourceHref ? (
-                    <SourceLine href={item.sourceHref} target="_blank" rel="noreferrer">
-                      {item.sourceLabel}
-                    </SourceLine>
-                  ) : (
-                    <SourceLineText>{item.sourceLabel}</SourceLineText>
-                  )}
-                </QuoteBox>
-              )}
-            </ItemGroup>
-          ))}
-        </List>
+                {expandedId === item.id && item.koSource && (
+                  <QuoteBox>
+                    <QuoteText>{item.koSource}</QuoteText>
+                    {item.sourceHref ? (
+                      <SourceLine href={item.sourceHref} target="_blank" rel="noreferrer">
+                        {item.sourceLabel}
+                      </SourceLine>
+                    ) : (
+                      <SourceLineText>{item.sourceLabel}</SourceLineText>
+                    )}
+                  </QuoteBox>
+                )}
+              </ItemGroup>
+            ))}
+          </List>
+        </ScrollArea>
       )}
     </Panel>
   );

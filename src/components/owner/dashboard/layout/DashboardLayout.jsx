@@ -53,12 +53,22 @@ const Card = styled.div`
   box-shadow:
     0 2px 6px 0 rgba(23, 44, 90, 0.06),
     0 30px 80px -34px rgba(23, 44, 90, 0.3);
+
+  /* Background 상하 padding(48px)과 맞춰서 아래 여백도 위 여백만큼만 남기고 카드 안에서 해결한다.
+     max-height 가 아니라 height 로 확정해야, 안쪽 자식들의 flex:1 이 실제 남는 높이를 제대로
+     전달받아 내부 스크롤이 동작한다. */
+  ${({ $fitViewport }) =>
+    $fitViewport &&
+    `
+      height: calc(100vh - 96px);
+      overflow: hidden;
+    `}
 `;
 
-function DashboardLayout({ children }) {
+function DashboardLayout({ children, fitViewport = false }) {
   return (
     <Background>
-      <Card>{children}</Card>
+      <Card $fitViewport={fitViewport}>{children}</Card>
     </Background>
   );
 }

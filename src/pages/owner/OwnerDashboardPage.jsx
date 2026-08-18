@@ -32,7 +32,7 @@ function OwnerDashboardPage() {
   }
 
   return (
-    <DashboardLayout>
+    <DashboardLayout fitViewport={activeTab === 'handbook'}>
       <DashboardHeader
         activeTab={activeTab}
         onTabChange={setActiveTab}
