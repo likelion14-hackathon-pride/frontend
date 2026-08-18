@@ -121,3 +121,13 @@ export function startIngestion(companyId, { provider, itemIds } = {}) {
 export function fetchIngestionJob(companyId, jobId) {
   return api.get(ENDPOINTS.sources.ingestionJob(companyId, jobId));
 }
+
+// 로컬 파일은 채널/레포처럼 미리 scopeId 를 박아 두지 않고, 수집을 걸 때 함께 넘긴다.
+// scopeId 가 없으면(회사 규칙) 서버가 내용을 보고 스스로 영역을 분류한다.
+export function collectFile(companyId, itemId, scopeId) {
+  return api.post(ENDPOINTS.sources.ingestionJobs(companyId), {
+    provider: CONNECTION_KIND.LOCAL,
+    itemIds: [itemId],
+    scopeId: scopeId ?? null,
+  });
+}
