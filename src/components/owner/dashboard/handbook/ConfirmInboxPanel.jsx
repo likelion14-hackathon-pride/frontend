@@ -315,7 +315,8 @@ function ConfirmInboxPanel({ items, pending = false, onConfirm, onConfirmAll, on
       <HeadRow>
         <WaitingTag>확인 대기</WaitingTag>
         <Description>
-          깃·문서 파일에서 추출한 규칙 초안입니다. 저장하면 핸드북에 올라가고, 삭제하면 목록에서 사라집니다.
+          깃·문서 파일에서 추출한 규칙 초안입니다. 저장하면 핸드북에 올라가고, 삭제하면 목록에서
+          사라집니다.
         </Description>
         <AllConfirmButton
           type="button"
@@ -345,11 +346,7 @@ function ConfirmInboxPanel({ items, pending = false, onConfirm, onConfirmAll, on
                     {item.groupLabel || getGroupLabel(item.groupKey)} · {item.sourceLabel}
                   </SourceText>
                 </TextGroup>
-                <DeleteButton
-                  type="button"
-                  onClick={() => onDelete(item.id)}
-                  disabled={pending}
-                >
+                <DeleteButton type="button" onClick={() => onDelete(item.id)} disabled={pending}>
                   삭제
                 </DeleteButton>
                 {/* 내용이 없는 BLANK 항목은 서버가 승인을 거절한다(cannot_approve_blank). */}

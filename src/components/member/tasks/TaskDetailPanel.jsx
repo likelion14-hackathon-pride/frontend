@@ -3,13 +3,7 @@ import styled from 'styled-components';
 
 import * as cardsApi from '../../../apis/cards';
 import * as qnaApi from '../../../apis/qna';
-import {
-  CARD_COLUMN,
-  ESCALATION_STATUS,
-  RISK_LEVEL,
-  URGENCY_LABEL,
-  lookup,
-} from '../../../apis/constants';
+import { CARD_COLUMN, URGENCY_LABEL, lookup } from '../../../apis/constants';
 import { useAsync, useMutation } from '../../../hooks/useAsync';
 import { formatDateTime } from '../../../utils/time';
 import { ErrorState, InlineError, LoadingState } from '../../common/AsyncStates';
@@ -17,19 +11,16 @@ import { useMemberNavigation } from '../../../context/member/MemberContext';
 import chatBubbleIcon from '../../../assets/icons/chat-org.svg';
 import bookIcon from '../../../assets/icons/book-org.svg';
 
-// 열마다 CTA 문구가 다르다. 옮길 수 있는 상태는 constants.ALLOWED_MOVES 가 정한다.
+// Ready/In progress/Answered 에서만 쓰는 CTA. Waiting 은 버튼이 없고, Done 은 별도 DoneRow 로 그린다.
 const CTA_LABEL = {
   [CARD_COLUMN.READY]: "I'll take this on",
   [CARD_COLUMN.IN_PROGRESS]: 'Mark as done',
   [CARD_COLUMN.ANSWERED]: 'Mark as done',
-  [CARD_COLUMN.WAITING]: 'Keep working on it',
-  [CARD_COLUMN.DONE]: 'Reopen',
   DEFAULT: null,
 };
 
 const MOVE_HINT = {
   [CARD_COLUMN.READY]: '시작하면 In progress 로 옮겨집니다.',
-  [CARD_COLUMN.WAITING]: '대표의 답을 기다리는 중에도 다른 단계는 진행할 수 있습니다.',
   DEFAULT: null,
 };
 
@@ -240,6 +231,13 @@ const DueValue = styled.div`
   white-space: nowrap;
 `;
 
+const SourceLink = styled.a`
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.85);
+`;
+
 const Card = styled.div`
   background: #fff;
   border-radius: 18px;
@@ -273,17 +271,6 @@ const CardTitle = styled.span`
   font-weight: 800;
 `;
 
-const Tag = styled.span`
-  flex: none;
-  white-space: nowrap;
-  font-size: 11.5px;
-  font-weight: 700;
-  color: ${({ $tone }) => ($tone === 'danger' ? '#B03A3A' : '#C97A22')};
-  background: ${({ $tone }) => ($tone === 'danger' ? '#FBEAEA' : '#FDF1E4')};
-  padding: 3px 8px;
-  border-radius: 6px;
-`;
-
 const List = styled.div`
   display: flex;
   flex-direction: column;
@@ -306,7 +293,7 @@ const ItemDot = styled.span`
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: ${({ $tone }) => ($tone === 'danger' ? '#DC2626' : '#FF8A3D')};
+  background: #ff8a3d;
   margin-top: 8px;
 `;
 
@@ -348,22 +335,6 @@ const SmallButton = styled.button`
     opacity: 0.5;
     cursor: default;
   }
-`;
-
-const AnswerBlock = styled.div`
-  margin-top: 8px;
-  background: #f7f7f8;
-  border-radius: 10px;
-  padding: 11px 12px;
-  font-size: 13.5px;
-  line-height: 1.65;
-  color: #3a3a42;
-`;
-
-const AnswerMeta = styled.div`
-  font-size: 11.5px;
-  color: #a0a0a8;
-  margin-top: 6px;
 `;
 
 const AskInputRow = styled.div`
@@ -444,11 +415,96 @@ const StatusHint = styled.div`
   margin-top: 9px;
 `;
 
-const SourceLink = styled.a`
-  display: inline-block;
-  margin-top: 10px;
+// Waiting: 대표에게 보낸(아직 답 없는) 질문. 버튼 없음 — 그냥 보여주기만.
+const KickerRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const KickerDot = styled.span`
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: ${(props) => props.$color ?? '#8a8a93'};
+`;
+
+const KickerLabel = styled.span`
   font-size: 12px;
+  font-weight: 700;
+  color: #a0a0a8;
+  letter-spacing: 0.08em;
+`;
+
+const MessageEn = styled.div`
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  line-height: 1.35;
+  margin-top: 9px;
+`;
+
+const MessageKo = styled.div`
+  font-size: 13px;
+  color: #8a8a93;
+  margin-top: 7px;
+  font-family: 'IBM Plex Mono', monospace;
+  line-height: 1.6;
+`;
+
+const AnswerMeta = styled.div`
+  font-size: 11.5px;
+  color: #a0a0a8;
+  margin-top: 6px;
+`;
+
+// Done: 초록 체크 + 같은 줄 우측에 Reopen
+const DoneCard = styled.div`
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0px 1px 20px 0px #0000002e;
+  padding: 16px 18px;
+`;
+
+const DoneRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 9px;
+`;
+
+const DoneCheck = styled.span`
+  width: 22px;
+  height: 22px;
+  flex: none;
+  border-radius: 7px;
+  background: #3ba55c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const DoneLabel = styled.span`
+  flex: 1;
+  min-width: 0;
+  font-size: 14.5px;
+  font-weight: 800;
+`;
+
+const DoneButton = styled.button`
+  flex: none;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 700;
   color: #6b6b73;
+  border: 1px solid #eaeaee;
+  padding: 8px 13px;
+  border-radius: 10px;
+  background: none;
+  cursor: pointer;
+
+  &:hover {
+    box-shadow: inset 0 0 0 999px rgba(23, 23, 27, 0.045);
+  }
 `;
 
 export default function TaskDetailPanel({ card, isWide, onToggleWide, onClose, onMoveAction }) {
@@ -457,13 +513,10 @@ export default function TaskDetailPanel({ card, isWide, onToggleWide, onClose, o
 
   const cardId = card?.id ?? null;
 
-  // 상세는 목록에 없는 것(수행 단계·미정 항목·근거 규칙·위험 경고)을 담고 있다.
-  // 여는 순간 서버가 읽음으로 표시한다.
   const detailQuery = useAsync(() => cardsApi.fetchCard(companyId, cardId), [companyId, cardId], {
     enabled: Boolean(companyId && cardId),
   });
 
-  const escalate = useMutation((blankId) => qnaApi.createEscalation(companyId, { blankId }));
   const acknowledge = useMutation((escalationId) =>
     qnaApi.acknowledgeEscalation(companyId, escalationId)
   );
@@ -475,17 +528,19 @@ export default function TaskDetailPanel({ card, isWide, onToggleWide, onClose, o
   const ctaLabel = lookup(CTA_LABEL, columnId);
   const moveHint = lookup(MOVE_HINT, columnId);
 
+  const isReady = columnId === CARD_COLUMN.READY;
+  const isInProgress = columnId === CARD_COLUMN.IN_PROGRESS;
+  const isWaiting = columnId === CARD_COLUMN.WAITING;
+  const isAnswered = columnId === CARD_COLUMN.ANSWERED;
+  const isDone = columnId === CARD_COLUMN.DONE;
+
+  // Done 카드가 어디서 왔는지는 서버가 previousColumn 으로 알려준다(추측 아님).
+  const previousColumn = card.previousColumn ?? detail?.previousColumn;
+  const doneFromAnswered = isDone && previousColumn === CARD_COLUMN.ANSWERED;
+
   function handleAskSend() {
     if (!askDraft.trim()) return;
     goToAskWithQuestion(askDraft.trim(), card.id);
-  }
-
-  async function handleEscalate(blankId) {
-    const result = await escalate.mutate(blankId);
-    if (result.ok) {
-      detailQuery.reload();
-      reloadCards();
-    }
   }
 
   async function handleAcknowledge(escalationId) {
@@ -496,11 +551,17 @@ export default function TaskDetailPanel({ card, isWide, onToggleWide, onClose, o
     }
   }
 
-  const steps = detail?.steps ?? [];
-  const blanks = detail?.blanks ?? [];
   const relatedRules = detail?.relatedRules ?? [];
-  const riskWarnings = detail?.riskWarnings ?? [];
   const questions = detail?.questions ?? [];
+
+  // 답이 없으면 "보낸 질문"(Waiting), 있으면 "답 온 질문"(Answered) — 같은 questions 배열을 상태로만 나눈다.
+  const sentQuestions = questions.filter((q) => !(q.answerEn || q.answerKo));
+  const answeredQuestions = questions.filter((q) => q.answerEn || q.answerKo);
+
+  const showMainCard = isReady || isInProgress || isWaiting || (isDone && !doneFromAnswered);
+  const showHandbookAndAsk = isInProgress; // Handbook rules / Ask SAI 는 In progress 에서만
+  const showSentQuestions = isWaiting;
+  const showAnsweredQuestions = isAnswered || (isDone && doneFromAnswered);
 
   return (
     <Overlay $wide={isWide}>
@@ -514,43 +575,88 @@ export default function TaskDetailPanel({ card, isWide, onToggleWide, onClose, o
       </Header>
 
       <Body>
-        <MainCard>
-          <MainCardTop>
-            <MainCardDot />
-            <MainCardKicker>WHAT YOU NEED TO DO</MainCardKicker>
-            <MainCardWhen>{lookup(URGENCY_LABEL, card.urgency)}</MainCardWhen>
-          </MainCardTop>
-          <MainCardBody>
-            <Purpose>{card.purposeEn || card.purpose}</Purpose>
-            {/* 영어가 본문이고 한국어는 대조용이다(cards/models.py 주석). */}
-            {card.purposeEn && card.purpose && card.purposeEn !== card.purpose && (
-              <PurposeKo>{card.purpose}</PurposeKo>
-            )}
-            <MetaRow>
-              <DeliverableBox>
-                <MetaLabel>DELIVERABLE</MetaLabel>
-                <DeliverableValue>
-                  {card.deliverableEn || card.deliverable || '따로 정해지지 않았습니다'}
-                </DeliverableValue>
-              </DeliverableBox>
-              <DueBox>
-                <DueLabel>DUE</DueLabel>
-                <DueValue>
-                  {card.deadlineTextEn ||
-                    card.deadlineText ||
-                    formatDateTime(card.deadlineAt, { fallback: '기한 없음' })}
-                </DueValue>
-              </DueBox>
-            </MetaRow>
-            {card.permalink && (
-              <SourceLink href={card.permalink} target="_blank" rel="noreferrer">
-                원문 열기 ↗
-              </SourceLink>
-            )}
-          </MainCardBody>
-        </MainCard>
+        {showMainCard && (
+          <MainCard>
+            <MainCardTop>
+              <MainCardDot />
+              <MainCardKicker>WHAT YOU NEED TO DO</MainCardKicker>
+              <MainCardWhen>{lookup(URGENCY_LABEL, card.urgency)}</MainCardWhen>
+            </MainCardTop>
+            <MainCardBody>
+              <Purpose>{card.purposeEn || card.purpose}</Purpose>
+              {card.purposeEn && card.purpose && card.purposeEn !== card.purpose && (
+                <PurposeKo>{card.purpose}</PurposeKo>
+              )}
+              <MetaRow>
+                <DeliverableBox>
+                  <MetaLabel>DELIVERABLE</MetaLabel>
+                  <DeliverableValue>
+                    {card.deliverableEn || card.deliverable || '따로 정해지지 않았습니다'}
+                  </DeliverableValue>
+                </DeliverableBox>
+                <DueBox>
+                  <DueLabel>DUE</DueLabel>
+                  <DueValue>
+                    {card.deadlineTextEn ||
+                      card.deadlineText ||
+                      formatDateTime(card.deadlineAt, { fallback: '기한 없음' })}
+                  </DueValue>
+                </DueBox>
+              </MetaRow>
+              {card.permalink && (
+                <SourceLink href={card.permalink} target="_blank" rel="noreferrer">
+                  원문 열기 ↗
+                </SourceLink>
+              )}
+            </MainCardBody>
+          </MainCard>
+        )}
 
-        <InlineError error={escalate.error || acknowledge.error} />
+        {showAnsweredQuestions &&
+          answeredQuestions.map((question) => (
+            <Card key={question.escalationId}>
+              <KickerRow>
+                <KickerDot $color="#3ba55c" />
+                <KickerLabel>김대표 ANSWERED</KickerLabel>
+              </KickerRow>
+              <MessageEn>{question.answerEn || question.answerKo}</MessageEn>
+              {question.answerEn &&
+                question.answerKo &&
+                question.answerEn !== question.answerKo && (
+                  <MessageKo>{question.answerKo}</MessageKo>
+                )}
+              <AnswerMeta>
+                물어본 것: {question.questionEn}
+                {question.sentAt
+                  ? ` · 보냄 ${formatDateTime(question.sentAt, { fallback: '' })}`
+                  : ''}
+              </AnswerMeta>
+              {!question.acknowledgedAt && (
+                <SmallButton
+                  type="button"
+                  disabled={acknowledge.pending}
+                  onClick={() => handleAcknowledge(question.escalationId)}
+                  style={{ marginTop: 10 }}
+                >
+                  확인함
+                </SmallButton>
+              )}
+            </Card>
+          ))}
+
+        {showSentQuestions &&
+          sentQuestions.map((question) => (
+            <Card key={question.escalationId}>
+              <KickerRow>
+                <KickerDot $color="#ff8a3d" />
+                <KickerLabel>SENT VIA SAI · AWAITING REPLY</KickerLabel>
+              </KickerRow>
+              <MessageEn>{question.questionEn}</MessageEn>
+              <MessageKo>{question.draftKo}</MessageKo>
+            </Card>
+          ))}
+
+        <InlineError error={acknowledge.error} />
 
         {detailQuery.loading && !detail && (
           <LoadingState compact label="카드 상세를 불러오는 중…" />
@@ -559,189 +665,77 @@ export default function TaskDetailPanel({ card, isWide, onToggleWide, onClose, o
           <ErrorState error={detailQuery.error} onRetry={detailQuery.reload} compact />
         )}
 
-        {detail && (
-          <>
-            {riskWarnings.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>대표가 등록한 위험 작업</CardTitle>
-                  <Tag $tone="danger">{riskWarnings.length}</Tag>
-                </CardHeader>
-                <List>
-                  {riskWarnings.map((warning) => (
-                    <ItemRow key={`${warning.keyword}-${warning.level}`}>
-                      <ItemDot $tone="danger" />
-                      <ItemTextBlock>
-                        <ItemTitle>{warning.keyword}</ItemTitle>
-                        <ItemSrc>
-                          {warning.level === RISK_LEVEL.DANGER ? '위험' : '주의'} ·{' '}
-                          {warning.note || '대표님께 먼저 확인하세요'}
-                        </ItemSrc>
-                      </ItemTextBlock>
-                    </ItemRow>
-                  ))}
-                </List>
-              </Card>
-            )}
-
-            {steps.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <IconBadge>
-                    <img src={bookIcon} alt="" width={15} height={15} />
-                  </IconBadge>
-                  <CardTitle>How to do it</CardTitle>
-                </CardHeader>
-                <List>
-                  {steps.map((step) => (
-                    <ItemRow key={step.id}>
-                      <ItemDot />
-                      <ItemTextBlock>
-                        <ItemTitle>{step.textEn || step.text}</ItemTitle>
-                        {/* entryId 가 있으면 그 규칙이 근거다. 없으면 근거가 없다는 뜻. */}
-                        <ItemSrc>
-                          {step.entryId ? `근거 · ${step.entryTitle}` : '근거로 삼을 규칙 없음'}
-                        </ItemSrc>
-                      </ItemTextBlock>
-                    </ItemRow>
-                  ))}
-                </List>
-              </Card>
-            )}
-
-            {blanks.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>확인이 필요한 것</CardTitle>
-                  <Tag>{blanks.filter((blank) => blank.needsOwner).length} 대기</Tag>
-                </CardHeader>
-                <List>
-                  {blanks.map((blank) => (
-                    <ItemRow key={blank.id}>
-                      <ItemDot $tone={blank.needsOwner ? 'danger' : 'default'} />
-                      <ItemTextBlock>
-                        <ItemTitle>{blank.questionEn}</ItemTitle>
-                        {blank.answeredBy ? (
-                          <>
-                            <AnswerBlock>{blank.saiAnswerEn || blank.saiAnswerKo}</AnswerBlock>
-                            <AnswerMeta>
-                              {blank.answeredBy === 'SAI'
-                                ? 'SAI 가 핸드북에서 찾은 답'
-                                : '대표가 준 답'}
-                            </AnswerMeta>
-                          </>
-                        ) : (
-                          <ItemSrc>
-                            {blank.escalationId
-                              ? '대표에게 물어봤습니다. 답을 기다리는 중입니다.'
-                              : '아직 아무도 답하지 않았습니다.'}
-                          </ItemSrc>
-                        )}
-                      </ItemTextBlock>
-                      {blank.needsOwner && !blank.escalationId && (
-                        <SmallButton
-                          type="button"
-                          disabled={escalate.pending}
-                          onClick={() => handleEscalate(blank.id)}
-                        >
-                          대표에게 묻기
-                        </SmallButton>
-                      )}
-                    </ItemRow>
-                  ))}
-                </List>
-              </Card>
-            )}
-
-            {questions.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>대표에게 보낸 질문</CardTitle>
-                </CardHeader>
-                <List>
-                  {questions.map((question) => (
-                    <ItemRow key={question.escalationId}>
-                      <ItemDot />
-                      <ItemTextBlock>
-                        <ItemTitle>{question.questionEn}</ItemTitle>
-                        <ItemSrc>{question.draftKo}</ItemSrc>
-                        {question.answerEn || question.answerKo ? (
-                          <AnswerBlock>{question.answerEn || question.answerKo}</AnswerBlock>
-                        ) : null}
-                        <AnswerMeta>
-                          {question.status}
-                          {question.sentAt
-                            ? ` · 보냄 ${formatDateTime(question.sentAt, { fallback: '' })}`
-                            : ''}
-                        </AnswerMeta>
-                      </ItemTextBlock>
-                      {/* 답을 읽었다고 표시해야 카드가 Answered 열에서 빠진다. */}
-                      {question.status === ESCALATION_STATUS.ANSWERED &&
-                        !question.acknowledgedAt && (
-                          <SmallButton
-                            type="button"
-                            disabled={acknowledge.pending}
-                            onClick={() => handleAcknowledge(question.escalationId)}
-                          >
-                            확인함
-                          </SmallButton>
-                        )}
-                    </ItemRow>
-                  ))}
-                </List>
-              </Card>
-            )}
-
-            {relatedRules.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <IconBadge>
-                    <img src={bookIcon} alt="" width={15} height={15} />
-                  </IconBadge>
-                  <CardTitle>Handbook rules for this task</CardTitle>
-                </CardHeader>
-                <List>
-                  {relatedRules.map((rule) => (
-                    <ItemRow key={rule.entryId}>
-                      <ItemDot />
-                      <ItemTextBlock>
-                        <ItemTitle>{rule.title}</ItemTitle>
-                        <ItemSrc>
-                          {[rule.scopeName, rule.source?.label].filter(Boolean).join(' · ')}
-                        </ItemSrc>
-                      </ItemTextBlock>
-                    </ItemRow>
-                  ))}
-                </List>
-              </Card>
-            )}
-
-            <Card>
-              <CardHeader>
-                <IconBadge>
-                  <img src={chatBubbleIcon} alt="" width={15} height={15} />
-                </IconBadge>
-                <CardTitle>Unclear? Ask SAI first.</CardTitle>
-              </CardHeader>
-              <AskInputRow>
-                <AskInput
-                  value={askDraft}
-                  onChange={(e) => setAskDraft(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleAskSend()}
-                  placeholder="Ask something about this task…"
-                />
-                <AskButton onClick={handleAskSend}>Ask</AskButton>
-              </AskInputRow>
-            </Card>
-          </>
+        {detail && showHandbookAndAsk && relatedRules.length > 0 && (
+          <Card>
+            <CardHeader>
+              <IconBadge>
+                <img src={bookIcon} alt="" width={15} height={15} />
+              </IconBadge>
+              <CardTitle>Handbook rules for this task</CardTitle>
+            </CardHeader>
+            <List>
+              {relatedRules.map((rule) => (
+                <ItemRow key={rule.entryId}>
+                  <ItemDot />
+                  <ItemTextBlock>
+                    <ItemTitle>{rule.title}</ItemTitle>
+                    <ItemSrc>
+                      {[rule.scopeName, rule.source?.label].filter(Boolean).join(' · ')}
+                    </ItemSrc>
+                  </ItemTextBlock>
+                </ItemRow>
+              ))}
+            </List>
+          </Card>
         )}
 
-        {ctaLabel && (
-          <StatusCard>
-            <StatusLabel>TASK STATUS</StatusLabel>
-            <StatusButton onClick={onMoveAction}>{ctaLabel}</StatusButton>
-            {moveHint && <StatusHint>{moveHint}</StatusHint>}
-          </StatusCard>
+        {detail && showHandbookAndAsk && (
+          <Card>
+            <CardHeader>
+              <IconBadge>
+                <img src={chatBubbleIcon} alt="" width={15} height={15} />
+              </IconBadge>
+              <CardTitle>Unclear? Ask SAI first.</CardTitle>
+            </CardHeader>
+            <AskInputRow>
+              <AskInput
+                value={askDraft}
+                onChange={(e) => setAskDraft(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleAskSend()}
+                placeholder="Ask something about this task…"
+              />
+              <AskButton onClick={handleAskSend}>Ask</AskButton>
+            </AskInputRow>
+          </Card>
+        )}
+
+        {isDone ? (
+          <DoneCard>
+            <DoneRow>
+              <DoneCheck>
+                <svg
+                  width="11"
+                  height="11"
+                  viewBox="0 0 10 10"
+                  fill="none"
+                  stroke="#fff"
+                  strokeWidth="1.9"
+                >
+                  <path d="M2 5.2l2 2L8 3" />
+                </svg>
+              </DoneCheck>
+              <DoneLabel>Done</DoneLabel>
+              <DoneButton onClick={onMoveAction}>Reopen</DoneButton>
+            </DoneRow>
+          </DoneCard>
+        ) : (
+          ctaLabel && (
+            <StatusCard>
+              <StatusLabel>TASK STATUS</StatusLabel>
+              <StatusButton onClick={onMoveAction}>{ctaLabel}</StatusButton>
+              {moveHint && <StatusHint>{moveHint}</StatusHint>}
+            </StatusCard>
+          )
         )}
       </Body>
     </Overlay>

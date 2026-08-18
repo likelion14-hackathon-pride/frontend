@@ -147,7 +147,7 @@ const LogoutButton = styled.button`
 
 const LogoutIcon = styled.img`
   width: 15px;
-  height: 15px; 
+  height: 15px;
   flex-shrink: 0;
 `;
 
