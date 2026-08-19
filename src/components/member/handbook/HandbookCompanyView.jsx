@@ -96,6 +96,7 @@ export default function HandbookCompanyView() {
                     quote={item.quote}
                     sourceLine={item.sourceLine}
                     sourceHref={item.sourceHref}
+                    showSourceBox={item.showSourceBox}
                     defaultOpen={item.defaultOpen}
                   />
                 ))
