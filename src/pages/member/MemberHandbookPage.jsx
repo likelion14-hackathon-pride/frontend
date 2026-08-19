@@ -35,7 +35,7 @@ function toRuleItem(entry, index) {
     sourceTag: source?.label ?? lookup(ENTRY_ORIGIN_LABEL, entry.sourceType),
     desc: entry.ruleEn && entry.ruleEn !== entry.title ? entry.title : null,
     quote: entry.originalKo,
-    showSourceBox: !['ONBOARDING', 'DIRECT_ENTRY'].includes(entry.sourceType),
+    showSourceBox: !['ONBOARDING', 'DIRECT_ENTRY', 'ESCALATION'].includes(entry.sourceType),
     sourceLine: source
       ? [
           `Source · ${lookup(EVIDENCE_TAG_LABEL, source.tag)}`,
