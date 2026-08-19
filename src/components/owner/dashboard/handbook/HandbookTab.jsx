@@ -261,8 +261,14 @@ function HandbookTab({ companyId }) {
         onTierChange={setActiveTier}
         waitingCount={waitingItems.length}
         archiveOpen={archiveOpen}
-        onToggleArchive={() => setArchiveOpen((prev) => !prev)}
-        onOpenAddPanel={() => setAddPanelOpen(true)}
+        onToggleArchive={() => {
+          setAddPanelOpen(false);
+          setArchiveOpen((prev) => !prev);
+        }}
+        onOpenAddPanel={() => {
+          setArchiveOpen(false);
+          setAddPanelOpen(true);
+        }}
       />
 
       <InlineError
@@ -276,16 +282,6 @@ function HandbookTab({ companyId }) {
           createScope.error
         }
       />
-
-      {addPanelOpen && (
-        <AddItemPanel
-          projects={projects}
-          pending={createEntry.pending}
-          onAddProject={handleAddProject}
-          onSave={handleSaveNewItem}
-          onClose={() => setAddPanelOpen(false)}
-        />
-      )}
 
       <FillArea ref={fillRef} style={fillHeight ? { height: fillHeight } : undefined}>
         {archiveOpen ? (
@@ -311,12 +307,22 @@ function HandbookTab({ companyId }) {
               </ScrollArea>
             </LeftColumn>
             <RightColumn style={fillHeight ? { height: fillHeight } : undefined}>
-              <HandbookDetailPanel
-                item={selectedItem}
-                pending={updateEntry.pending || deleteEntry.pending}
-                onSave={handleUpdateItemText}
-                onDelete={handleDeleteItem}
-              />
+              {addPanelOpen ? (
+                <AddItemPanel
+                  projects={projects}
+                  pending={createEntry.pending}
+                  onAddProject={handleAddProject}
+                  onSave={handleSaveNewItem}
+                  onClose={() => setAddPanelOpen(false)}
+                />
+              ) : (
+                <HandbookDetailPanel
+                  item={selectedItem}
+                  pending={updateEntry.pending || deleteEntry.pending}
+                  onSave={handleUpdateItemText}
+                  onDelete={handleDeleteItem}
+                />
+              )}
             </RightColumn>
           </Body>
         )}
