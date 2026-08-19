@@ -683,7 +683,7 @@ export default function TaskDetailPanel({ card, isWide, onToggleWide, onClose, o
                 <ItemRow key={rule.entryId}>
                   <ItemDot />
                   <ItemTextBlock>
-                    <ItemTitle>{rule.title}</ItemTitle>
+                    <ItemTitle>{rule.titleEn ?? rule.title}</ItemTitle>
                     <ItemSrc>
                       {[rule.scopeName, rule.source?.label].filter(Boolean).join(' · ')}
                     </ItemSrc>
