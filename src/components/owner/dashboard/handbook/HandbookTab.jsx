@@ -314,13 +314,15 @@ function HandbookTab({ companyId }) {
             </LeftColumn>
             <RightColumn style={fillHeight ? { height: fillHeight } : undefined}>
               {addPanelOpen ? (
-                <AddItemPanel
-                  projects={projects}
-                  pending={createEntry.pending}
-                  onAddProject={handleAddProject}
-                  onSave={handleSaveNewItem}
-                  onClose={() => setAddPanelOpen(false)}
-                />
+                <ScrollArea>
+                  <AddItemPanel
+                    projects={projects}
+                    pending={createEntry.pending}
+                    onAddProject={handleAddProject}
+                    onSave={handleSaveNewItem}
+                    onClose={() => setAddPanelOpen(false)}
+                  />
+                </ScrollArea>
               ) : (
                 <HandbookDetailPanel
                   item={selectedItem}

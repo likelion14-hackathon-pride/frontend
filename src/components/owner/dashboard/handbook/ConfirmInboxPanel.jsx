@@ -114,11 +114,17 @@ const List = styled.div`
   flex-shrink: 0;
 `;
 
-const ItemGroup = styled.div`
+const CardBox = styled.div`
+  box-sizing: border-box;
   display: flex;
   width: 100%;
   flex-direction: column;
-  gap: 8px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  border: 0.667px solid #f0e7d6;
+  background: #fff;
+  opacity: ${({ $processing }) => ($processing ? 0.5 : 1)};
+  transition: opacity 0.15s ease;
 `;
 
 const Row = styled.div`
@@ -130,11 +136,6 @@ const Row = styled.div`
   align-items: center;
   gap: 12px;
   flex-shrink: 0;
-  border-radius: 12px;
-  border: 0.667px solid #f0e7d6;
-  background: #fff;
-  opacity: ${({ $processing }) => ($processing ? 0.5 : 1)};
-  transition: opacity 0.15s ease;
 `;
 
 const LeadingDot = styled.span`
@@ -243,10 +244,10 @@ const ConfirmButton = styled.button`
 const QuoteBox = styled.div`
   box-sizing: border-box;
   display: flex;
-  width: 100%;
+  width: calc(100% - 29.334px);
   flex-direction: column;
   gap: 8px;
-  margin-top: -4px;
+  margin: 0 14.667px 14.667px;
   background: #fafafb;
   border-radius: 11px;
   padding: 14px 16px;
@@ -362,46 +363,47 @@ function ConfirmInboxPanel({ items, pending = false, onConfirm, onConfirmAll, on
           <List>
             {items.map((item) => {
               const isProcessing = processingId === item.id;
+              const expanded = expandedId === item.id && item.koSource;
               return (
-              <ItemGroup key={item.id}>
-                <Row $processing={isProcessing}>
-                  <LeadingDot />
-                  <TextGroup type="button" onClick={() => toggleExpanded(item.id)}>
-                    <ItemText>{item.text || '(내용 없음)'}</ItemText>
-                    <SourceText>
-                      {item.groupLabel || getGroupLabel(item.groupKey)} · {item.sourceLabel}
-                    </SourceText>
-                  </TextGroup>
-                  <DeleteButton
-                    type="button"
-                    onClick={() => handleDelete(item.id)}
-                    disabled={isProcessing}
-                  >
-                    삭제
-                  </DeleteButton>
-                  {/* 내용이 없는 BLANK 항목은 서버가 승인을 거절한다(cannot_approve_blank). */}
-                  <ConfirmButton
-                    type="button"
-                    onClick={() => handleConfirm(item.id)}
-                    disabled={isProcessing || item.status === 'empty'}
-                  >
-                    저장
-                  </ConfirmButton>
-                </Row>
+                <CardBox key={item.id} $processing={isProcessing}>
+                  <Row>
+                    <LeadingDot />
+                    <TextGroup type="button" onClick={() => toggleExpanded(item.id)}>
+                      <ItemText>{item.text || '(내용 없음)'}</ItemText>
+                      <SourceText>
+                        {item.groupLabel || getGroupLabel(item.groupKey)} · {item.sourceLabel}
+                      </SourceText>
+                    </TextGroup>
+                    <DeleteButton
+                      type="button"
+                      onClick={() => handleDelete(item.id)}
+                      disabled={isProcessing}
+                    >
+                      삭제
+                    </DeleteButton>
+                    {/* 내용이 없는 BLANK 항목은 서버가 승인을 거절한다(cannot_approve_blank). */}
+                    <ConfirmButton
+                      type="button"
+                      onClick={() => handleConfirm(item.id)}
+                      disabled={isProcessing || item.status === 'empty'}
+                    >
+                      저장
+                    </ConfirmButton>
+                  </Row>
 
-                {expandedId === item.id && item.koSource && (
-                  <QuoteBox>
-                    <QuoteText>{item.koSource}</QuoteText>
-                    {item.sourceHref ? (
-                      <SourceLine href={item.sourceHref} target="_blank" rel="noreferrer">
-                        {item.sourceLabel}
-                      </SourceLine>
-                    ) : (
-                      <SourceLineText>{item.sourceLabel}</SourceLineText>
-                    )}
-                  </QuoteBox>
-                )}
-              </ItemGroup>
+                  {expanded && (
+                    <QuoteBox>
+                      <QuoteText>{item.koSource}</QuoteText>
+                      {item.sourceHref ? (
+                        <SourceLine href={item.sourceHref} target="_blank" rel="noreferrer">
+                          {item.sourceLabel}
+                        </SourceLine>
+                      ) : (
+                        <SourceLineText>{item.sourceLabel}</SourceLineText>
+                      )}
+                    </QuoteBox>
+                  )}
+                </CardBox>
               );
             })}
           </List>
