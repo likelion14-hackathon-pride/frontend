@@ -49,7 +49,7 @@ const List = styled.div`
   width: 100%;
   flex: 1;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: flex-start;
 `;
 
@@ -147,39 +147,35 @@ const EmptyRow = styled.div`
 `;
 
 function AiAnsweredList({ recentAnswers, ownerType }) {
-  const items = recentAnswers?.items ?? [];
+  // 대표가 직접 답한 건 SAI 가 "대신" 답한 게 아니므로 이 목록에서는 뺀다.
+  const items = (recentAnswers?.items ?? []).filter((item) => item.resolutionType !== ownerType);
 
   return (
     <Panel>
       <HeadRow>
         <Title>SAI가 대신 답한 순간</Title>
-        <TodayCount>오늘 {recentAnswers?.todayCount ?? 0}건</TodayCount>
+        <TodayCount>오늘 {items.length}건</TodayCount>
       </HeadRow>
       <List>
         {items.length === 0 ? (
           <EmptyRow>오늘 처리된 질문이 아직 없습니다</EmptyRow>
         ) : (
-          items.map((item, index) => {
-            const byOwner = item.resolutionType === ownerType;
-            return (
-              <Row key={`${item.resolvedAt}-${index}`}>
-                <MainGroup>
-                  <Time>{formatClock(item.resolvedAt, { fallback: '--:--' })}</Time>
-                  <TextGroup>
-                    <QuestionText>{item.question || '(질문 원문 없음)'}</QuestionText>
-                    <SourceText>
-                      {item.sourceLabels?.length
-                        ? `근거 · ${item.sourceLabels.join(' · ')}`
-                        : '근거 없음 → 대표님께 전달'}
-                    </SourceText>
-                  </TextGroup>
-                </MainGroup>
-                <Badge $tone={byOwner ? 'owner' : 'instant'}>
-                  {byOwner ? '대표 확인' : '즉시 답변'}
-                </Badge>
-              </Row>
-            );
-          })
+          items.map((item, index) => (
+            <Row key={`${item.resolvedAt}-${index}`}>
+              <MainGroup>
+                <Time>{formatClock(item.resolvedAt, { fallback: '--:--' })}</Time>
+                <TextGroup>
+                  <QuestionText>{item.question || '(질문 원문 없음)'}</QuestionText>
+                  <SourceText>
+                    {item.sourceLabels?.length
+                      ? `근거 · ${item.sourceLabels.join(' · ')}`
+                      : '근거 없음 → 대표님께 전달'}
+                  </SourceText>
+                </TextGroup>
+              </MainGroup>
+              <Badge $tone="instant">즉시 답변</Badge>
+            </Row>
+          ))
         )}
       </List>
     </Panel>
