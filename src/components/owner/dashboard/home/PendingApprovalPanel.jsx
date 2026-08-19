@@ -194,7 +194,9 @@ function PendingApprovalPanel({ waitingQuestions, onViewAll }) {
                 <IconShape />
               </IconBox>
               <TextGroup>
-                <QuestionText>{question.question}</QuestionText>
+                <QuestionText>
+                  {question.draftKo || question.questionEn || '(질문 없음)'}
+                </QuestionText>
                 <MetaText>
                   {[
                     question.askedByName,

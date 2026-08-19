@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 
 import * as handbookApi from '../../../../apis/handbook';
-import { ENTRY_STATUS, REVIEW_DECISION, SCOPE_KIND } from '../../../../apis/constants';
+import {ENTRY_ORIGIN, ENTRY_STATUS, REVIEW_DECISION, REVIEW_STATUS, SCOPE_KIND} from '../../../../apis/constants';
 import { ErrorState, InlineError, LoadingState } from '../../../common/AsyncStates';
 import { useAsync, useMutation } from '../../../../hooks/useAsync';
 import HandbookHeaderControls from './HandbookHeaderControls';
@@ -122,6 +122,15 @@ function HandbookTab({ companyId }) {
   const entriesQuery = useAsync(() => handbookApi.fetchAllEntries(companyId), [companyId], {
     enabled: Boolean(companyId),
   });
+  const reviewInboxQuery = useAsync(
+    () =>
+      handbookApi.fetchAllEntries(companyId, {
+        reviewStatus: REVIEW_STATUS.PENDING,
+        origin: [ENTRY_ORIGIN.SLACK, ENTRY_ORIGIN.GITHUB, ENTRY_ORIGIN.FILE].join(','),
+      }),
+    [companyId],
+    { enabled: Boolean(companyId) }
+  );
   const scopesQuery = useAsync(() => handbookApi.fetchScopes(companyId), [companyId], {
     enabled: Boolean(companyId),
   });
@@ -154,7 +163,14 @@ function HandbookTab({ companyId }) {
     [scopes]
   );
 
-  const waitingItems = items.filter((item) => item.status !== 'confirmed');
+  const waitingItems = useMemo(
+    () =>
+      (reviewInboxQuery.data ?? [])
+        .filter((entry) => entry.status !== ENTRY_STATUS.ARCHIVED)
+        .map(toItem)
+        .filter((item) => item.status !== 'confirmed'),
+    [reviewInboxQuery.data]
+  );
   // 오른쪽 상세 박스는 왼쪽 핸드북 트리(확정 항목)에 있는 것만 보여준다. 보관함의 초안은 대상이 아니다.
   const confirmedItems = items.filter((item) => item.status === 'confirmed');
   const selectedItem =
@@ -162,6 +178,7 @@ function HandbookTab({ companyId }) {
 
   const reload = () => {
     entriesQuery.reload();
+    reviewInboxQuery.reload();
     scopesQuery.reload();
   };
 
@@ -251,6 +268,7 @@ function HandbookTab({ companyId }) {
       <InlineError
         error={
           review.error ||
+          reviewInboxQuery.error ||
           reviewAll.error ||
           createEntry.error ||
           updateEntry.error ||

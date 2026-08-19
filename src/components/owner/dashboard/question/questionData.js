@@ -32,8 +32,8 @@ export function toQuestionRow(escalation) {
   return {
     id: escalation.id,
     employee: escalation.askedByName || '팀원',
-    // 화면에 띄우는 질문 문구. 보낸 원문이 있으면 그것이 대표가 실제로 본 문장이다.
-    text: escalation.sentText || escalation.draftKo || escalation.questionEn || '(질문 없음)',
+    // 대표 화면에는 Slack 멘션 등이 붙은 sentText 대신 한국어 초안을 보여 준다.
+    text: escalation.draftKo || escalation.questionEn || '(질문 없음)',
     questionEn: escalation.questionEn,
     draftKo: escalation.draftKo,
     project: escalation.scopeName || '공통 규칙',
