@@ -7,7 +7,6 @@ import {
   CONNECTION_STATUS,
   LOCAL_FILE_EXTENSIONS,
   LOCAL_FILE_MAX_SIZE,
-  LOCAL_FILE_MIME_TYPES,
 } from '../../../../apis/constants';
 import { toApiError } from '../../../../apis/errors';
 import { ErrorState, InlineError, LoadingState } from '../../../common/AsyncStates';
@@ -245,7 +244,6 @@ function SourceConnectStep({ companyId, connections, loading, error, onReload, o
     fileInputRef.current?.click();
   };
 
-  // 로컬 파일: 메타를 먼저 만들고, 서버가 준 S3 URL 로 파일을 직접 올린다.
   async function handleFileSelected(event) {
     const file = event.target.files?.[0];
     event.target.value = '';
@@ -264,37 +262,10 @@ function SourceConnectStep({ companyId, connections, loading, error, onReload, o
       setUploadError({ message: '파일이 너무 큽니다. 20MB 이하만 올릴 수 있습니다.' });
       return;
     }
-    // 브라우저가 확장자를 못 알아보는 경우가 있어 서버가 받는 값으로 보정한다.
-    const mimeType = LOCAL_FILE_MIME_TYPES[extension].includes(file.type)
-      ? file.type
-      : LOCAL_FILE_MIME_TYPES[extension][0];
 
     setUploading(true);
     try {
-      const created = await sourcesApi.createLocalFileUpload(companyId, {
-        fileName: file.name,
-        mimeType,
-        size: file.size,
-      });
-      // S3 presigned URL 은 우리 서버가 아니므로 axios 인스턴스를 태우지 않는다.
-      const response = await fetch(created.uploadTarget, {
-        method: 'PUT',
-        headers: { 'Content-Type': mimeType },
-        body: file,
-      });
-      if (!response.ok) throw new Error('upload failed');
-
-      // 온보딩에서 올린 파일은 다음 단계의 핸드북 초안이 되어야 한다.
-      // 추출을 걸어 두지 않으면 2단계에 아무것도 뜨지 않는다.
-      try {
-        await sourcesApi.startIngestion(companyId, {
-          provider: CONNECTION_KIND.LOCAL,
-          itemIds: [created.sourceFile.id],
-        });
-      } catch {
-        // 파일은 이미 올라갔다. 스케줄러가 대신 처리하므로 여기서 막지 않는다.
-      }
-
+      await sourcesApi.uploadAndCollectFile(companyId, file);
       onReload();
     } catch (caught) {
       setUploadError(

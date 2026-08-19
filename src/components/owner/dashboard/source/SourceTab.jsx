@@ -7,13 +7,11 @@ import {
   CONNECTION_KIND,
   LOCAL_FILE_EXTENSIONS,
   LOCAL_FILE_MAX_SIZE,
-  LOCAL_FILE_MIME_TYPES,
   LOCAL_FILE_STATUS,
   LOCAL_FILE_STATUS_LABEL,
   SCOPE_KIND,
   lookup,
 } from '../../../../apis/constants';
-import { toApiError } from '../../../../apis/errors';
 import { ErrorState, InlineError, LoadingState } from '../../../common/AsyncStates';
 import { useAsync, useMutation } from '../../../../hooks/useAsync';
 import { formatRelativeKo } from '../../../../utils/time';
@@ -116,6 +114,7 @@ const FILE_IN_FLIGHT_STATUSES = [LOCAL_FILE_STATUS.PENDING_UPLOAD, LOCAL_FILE_ST
 function SourceTab({ companyId }) {
   const [actionError, setActionError] = useState(null);
   const [collectTarget, setCollectTarget] = useState(null);
+  const [uploadTargetFile, setUploadTargetFile] = useState(null);
   const fileInputRef = useRef(null);
 
   const connectionsQuery = useAsync(() => sourcesApi.fetchConnections(companyId), [companyId], {
@@ -184,7 +183,21 @@ function SourceTab({ companyId }) {
     return sourcesApi.startIngestion(companyId, { provider: kind, itemIds: [item.id] });
   });
 
+  const uploadFile = useMutation(({ file, scopeId }) =>
+    sourcesApi.uploadAndCollectFile(companyId, file, scopeId)
+  );
+
   const handleCollect = async (scopeId) => {
+    if (uploadTargetFile) {
+      const result = await uploadFile.mutate({ file: uploadTargetFile, scopeId });
+      if (result.ok) {
+        setUploadTargetFile(null);
+        filesQuery.reload();
+        connectionsQuery.reload();
+      }
+      return;
+    }
+
     if (!collectTarget) return;
     const result = await collectItem.mutate({ ...collectTarget, scopeId });
     if (result.ok) {
@@ -240,42 +253,8 @@ function SourceTab({ companyId }) {
       setActionError({ message: '파일이 너무 큽니다. 20MB 이하만 올릴 수 있습니다.' });
       return;
     }
-    const mimeType = LOCAL_FILE_MIME_TYPES[extension].includes(file.type)
-      ? file.type
-      : LOCAL_FILE_MIME_TYPES[extension][0];
-
-    try {
-      const created = await sourcesApi.createLocalFileUpload(companyId, {
-        fileName: file.name,
-        mimeType,
-        size: file.size,
-      });
-      const response = await fetch(created.uploadTarget, {
-        method: 'PUT',
-        headers: { 'Content-Type': mimeType },
-        body: file,
-      });
-      if (!response.ok) throw new Error('upload failed');
-
-      // S3 에 올려 두는 것만으로는 아무 일도 일어나지 않는다. 텍스트 추출과 분류는
-      // 수집 작업이 한다. 서버 스케줄러도 곧 집어 가지만 그만큼 기다려야 하므로 바로 건다.
-      try {
-        await sourcesApi.startIngestion(companyId, {
-          provider: CONNECTION_KIND.LOCAL,
-          itemIds: [created.sourceFile.id],
-        });
-      } catch {
-        // 파일은 이미 올라갔다. 여기서 실패해도 스케줄러가 대신 처리하므로
-        // 업로드가 실패한 것처럼 알리지 않는다.
-      }
-
-      filesQuery.reload();
-      connectionsQuery.reload();
-    } catch (caught) {
-      setActionError(
-        caught?.response ? toApiError(caught) : { message: '파일을 올리지 못했습니다.' }
-      );
-    }
+    setCollectTarget(null);
+    setUploadTargetFile(file);
   }
 
   if (connectionsQuery.loading && !connectionsQuery.data) {
@@ -360,7 +339,9 @@ function SourceTab({ companyId }) {
       </HeaderTextGroup>
 
       <InlineError
-        error={actionError || addRepository.error || addChannel.error || collectItem.error}
+        error={
+          actionError || addRepository.error || addChannel.error || collectItem.error || uploadFile.error
+        }
       />
 
       <Grid>
@@ -397,13 +378,16 @@ function SourceTab({ companyId }) {
         onChange={handleUploadFile}
       />
 
-      {collectTarget && (
+      {(collectTarget || uploadTargetFile) && (
         <CollectScopeModal
-          itemName={collectTarget.item.name}
+          itemName={uploadTargetFile?.name ?? collectTarget.item.name}
           projects={projects}
-          pending={collectItem.pending}
+          pending={uploadFile.pending || collectItem.pending}
           onCollect={handleCollect}
-          onClose={() => setCollectTarget(null)}
+          onClose={() => {
+            setCollectTarget(null);
+            setUploadTargetFile(null);
+          }}
         />
       )}
     </TabContent>

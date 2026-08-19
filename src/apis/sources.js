@@ -1,6 +1,6 @@
 import { api } from './axiosInstance';
 import { ENDPOINTS } from './endpoints';
-import { CONNECTION_KIND } from './constants';
+import { CONNECTION_KIND, LOCAL_FILE_MIME_TYPES } from './constants';
 
 // 팀원도 볼 수 있는 것은 채널 목록과 채널 메시지뿐이다. 나머지는 대표 전용이다.
 
@@ -98,6 +98,34 @@ export function fetchLocalFiles(companyId, { cursor, limit } = {}) {
 // axios 인스턴스를 태우지 않고 fetch 로 PUT 한다.
 export function createLocalFileUpload(companyId, { fileName, mimeType, size }) {
   return api.post(ENDPOINTS.sources.files(companyId), { fileName, mimeType, size });
+}
+
+function extensionOf(fileName) {
+  const dot = fileName.lastIndexOf('.');
+  return dot === -1 ? '' : fileName.slice(dot).toLowerCase();
+}
+
+function fileWithSupportedMimeType(file) {
+  const supportedTypes = LOCAL_FILE_MIME_TYPES[extensionOf(file.name)];
+  if (!supportedTypes || supportedTypes.includes(file.type)) {
+    return file;
+  }
+
+  return new File([file], file.name, {
+    type: supportedTypes[0],
+    lastModified: file.lastModified,
+  });
+}
+
+export function uploadAndCollectFile(companyId, file, scopeId) {
+  const form = new FormData();
+  form.append('file', fileWithSupportedMimeType(file));
+
+  if (scopeId != null) {
+    form.append('scopeId', scopeId);
+  }
+
+  return api.post(ENDPOINTS.sources.files(companyId), form);
 }
 
 export function deleteLocalFile(companyId, itemId) {
