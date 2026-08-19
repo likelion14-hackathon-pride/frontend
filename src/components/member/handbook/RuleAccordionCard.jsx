@@ -86,6 +86,7 @@ export default function RuleAccordionCard({
   quote,
   sourceLine,
   sourceHref,
+  showSourceBox = true,
   defaultOpen,
 }) {
   return (
@@ -99,7 +100,7 @@ export default function RuleAccordionCard({
 
       {desc && <Desc>{desc}</Desc>}
 
-      {quote && (
+      {showSourceBox && quote && (
         <QuoteBox>
           <QuoteText>{quote}</QuoteText>
           {sourceLine && (

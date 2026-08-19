@@ -19,6 +19,12 @@ import { useMemberNavigation } from '../../context/member/MemberContext';
 import { formatDateTime } from '../../utils/time';
 
 const EMPTY = [];
+const MEMBER_AREA_DESCRIPTION = {
+  COMPANY: 'Values · mission · communication · handbook',
+  PEOPLE: 'HR · hiring · compensation · learning',
+  PRODUCT_ENG: 'Product principles · dev ops · support',
+  SECURITY: 'Security standards · operations',
+};
 
 function toRuleItem(entry, index) {
   const source = entry.source;
@@ -29,6 +35,7 @@ function toRuleItem(entry, index) {
     sourceTag: source?.label ?? lookup(ENTRY_ORIGIN_LABEL, entry.sourceType),
     desc: entry.ruleEn && entry.ruleEn !== entry.title ? entry.title : null,
     quote: entry.originalKo,
+    showSourceBox: !['ONBOARDING', 'DIRECT_ENTRY'].includes(entry.sourceType),
     sourceLine: source
       ? [
           `Source · ${lookup(EVIDENCE_TAG_LABEL, source.tag)}`,
@@ -73,7 +80,11 @@ export default function MemberHandbookPage() {
       return {
         id: scope.id,
         name: scope.name || lookup(AREA_KEY_LABEL, scope.areaKey),
-        meta: scope.description || lookup(AREA_KEY_DESCRIPTION, scope.areaKey),
+        meta:
+          scope.descriptionEn ||
+          MEMBER_AREA_DESCRIPTION[scope.areaKey] ||
+          scope.description ||
+          lookup(AREA_KEY_DESCRIPTION, scope.areaKey),
         items,
       };
     });
@@ -84,7 +95,7 @@ export default function MemberHandbookPage() {
     projectScopes.forEach((scope) => {
       map[String(scope.id)] = {
         name: scope.name,
-        description: scope.description,
+        description: scope.descriptionEn ?? scope.description ?? '',
         items: entries.filter((entry) => entry.scopeId === scope.id).map(toRuleItem),
       };
     });

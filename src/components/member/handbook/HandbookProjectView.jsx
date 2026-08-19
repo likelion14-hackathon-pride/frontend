@@ -58,6 +58,7 @@ export default function HandbookProjectView() {
                   quote={item.quote}
                   sourceLine={item.sourceLine}
                   sourceHref={item.sourceHref}
+                  showSourceBox={item.showSourceBox}
                   defaultOpen={item.defaultOpen}
                 />
               ))
