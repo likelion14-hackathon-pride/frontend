@@ -133,6 +133,8 @@ const Row = styled.div`
   border-radius: 12px;
   border: 0.667px solid #f0e7d6;
   background: #fff;
+  opacity: ${({ $processing }) => ($processing ? 0.5 : 1)};
+  transition: opacity 0.15s ease;
 `;
 
 const LeadingDot = styled.span`
@@ -307,9 +309,28 @@ const EmptyText = styled.span`
 
 function ConfirmInboxPanel({ items, pending = false, onConfirm, onConfirmAll, onDelete, onClose }) {
   const [expandedId, setExpandedId] = useState(null);
+  const [processingId, setProcessingId] = useState(null);
 
   const toggleExpanded = (id) => {
     setExpandedId((prev) => (prev === id ? null : id));
+  };
+
+  const handleConfirm = async (id) => {
+    setProcessingId(id);
+    try {
+      await onConfirm(id);
+    } finally {
+      setProcessingId(null);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    setProcessingId(id);
+    try {
+      await onDelete(id);
+    } finally {
+      setProcessingId(null);
+    }
   };
 
   return (
@@ -339,9 +360,11 @@ function ConfirmInboxPanel({ items, pending = false, onConfirm, onConfirmAll, on
       ) : (
         <ScrollArea accentColor="#9A6212">
           <List>
-            {items.map((item) => (
+            {items.map((item) => {
+              const isProcessing = processingId === item.id;
+              return (
               <ItemGroup key={item.id}>
-                <Row>
+                <Row $processing={isProcessing}>
                   <LeadingDot />
                   <TextGroup type="button" onClick={() => toggleExpanded(item.id)}>
                     <ItemText>{item.text || '(내용 없음)'}</ItemText>
@@ -349,14 +372,18 @@ function ConfirmInboxPanel({ items, pending = false, onConfirm, onConfirmAll, on
                       {item.groupLabel || getGroupLabel(item.groupKey)} · {item.sourceLabel}
                     </SourceText>
                   </TextGroup>
-                  <DeleteButton type="button" onClick={() => onDelete(item.id)} disabled={pending}>
+                  <DeleteButton
+                    type="button"
+                    onClick={() => handleDelete(item.id)}
+                    disabled={isProcessing}
+                  >
                     삭제
                   </DeleteButton>
                   {/* 내용이 없는 BLANK 항목은 서버가 승인을 거절한다(cannot_approve_blank). */}
                   <ConfirmButton
                     type="button"
-                    onClick={() => onConfirm(item.id)}
-                    disabled={pending || item.status === 'empty'}
+                    onClick={() => handleConfirm(item.id)}
+                    disabled={isProcessing || item.status === 'empty'}
                   >
                     저장
                   </ConfirmButton>
@@ -375,7 +402,8 @@ function ConfirmInboxPanel({ items, pending = false, onConfirm, onConfirmAll, on
                   </QuoteBox>
                 )}
               </ItemGroup>
-            ))}
+              );
+            })}
           </List>
         </ScrollArea>
       )}
