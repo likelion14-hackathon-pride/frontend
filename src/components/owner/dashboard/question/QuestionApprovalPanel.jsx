@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-import { lookup } from '../../../../apis/constants';
+import { ESCALATION_STATUS, lookup } from '../../../../apis/constants';
 import { formatShortKo } from '../../../../utils/time';
 import { ErrorState, LoadingState } from '../../../common/AsyncStates';
 
@@ -411,6 +411,7 @@ function QuestionApprovalPanel({
 
   const meta = lookup(STATUS_META, question.status);
   const proposal = detail?.proposal ?? null;
+  const needsReanswer = question.serverStatus === ESCALATION_STATUS.SENT && question.declined;
 
   const startEdit = () => {
     setDraftTitle(proposal?.title ?? '');
@@ -432,7 +433,10 @@ function QuestionApprovalPanel({
     <Panel>
       <HeaderRow>
         <HeaderLeft>
-          <StatusBadge $bg={meta.bg} $color={meta.color}>
+          <StatusBadge
+            $bg={needsReanswer ? '#FEF2F2' : meta.bg}
+            $color={needsReanswer ? '#DC2626' : meta.color}
+          >
             {meta.label}
           </StatusBadge>
           <ProjectText>{question.project}</ProjectText>
@@ -460,8 +464,8 @@ function QuestionApprovalPanel({
 
       {question.status === 'waiting' && (
         <>
-          <StatusBanner style={{ background: '#FFF6E8' }}>
-            <StatusBannerTitle style={{ color: '#9A6212' }}>
+          <StatusBanner style={{ background: needsReanswer ? '#FEF2F2' : '#FFF6E8' }}>
+            <StatusBannerTitle style={{ color: needsReanswer ? '#DC2626' : '#9A6212' }}>
               {question.serverStatus === 'DRAFT'
                 ? '팀원이 아직 슬랙으로 보내지 않았습니다.'
                 : '슬랙 스레드에 답장해 주세요.'}

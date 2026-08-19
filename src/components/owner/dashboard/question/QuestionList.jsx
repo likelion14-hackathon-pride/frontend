@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import { lookup } from '../../../../apis/constants';
+import { ESCALATION_STATUS, lookup } from '../../../../apis/constants';
 
 const STATUS_META = {
   waiting: { label: '답변 대기', bg: '#FFF6E8', color: '#9A6212' },
@@ -148,6 +148,7 @@ function QuestionList({ questions, selectedId, onSelect }) {
     <Panel>
       {questions.map((q) => {
         const meta = lookup(STATUS_META, q.status);
+        const needsReanswer = q.serverStatus === ESCALATION_STATUS.SENT && q.declined;
         return (
           <Row
             key={q.id}
@@ -165,7 +166,10 @@ function QuestionList({ questions, selectedId, onSelect }) {
                 {q.declined ? ' · 응답 거부' : ''}
               </SourceText>
             </TextGroup>
-            <Badge $bg={meta.bg} $color={meta.color}>
+            <Badge
+              $bg={needsReanswer ? '#FEF2F2' : meta.bg}
+              $color={needsReanswer ? '#DC2626' : meta.color}
+            >
               {meta.label}
             </Badge>
           </Row>
