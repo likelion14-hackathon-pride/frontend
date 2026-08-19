@@ -82,7 +82,7 @@ const EMPTY_ANSWER_TEXT = {
 
 export default function ChatBubble({ message, channels = [] }) {
   const { companyId, reloadCards } = useMemberNavigation();
-  const [view, setView] = useState('collapsed'); // 'collapsed' | 'reviewing' | 'sent'
+  const [isSent, setIsSent] = useState(false);
   const [escalation, setEscalation] = useState(null);
   const [sentLabel, setSentLabel] = useState('');
 
@@ -122,11 +122,6 @@ export default function ChatBubble({ message, channels = [] }) {
     return result.data;
   }
 
-  async function handleReview() {
-    const created = await ensureEscalation();
-    if (created) setView('reviewing');
-  }
-
   async function handleSend(extraEn = [], itemId) {
     const created = await ensureEscalation();
     if (!created) return;
@@ -144,7 +139,7 @@ export default function ChatBubble({ message, channels = [] }) {
     const channelName = channels.find((channel) => channel.id === targetItemId)?.label ?? '슬랙';
     setSentLabel(`Sent to ${channelName}`);
     setEscalation(result.data);
-    setView('sent');
+    setIsSent(true);
     // 카드에서 올라온 질문이면 보드의 열이 바뀐다.
     reloadCards();
   }
@@ -172,15 +167,12 @@ export default function ChatBubble({ message, channels = [] }) {
 
         {needsOwner && message.draftKo && (
           <DraftReplyBlock
-            view={view}
+            view={isSent ? 'sent' : 'reviewing'}
             enText={message.question ?? message.body}
             draftKr={escalation?.draftKo ?? message.draftKo}
             channels={channels}
             pending={create.pending || send.pending}
             sentLabel={sentLabel}
-            onReview={handleReview}
-            onSendAsIs={() => handleSend([])}
-            onCancelReview={() => setView('collapsed')}
             onSend={handleSend}
           />
         )}

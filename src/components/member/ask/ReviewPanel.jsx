@@ -224,6 +224,12 @@ const ChannelSelect = styled.select`
   outline: none;
 `;
 
+const NoChannelNote = styled.div`
+  font-size: 12.5px;
+  color: #a0a0a8;
+  line-height: 1.6;
+`;
+
 const OwnerNote = styled.div`
   flex: 1;
   min-width: 0;
@@ -349,19 +355,26 @@ export default function ReviewPanel({
 
       {hint && <Hint>{hint}</Hint>}
 
-      <ChannelRow>
-        <ChannelLabel>Sent to</ChannelLabel>
-        <ChannelSelect
-          value={itemId ?? ''}
-          onChange={(event) => setItemId(Number(event.target.value))}
-        >
-          {channels.map((channel) => (
-            <option key={channel.id} value={channel.id}>
-              {channel.label}
-            </option>
-          ))}
-        </ChannelSelect>
-      </ChannelRow>
+      {channels.length > 0 ? (
+        <ChannelRow>
+          <ChannelLabel>Sent to</ChannelLabel>
+          <ChannelSelect
+            value={itemId ?? ''}
+            onChange={(event) => setItemId(Number(event.target.value))}
+          >
+            {channels.map((channel) => (
+              <option key={channel.id} value={channel.id}>
+                {channel.label}
+              </option>
+            ))}
+          </ChannelSelect>
+        </ChannelRow>
+      ) : (
+        <NoChannelNote>
+          No Slack channel is connected yet. The owner needs to add one under Source connections
+          before this can be sent.
+        </NoChannelNote>
+      )}
 
       <FooterRow>
         <OwnerNote>Sent to the owner's Slack channel in Korean.</OwnerNote>
@@ -369,7 +382,7 @@ export default function ReviewPanel({
           Cancel
         </CancelButton>
         <SendButton onClick={() => onSend(addedItems, itemId)} disabled={pending || !itemId}>
-          {pending ? '보내는 중…' : 'Send in Slack'}
+          {pending ? 'Sending…' : 'Send in Slack'}
         </SendButton>
       </FooterRow>
     </Panel>
