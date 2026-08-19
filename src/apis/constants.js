@@ -195,10 +195,10 @@ export const AREA_KEY_LABEL = {
 };
 
 export const AREA_KEY_DESCRIPTION = {
-  COMPANY: 'Values · mission · communication · handbook operations',
-  PEOPLE: 'HR · hiring · diversity · compensation · learning',
-  PRODUCT_ENG: 'Product principles · dev ops · customer support · open source',
-  SECURITY: 'Security standards · product security · security ops · threat management',
+  COMPANY: '가치 · 미션 · 커뮤니케이션 · 핸드북 운영',
+  PEOPLE: '인사 · 채용 · 다양성 · 보상 · 학습',
+  PRODUCT_ENG: '제품 원칙 · 개발 운영 · 고객지원 · 오픈소스',
+  SECURITY: '보안 표준 · 제품 보안 · 보안 운영 · 위협 관리',
   DEFAULT: '',
 };
 
