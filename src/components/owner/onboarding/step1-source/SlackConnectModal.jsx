@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import * as sourcesApi from '../../../../apis/sources';
 import { toApiError } from '../../../../apis/errors';
 
-const TOTAL_STEPS = 5;
+const TOTAL_STEPS = 6;
 const COPY_RESET_MS = 1800;
 
 // 슬랙 이벤트 수신 주소. config/urls.py 의 path('api/slack/events/') 그대로다.
@@ -21,6 +21,7 @@ const RAIL_META = [
   { id: 3, title: 'Signing Secret 복사', place: 'Slack에서', category: 'slack' },
   { id: 4, title: '복사한 값 붙여넣기', place: 'SAI에서', category: 'sai' },
   { id: 5, title: '실시간 수신 설정', place: 'Slack에서', category: 'slack' },
+  { id: 6, title: '읽을 채널 선택', place: 'SAI에서', category: 'sai' },
 ];
 
 const PERMISSION_ROWS = [
@@ -113,7 +114,7 @@ const StepAndCloseGroup = styled.div`
 
 const DotBar = styled.div`
   display: flex;
-  width: 66px;
+  width: 84px;
   height: 7px;
   justify-content: center;
   align-items: center;
@@ -1205,7 +1206,7 @@ settings:
   };
 
   const goTo = (n) => {
-    if (n === 5 && conn !== 'success') return;
+    if ((n === 5 && conn !== 'success') || n === 6) return;
     setCurrent(n);
   };
 
@@ -1327,6 +1328,7 @@ settings:
     primaryLabel = '완료';
     primaryAction = () => {
       setDone((prev) => ({ ...prev, 5: true }));
+      setCurrent(6);
       setScreen('channels');
       loadAvailableChannels();
     };
@@ -1394,7 +1396,8 @@ settings:
               <SidebarLabel>연결 순서</SidebarLabel>
               {RAIL_META.map((meta) => {
                 const isCurrent = meta.id === current;
-                const isLocked = meta.id === 5 && conn !== 'success' && !isCurrent;
+                const isLocked =
+                  meta.id === 6 || (meta.id === 5 && conn !== 'success' && !isCurrent);
                 const variant = isCurrent ? 'current' : isLocked ? 'locked' : 'todo';
 
                 return (
@@ -1817,7 +1820,7 @@ settings:
         ) : (
           <ChannelsWrap>
             <Badge $type="sai">● SAI에서 할 일</Badge>
-            <ContentHeading style={{ margin: '14px 0 0' }}>수집 채널 선택</ContentHeading>
+            <ContentHeading style={{ margin: '14px 0 0' }}>읽을 채널 선택</ContentHeading>
             <ContentDescription style={{ margin: '8px 0 0' }}>
               채널마다 최근 대화를 가져옵니다. 슬랙 무료 플랜은 90일 이전 기록을 제공하지 않습니다.
             </ContentDescription>
@@ -1866,7 +1869,9 @@ settings:
                         </ChannelPrivateHint>
                       )}
                     </ChannelTextGroup>
-                    <ChannelMembers>{channel.isMember ? '참여 중' : '추가 시 참여'}</ChannelMembers>
+                    {channel.memberCount != null && (
+                      <ChannelMembers>{channel.memberCount}명</ChannelMembers>
+                    )}
                   </ChannelRow>
                 );
               })}
@@ -1886,6 +1891,7 @@ settings:
               <GhostButton
                 type="button"
                 onClick={() => {
+                  setCurrent(6);
                   setScreen('channels');
                   loadAvailableChannels();
                 }}
