@@ -98,7 +98,7 @@ export default function TasksGreeting({ taskCount = 0, userName, onAskClick }) {
         <TextBlock>
           <Title>
             {taskCount === 0
-              ? '아직 들어온 지시가 없습니다'
+              ? 'No new tasks yet'
               : `${taskCount} new task${taskCount === 1 ? '' : 's'}`}
             {userName ? `, ${userName}` : ''}
           </Title>
