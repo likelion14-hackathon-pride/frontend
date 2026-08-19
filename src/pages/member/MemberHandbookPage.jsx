@@ -107,7 +107,7 @@ export default function MemberHandbookPage() {
   return (
     <MemberShell screenTitle="Handbook">
       {entriesQuery.loading && !entriesQuery.data ? (
-        <LoadingState label="핸드북을 불러오는 중…" />
+        <LoadingState label="Loading handbook…" />
       ) : entriesQuery.error && !entriesQuery.data ? (
         <ErrorState error={entriesQuery.error} onRetry={entriesQuery.reload} />
       ) : (

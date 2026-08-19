@@ -73,7 +73,7 @@ export default function HandbookCompanyView() {
 
       <Wrap>
         {isEmpty && (
-          <EmptyState label="아직 확정된 회사 규칙이 없습니다. 대표님이 Day 0 질문에 답하면 여기에 쌓입니다." />
+          <EmptyState label="No confirmed company rules yet. These will appear once the owner answers the Day 0 questions." />
         )}
 
         {companyGroups.map((group) => (
@@ -85,7 +85,7 @@ export default function HandbookCompanyView() {
             />
             <CardGroup>
               {group.items.length === 0 ? (
-                <EmptyState compact label="이 영역에는 아직 규칙이 없습니다" />
+                <EmptyState compact label="No rules in this area yet" />
               ) : (
                 group.items.map((item) => (
                   <RuleAccordionCard

@@ -169,6 +169,13 @@ const Content = styled.div`
   padding: 18px 32px 60px;
   overflow-y: auto;
   overflow-x: hidden;
+
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 export default function MemberShell({ screenTitle, children }) {

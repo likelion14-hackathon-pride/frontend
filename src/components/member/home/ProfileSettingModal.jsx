@@ -239,10 +239,10 @@ export default function ProfileSettingModal({ onClose }) {
           <Label>YOUR NAME</Label>
           <ReadOnlyValue>{profile.name || '—'}</ReadOnlyValue>
           {/* PATCH /api/me 는 location / role / locale 만 받는다. 이름은 가입 때 정해진다. */}
-          <FieldNote>이름은 가입할 때 정해집니다. 지금은 여기서 바꿀 수 없습니다.</FieldNote>
+          <FieldNote>Your name is set when you sign up and can't be changed here.</FieldNote>
         </Field>
 
-        {optionsQuery.loading && <LoadingState compact label="선택지를 불러오는 중…" />}
+        {optionsQuery.loading && <LoadingState compact label="Loading options…" />}
         {optionsQuery.error && !optionsQuery.data && (
           <ErrorState error={optionsQuery.error} onRetry={optionsQuery.reload} compact />
         )}
@@ -268,9 +268,11 @@ export default function ProfileSettingModal({ onClose }) {
               </ChipGrid>
               {selectedLocation && (
                 <OverlapNote>
-                  대표 근무시간은 이곳 시계로 {String(selectedLocation.ownerHoursStart).slice(0, 5)}
-                  –{String(selectedLocation.ownerHoursEnd).slice(0, 5)} 입니다. 하루에 겹치는 시간은{' '}
-                  {selectedLocation.overlapHours}시간.
+                  The owner's working hours are{' '}
+                  {String(selectedLocation.ownerHoursStart).slice(0, 5)}–
+                  {String(selectedLocation.ownerHoursEnd).slice(0, 5)} on this clock. Overlap per
+                  day: {selectedLocation.overlapHours} hour
+                  {selectedLocation.overlapHours === 1 ? '' : 's'}.
                 </OverlapNote>
               )}
             </Field>
@@ -297,10 +299,10 @@ export default function ProfileSettingModal({ onClose }) {
 
         <ButtonRow>
           <CancelButton type="button" onClick={onClose}>
-            닫기
+            Cancel
           </CancelButton>
           <SaveButton type="button" onClick={handleSave} disabled={save.pending}>
-            {save.pending ? '저장 중…' : 'Save'}
+            {save.pending ? 'Saving…' : 'Save'}
           </SaveButton>
         </ButtonRow>
       </Modal>

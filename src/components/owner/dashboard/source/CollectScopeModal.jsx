@@ -177,8 +177,8 @@ function CollectScopeModal({ itemName, projects = [], pending = false, onCollect
         </HeadRow>
 
         <HintText>
-          회사 규칙으로 모으면 어느 영역에 해당하는지는 SAI 가 내용을 보고 스스로 분류합니다.
-          특정 프로젝트에서만 쓰는 내용이라면 프로젝트를 골라 주세요.
+          회사 규칙으로 모으면 어느 영역에 해당하는지는 SAI 가 내용을 보고 스스로 분류합니다. 특정
+          프로젝트에서만 쓰는 내용이라면 프로젝트를 골라 주세요.
         </HintText>
 
         <ChipRow>

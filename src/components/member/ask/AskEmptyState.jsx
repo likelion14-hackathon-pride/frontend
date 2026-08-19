@@ -83,11 +83,7 @@ export default function AskEmptyState({
       <Icon src={mascot} alt="" />
       <div>
         <Title>Ask me anything, {userName}</Title>
-        <Subtitle>
-          Your team's Slack, GitHub and handbook are already read.
-          <br />
-          No waiting for 김대표.
-        </Subtitle>
+        <Subtitle>Your team's Slack, GitHub and handbook are already read.</Subtitle>
       </div>
 
       <SuggestionRow>

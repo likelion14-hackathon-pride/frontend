@@ -340,7 +340,11 @@ function SourceTab({ companyId }) {
 
       <InlineError
         error={
-          actionError || addRepository.error || addChannel.error || collectItem.error || uploadFile.error
+          actionError ||
+          addRepository.error ||
+          addChannel.error ||
+          collectItem.error ||
+          uploadFile.error
         }
       />
 

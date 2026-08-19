@@ -15,10 +15,9 @@ import { InlineError, LoadingState } from '../../components/common/AsyncStates';
 import { useAsync } from '../../hooks/useAsync';
 import { useMemberNavigation } from '../../context/member/MemberContext';
 
+// Layout 은 이제 폭 제한이 없다 — 화면 전체 폭을 차지해야 스크롤바가 진짜 오른쪽 끝에 붙는다.
 const Layout = styled.div`
   width: 100%;
-  max-width: 760px;
-  margin: 0 auto;
   flex: 1;
   min-height: 0;
   display: flex;
@@ -27,10 +26,28 @@ const Layout = styled.div`
   overflow: hidden;
 `;
 
-const MessageList = styled.div`
+// 스크롤은 이 영역(화면 전체 폭)에서 일어난다.
+const ScrollArea = styled.div`
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`;
+
+// 실제 채팅 내용은 이 안에서만 760px로 가운데 정렬 — 폭은 예전과 동일하다.
+const CenteredContent = styled.div`
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+`;
+
+const MessageList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -38,7 +55,9 @@ const MessageList = styled.div`
 `;
 
 const Footer = styled.div`
-  margin-top: auto;
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -154,21 +173,25 @@ export default function MemberAskPage() {
   return (
     <MemberShell screenTitle="Ask SAI">
       <Layout>
-        {messages.length === 0 ? (
-          <AskEmptyState userName={profile.name} onSuggestionClick={(q) => handleSend(q)} />
-        ) : (
-          <MessageList ref={listRef}>
-            {messages.map((message, index) => (
-              <ChatBubble
-                key={`${index}-${message.role}-${message.messageId ?? 'local'}`}
-                message={message}
-                channels={channels}
-                onEscalated={() => {}}
-              />
-            ))}
-            {sending && <LoadingState compact label="SAI is checking the handbook..." />}
-          </MessageList>
-        )}
+        <ScrollArea ref={listRef}>
+          <CenteredContent>
+            {messages.length === 0 ? (
+              <AskEmptyState userName={profile.name} onSuggestionClick={(q) => handleSend(q)} />
+            ) : (
+              <MessageList>
+                {messages.map((message, index) => (
+                  <ChatBubble
+                    key={`${index}-${message.role}-${message.messageId ?? 'local'}`}
+                    message={message}
+                    channels={channels}
+                    onEscalated={() => {}}
+                  />
+                ))}
+                {sending && <LoadingState compact label="SAI is checking the handbook..." />}
+              </MessageList>
+            )}
+          </CenteredContent>
+        </ScrollArea>
 
         <Footer>
           <InlineError error={askError} />

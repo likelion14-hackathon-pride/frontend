@@ -3,6 +3,8 @@ import styled from 'styled-components';
 const Card = styled.button`
   flex: none;
   max-width: 238px;
+  height: 160px;
+  overflow: hidden;
   background: #ff6000;
   border-radius: 18px;
   box-shadow:
@@ -72,7 +74,7 @@ const MessagePreview = styled.span`
   color: #fff;
   line-height: 1.55;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   font-weight: 400;
   overflow: hidden;

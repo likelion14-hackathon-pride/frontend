@@ -2,7 +2,13 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 
 import * as handbookApi from '../../../../apis/handbook';
-import {ENTRY_ORIGIN, ENTRY_STATUS, REVIEW_DECISION, REVIEW_STATUS, SCOPE_KIND} from '../../../../apis/constants';
+import {
+  ENTRY_ORIGIN,
+  ENTRY_STATUS,
+  REVIEW_DECISION,
+  REVIEW_STATUS,
+  SCOPE_KIND,
+} from '../../../../apis/constants';
 import { ErrorState, InlineError, LoadingState } from '../../../common/AsyncStates';
 import { useAsync, useMutation } from '../../../../hooks/useAsync';
 import HandbookHeaderControls from './HandbookHeaderControls';

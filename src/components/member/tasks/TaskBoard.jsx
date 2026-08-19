@@ -40,6 +40,13 @@ const Grid = styled.div`
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 10px;
   align-items: start;
+
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 export default function TaskBoard({
