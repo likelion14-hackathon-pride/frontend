@@ -121,7 +121,7 @@ export default function MemberHomeSummary({ slackMessages, turnedIntoTasks, wait
         <UserText>
           <UserName>{user?.name || '이름 없음'}</UserName>
           <UserMeta>
-            {user?.locationLabel ?? '—'}
+            {[user?.roleLabel, user?.locationLabel].filter(Boolean).join(' · ')}
             {zoneLabel ? ` (${zoneLabel})` : ''}
           </UserMeta>
         </UserText>

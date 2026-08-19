@@ -9,6 +9,7 @@ const Box = styled.div`
   justify-content: center;
   gap: 10px;
   width: 100%;
+  flex-shrink: 0;
   min-height: ${({ $compact }) => ($compact ? '80px' : '160px')};
   padding: 20px;
   text-align: center;
@@ -17,6 +18,7 @@ const Box = styled.div`
 const Spinner = styled.span`
   width: 22px;
   height: 22px;
+  flex-shrink: 0;
   border-radius: 50%;
   border: 2.5px solid rgba(23, 23, 27, 0.1);
   border-top-color: #ff6000;

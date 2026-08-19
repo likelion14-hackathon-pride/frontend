@@ -118,6 +118,13 @@ const Body = styled.div`
   display: flex;
   flex-direction: column;
   gap: 12px;
+
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 const MainCard = styled.div`

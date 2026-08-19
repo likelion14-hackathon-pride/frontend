@@ -196,7 +196,7 @@ export default function LoadingScreen() {
           <Dot $delay="0.36s" />
         </Dots>
 
-        <Caption>잠시만 기다려 주세요</Caption>
+        <Caption>Please wait a moment </Caption>
       </Inner>
     </Wrapper>
   );

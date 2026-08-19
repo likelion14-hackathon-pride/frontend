@@ -28,6 +28,13 @@ const Modal = styled.div`
   box-shadow: 0 30px 80px rgba(17, 17, 20, 0.35);
   padding: 26px 28px;
   transform: scale(${(props) => props.$scale ?? 1});
+
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 const Header = styled.div`
