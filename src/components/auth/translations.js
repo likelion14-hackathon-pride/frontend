@@ -35,8 +35,7 @@ export const translations = {
     // value 는 백엔드 WorkLocation.TextChoices 값 그대로다(accounts/profile.py).
     // 목록에 없는 도시는 고를 수 없다. 서버가 타임존을 이 값으로 정하기 때문이다.
     workLocationOptions: [
-      { value: 'HANOI', label: '하노이' },
-      { value: 'DA_NANG', label: '다낭' },
+      { value: 'HANOI', label: '호치민' },
       { value: 'JAKARTA', label: '자카르타' },
       { value: 'NEW_YORK', label: '뉴욕' },
       { value: 'SEOUL', label: '서울' },
@@ -91,8 +90,7 @@ export const translations = {
     backLabel: 'Back',
     workLocationLabel: 'Work location',
     workLocationOptions: [
-      { value: 'HANOI', label: 'Hanoi' },
-      { value: 'DA_NANG', label: 'Da Nang' },
+      { value: 'HANOI', label: 'Ho Chi Minh' },
       { value: 'JAKARTA', label: 'Jakarta' },
       { value: 'NEW_YORK', label: 'New York' },
       { value: 'SEOUL', label: 'Seoul' },
