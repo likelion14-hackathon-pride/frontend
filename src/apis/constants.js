@@ -9,8 +9,8 @@ export const WORK_LOCATION = {
 };
 
 export const WORK_LOCATION_LABEL = {
-  HANOI: 'Hanoi',
-  DA_NANG: 'Da Nang',
+  HANOI: 'Ho Chi Minh',
+  DA_NANG: 'Ho Chi Minh',
   JAKARTA: 'Jakarta',
   NEW_YORK: 'New York',
   SEOUL: 'Seoul',

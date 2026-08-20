@@ -86,7 +86,7 @@ export default function SaiResolutionCard({ percent, resolved, total, dateRange 
     <Card>
       <Header>
         <img src={graphIcon} alt="" width={15} height={15} />
-        <HeaderTitle>SAI resolution</HeaderTitle>
+        <HeaderTitle>SAi resolution</HeaderTitle>
       </Header>
 
       <Body>

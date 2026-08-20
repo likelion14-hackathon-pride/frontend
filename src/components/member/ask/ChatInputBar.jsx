@@ -93,7 +93,7 @@ export default function ChatInputBar({
             onChange={handleChange}
             onKeyDown={handleKeyDown}
             disabled={disabled}
-            placeholder="Ask SAI anything about this team"
+            placeholder="Ask SAi anything about this team"
           />
           <SendButton onClick={handleSend} disabled={disabled || !inputValue.trim()}>
             ↑

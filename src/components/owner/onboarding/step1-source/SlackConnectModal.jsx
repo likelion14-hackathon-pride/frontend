@@ -1321,7 +1321,7 @@ settings:
       primaryAction = handleConnect;
       primaryEnabled = token.trim() !== '' && secret.trim() !== '' && !tokenBad;
       footerNote = primaryEnabled
-        ? 'SAI가 슬랙과 값이 맞는지 확인합니다.'
+        ? 'SAi가 슬랙과 값이 맞는지 확인합니다.'
         : '두 값을 모두 붙여넣으면 연결할 수 있습니다.';
     }
   } else if (current === 5) {
@@ -1424,7 +1424,7 @@ settings:
               {current === 1 && (
                 <>
                   <Badge $type="slack">◆ Slack에서 할 일</Badge>
-                  <ContentHeading>슬랙에 SAI 추가하기</ContentHeading>
+                  <ContentHeading>슬랙에 SAi 추가하기</ContentHeading>
                   <ContentDescription>
                     슬랙이 외부 서비스에 대화를 열어주려면 연결용 앱을 하나 등록해야 합니다. 새
                     워크스페이스를 만드는 것이 아니며, 기존 채널과 대화는 그대로 유지됩니다.
@@ -1640,7 +1640,7 @@ settings:
                   <Badge $type="slack">◆ Slack에서 할 일</Badge>
                   <ContentHeading>Signing Secret 복사</ContentHeading>
                   <ContentDescription>
-                    SAI가 슬랙에서 온 요청인지 확인할 때 쓰는 값입니다.
+                    SAi가 슬랙에서 온 요청인지 확인할 때 쓰는 값입니다.
                   </ContentDescription>
 
                   <InstructionBox>
@@ -1673,7 +1673,7 @@ settings:
 
               {current === 4 && (
                 <>
-                  <Badge $type="sai">● SAI에서 할 일</Badge>
+                  <Badge $type="sai">● SAi에서 할 일</Badge>
                   <ContentHeading>복사한 값 붙여넣기</ContentHeading>
                   <ContentDescription>
                     2단계와 3단계에서 복사한 값을 각각 넣어 주세요.
@@ -1754,7 +1754,7 @@ settings:
                   <Badge $type="slack">◆ Slack에서 할 일</Badge>
                   <ContentHeading>실시간 수신 설정</ContentHeading>
                   <ContentDescription>
-                    앞으로 새로 올라오는 메시지를 SAI가 바로 받도록 주소를 등록합니다.
+                    앞으로 새로 올라오는 메시지를 SAi가 바로 받도록 주소를 등록합니다.
                   </ContentDescription>
 
                   <InstructionBox>
@@ -1819,7 +1819,7 @@ settings:
           </Body>
         ) : (
           <ChannelsWrap>
-            <Badge $type="sai">● SAI에서 할 일</Badge>
+            <Badge $type="sai">● SAi에서 할 일</Badge>
             <ContentHeading style={{ margin: '14px 0 0' }}>읽을 채널 선택</ContentHeading>
             <ContentDescription style={{ margin: '8px 0 0' }}>
               채널마다 최근 대화를 가져옵니다. 슬랙 무료 플랜은 90일 이전 기록을 제공하지 않습니다.

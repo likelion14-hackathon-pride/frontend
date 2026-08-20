@@ -101,7 +101,7 @@ export default function MemberHomeSummary({ slackMessages, turnedIntoTasks, wait
   return (
     <Wrap>
       <SummaryCard>
-        <SummaryTitle>SAI READ FOR YOU TODAY</SummaryTitle>
+        <SummaryTitle>SAi READ FOR YOU TODAY</SummaryTitle>
         <Row>
           <span>Slack messages</span>
           <strong>{show(slackMessages)}</strong>

@@ -129,7 +129,7 @@ export default function AskCard() {
         <TextBlock>
           <Title>Ask instead of waiting</Title>
           <Subtitle>
-            SAI knows your team's rules — it turns the ask into a clear next step for you
+            SAi knows your team's rules — it turns the ask into a clear next step for you
           </Subtitle>
         </TextBlock>
       </MainButton>

@@ -153,7 +153,7 @@ function AiAnsweredList({ recentAnswers, ownerType }) {
   return (
     <Panel>
       <HeadRow>
-        <Title>SAI가 대신 답한 순간</Title>
+        <Title>SAi가 대신 답한 순간</Title>
         <TodayCount>오늘 {items.length}건</TodayCount>
       </HeadRow>
       <List>

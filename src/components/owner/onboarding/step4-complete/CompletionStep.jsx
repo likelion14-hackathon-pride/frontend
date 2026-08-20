@@ -485,7 +485,7 @@ function CompletionStep({ summary, companyCode, onReviewSettings, onOpenHandbook
           </BannerTitleWrap>
           <BannerSubtitleWrap>
             <BannerSubtitle>
-              SAI로 원격 팀원과의 협업을 더 쉽게 만들어보세요. 팀의 규칙에 맞춰 정확한 지시로
+              SAi로 원격 팀원과의 협업을 더 쉽게 만들어보세요. 팀의 규칙에 맞춰 정확한 지시로
               안내해드립니다.
             </BannerSubtitle>
           </BannerSubtitleWrap>

@@ -1,6 +1,6 @@
 export const translations = {
   ko: {
-    brandWelcome: 'SAI에 오신 것을 환영합니다',
+    brandWelcome: 'SAi에 오신 것을 환영합니다',
     heroTitle: 'SAI가 사이를 메웁니다',
     heroDescriptionLine1: [
       { text: '나라도 언어도 일하는 방식도 다른 글로벌 협업 팀 ' },
@@ -35,8 +35,7 @@ export const translations = {
     // value 는 백엔드 WorkLocation.TextChoices 값 그대로다(accounts/profile.py).
     // 목록에 없는 도시는 고를 수 없다. 서버가 타임존을 이 값으로 정하기 때문이다.
     workLocationOptions: [
-      { value: 'HANOI', label: '하노이' },
-      { value: 'DA_NANG', label: '다낭' },
+      { value: 'HANOI', label: '호치민' },
       { value: 'JAKARTA', label: '자카르타' },
       { value: 'NEW_YORK', label: '뉴욕' },
       { value: 'SEOUL', label: '서울' },
@@ -52,15 +51,15 @@ export const translations = {
       { value: 'QA', label: 'QA' },
       { value: 'DATA', label: '데이터' },
     ],
-    submitSetup: 'SAI 시작하기',
+    submitSetup: 'SAi 시작하기',
     errorRequired: '모든 항목을 입력해주세요.',
     errorSetupRequired: '근무 위치와 담당 역할을 선택해주세요.',
     errorLoginRequired: '이메일과 비밀번호를 모두 입력해주세요.',
   },
   en: {
-    brandWelcome: 'Welcome to SAI',
-    heroTitle: 'Say it to SAI',
-    heroDescriptionLine1: [{ text: 'SAI reads the instructions and the handbook for you,' }],
+    brandWelcome: 'Welcome to SAi',
+    heroTitle: 'Say it to SAi',
+    heroDescriptionLine1: [{ text: 'SAi reads the instructions and the handbook for you,' }],
     heroDescriptionLine2: [
       { text: 'and turns them into ' },
       { text: 'what to do next.', highlight: true },
@@ -91,8 +90,7 @@ export const translations = {
     backLabel: 'Back',
     workLocationLabel: 'Work location',
     workLocationOptions: [
-      { value: 'HANOI', label: 'Hanoi' },
-      { value: 'DA_NANG', label: 'Da Nang' },
+      { value: 'HANOI', label: 'Ho Chi Minh' },
       { value: 'JAKARTA', label: 'Jakarta' },
       { value: 'NEW_YORK', label: 'New York' },
       { value: 'SEOUL', label: 'Seoul' },
@@ -107,7 +105,7 @@ export const translations = {
       { value: 'QA', label: 'QA' },
       { value: 'DATA', label: 'Data' },
     ],
-    submitSetup: 'Start with SAI',
+    submitSetup: 'Start with SAi',
     errorRequired: 'Please fill in all fields.',
     errorSetupRequired: 'Please select a work location and a role.',
     errorLoginRequired: 'Please enter both email and password.',

@@ -71,7 +71,7 @@ const LegendLabel = styled.span`
 
 function AdoptionRateCard({ value, aiCount, ownerCount }) {
   return (
-    <StatCardShell title="SAI 해결">
+    <StatCardShell title="SAi 해결">
       <GraphContainer>
         <DonutGauge
           value={value}
@@ -90,7 +90,7 @@ function AdoptionRateCard({ value, aiCount, ownerCount }) {
       <LegendRow>
         <LegendItem>
           <LegendSwatch $color="#2563EB" />
-          <LegendLabel>SAI {aiCount}건</LegendLabel>
+          <LegendLabel>SAi {aiCount}건</LegendLabel>
         </LegendItem>
         <LegendItem>
           <LegendSwatch $color="#E6E6EB" />

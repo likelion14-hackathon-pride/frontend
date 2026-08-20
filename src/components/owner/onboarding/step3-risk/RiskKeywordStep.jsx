@@ -314,7 +314,7 @@ function RiskKeywordStep({
           </HeadingWrap>
           <SubheadingWrap>
             <Subheading>
-              팀원이 이 단어가 들어간 질문을 하면, SAI는 답하지 않고{' '}
+              팀원이 이 단어가 들어간 질문을 하면, SAi는 답하지 않고{' '}
               <strong>"대표님께 먼저 확인하세요"</strong>라고 안내합니다.
             </Subheading>
           </SubheadingWrap>

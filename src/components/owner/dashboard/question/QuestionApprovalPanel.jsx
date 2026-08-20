@@ -474,7 +474,7 @@ function QuestionApprovalPanel({
             <StatusBannerHint>
               {question.declined
                 ? `직전 답장은 답으로 보지 않았습니다 · ${question.answerReason ?? ''}`
-                : '답장하고 이 화면으로 돌아오면 SAI가 답을 가져와 정리합니다.'}
+                : '답장하고 이 화면으로 돌아오면 SAi가 답을 가져와 정리합니다.'}
             </StatusBannerHint>
           </StatusBanner>
 
@@ -502,7 +502,7 @@ function QuestionApprovalPanel({
         <StatusBanner>
           <StatusBannerTitle>핸드북에 저장되었습니다.</StatusBannerTitle>
           <StatusBannerHint>
-            초안으로 들어갔습니다. 핸드북 탭의 확인 보관함에서 확정하면 SAI가 바로 답합니다.
+            초안으로 들어갔습니다. 핸드북 탭의 확인 보관함에서 확정하면 SAi가 바로 답합니다.
           </StatusBannerHint>
         </StatusBanner>
       )}
@@ -545,7 +545,7 @@ function QuestionApprovalPanel({
                       value={draftScopeId}
                       onChange={(e) => setDraftScopeId(e.target.value)}
                     >
-                      <option value="">회사 규칙 (SAI가 자동 분류)</option>
+                      <option value="">회사 규칙 (SAi가 자동 분류)</option>
                       {scopes.map((scope) => (
                         <option key={scope.id} value={scope.id}>
                           {scope.name}

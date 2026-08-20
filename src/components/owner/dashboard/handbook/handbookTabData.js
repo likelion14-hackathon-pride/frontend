@@ -50,8 +50,16 @@ export function firstConfirmedItemForTier(items, tier, projects = []) {
     return null;
   };
 
-  const firstCompany = () => firstInOrder(COMPANY_GROUPS.map((group) => group.key), companyItems);
-  const firstProject = () => firstInOrder(projects.map((project) => project.key), projectItems);
+  const firstCompany = () =>
+    firstInOrder(
+      COMPANY_GROUPS.map((group) => group.key),
+      companyItems
+    );
+  const firstProject = () =>
+    firstInOrder(
+      projects.map((project) => project.key),
+      projectItems
+    );
 
   if (tier === 'company') return firstCompany();
   if (tier === 'project') return firstProject();
