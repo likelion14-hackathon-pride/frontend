@@ -10,7 +10,8 @@ const Panel = styled.div`
   display: flex;
   flex: 1 1 320px;
   min-width: 0;
-  min-height: 388.823px;
+  // 승인 대기는 제안 내용이 많아 좀 더 크게 두고, 그 외 상태는 왼쪽 질문 카드 높이에 맞춘다.
+  min-height: ${({ $tall }) => ($tall ? '388.823px' : '334.792px')};
   flex-direction: column;
   padding: 24px 20.667px;
   gap: 16px;
@@ -430,7 +431,7 @@ function QuestionApprovalPanel({
     });
 
   return (
-    <Panel>
+    <Panel $tall={question.status === 'pending_approval'}>
       <HeaderRow>
         <HeaderLeft>
           <StatusBadge

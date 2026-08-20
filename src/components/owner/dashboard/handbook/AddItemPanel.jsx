@@ -34,9 +34,12 @@ const HeadRow = styled.div`
 
 const Badge = styled.span`
   display: inline-flex;
+  height: 21.333px;
   flex-shrink: 0;
-  padding: 5.667px 15.74px 5.333px 11px;
+  padding: 0 12px;
+  justify-content: center;
   align-items: center;
+  text-align: center;
   border-radius: 8px;
   background: #17171b;
   color: #fff;
@@ -44,7 +47,7 @@ const Badge = styled.span`
   font-size: 10.5px;
   font-style: normal;
   font-weight: 700;
-  line-height: 121%;
+  line-height: 1;
   white-space: nowrap;
 `;
 
@@ -116,8 +119,10 @@ const Chip = styled.button`
   font-weight: 700;
   line-height: 127%;
 
-  border: 0.667px solid ${({ $active }) => ($active ? '#2563EB' : '#E6E6EB')};
-  background: ${({ $active }) => ($active ? '#2563EB' : '#FFFFFF')};
+  border: 0.667px solid
+    ${({ $active, $tone }) => ($active ? ($tone === 'project' ? '#2563EB' : '#17171B') : '#E6E6EB')};
+  background: ${({ $active, $tone }) =>
+    $active ? ($tone === 'project' ? '#2563EB' : '#17171B') : '#FFFFFF'};
   color: ${({ $active }) => ($active ? '#FFFFFF' : '#6B6B73')};
 `;
 
@@ -288,6 +293,7 @@ function AddItemPanel({ projects, pending = false, onAddProject, onSave, onClose
             <Chip
               key={cat.key}
               type="button"
+              $tone="company"
               $active={tier === 'company' && categoryKey === cat.key}
               onClick={() => {
                 setTier('company');
@@ -307,6 +313,7 @@ function AddItemPanel({ projects, pending = false, onAddProject, onSave, onClose
             <Chip
               key={project.key}
               type="button"
+              $tone="project"
               $active={tier === 'project' && projectKey === project.key}
               onClick={() => {
                 setTier('project');
