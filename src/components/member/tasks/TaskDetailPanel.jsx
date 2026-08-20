@@ -656,7 +656,7 @@ export default function TaskDetailPanel({ card, isWide, onToggleWide, onClose, o
             <Card key={question.escalationId}>
               <KickerRow>
                 <KickerDot $color="#ff8a3d" />
-                <KickerLabel>SENT VIA SAI · AWAITING REPLY</KickerLabel>
+                <KickerLabel>SENT VIA SAi · AWAITING REPLY</KickerLabel>
               </KickerRow>
               <MessageEn>{question.questionEn}</MessageEn>
               <MessageKo>{question.draftKo}</MessageKo>
@@ -700,7 +700,7 @@ export default function TaskDetailPanel({ card, isWide, onToggleWide, onClose, o
               <IconBadge>
                 <img src={chatBubbleIcon} alt="" width={15} height={15} />
               </IconBadge>
-              <CardTitle>Unclear? Ask SAI first.</CardTitle>
+              <CardTitle>Unclear? Ask SAi first.</CardTitle>
             </CardHeader>
             <AskInputRow>
               <AskInput

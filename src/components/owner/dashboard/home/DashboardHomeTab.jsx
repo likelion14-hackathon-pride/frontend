@@ -91,7 +91,7 @@ function DashboardHomeTab({ companyId, ownerName = '김대표', onNavigateToQues
         <Heading>안녕하세요, {ownerName || '대표'}님</Heading>
         <Subheading>
           이번 주 질문 {weekly.totalCount}건 중{' '}
-          <SubheadingStrong>{weekly.saiAnsweredCount}건은 SAI가 답했습니다</SubheadingStrong>
+          <SubheadingStrong>{weekly.saiAnsweredCount}건은 SAi가 답했습니다</SubheadingStrong>
         </Subheading>
       </HeaderTextGroup>
 

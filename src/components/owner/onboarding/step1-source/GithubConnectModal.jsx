@@ -847,7 +847,7 @@ function GithubConnectModal({ companyId, onClose, onConnected }) {
           <HeaderTextGroup>
             <HeaderTitle>깃허브 연결</HeaderTitle>
             <HeaderSubtitle>
-              SAI가 레포의 README·Issue·PR을 읽을 수 있도록 연결합니다.
+              SAi가 레포의 README·Issue·PR을 읽을 수 있도록 연결합니다.
             </HeaderSubtitle>
           </HeaderTextGroup>
           <StepAndCloseGroup>
@@ -933,7 +933,7 @@ function GithubConnectModal({ companyId, onClose, onConnected }) {
                 <Badge $type="github">◆ GitHub에서 할 일</Badge>
                 <ContentHeading>권한 설정</ContentHeading>
                 <ContentDescription>
-                  SAI가 레포지토리의 문서와 작업 내용을 읽을 수 있도록 권한을 설정합니다.
+                  SAi가 레포지토리의 문서와 작업 내용을 읽을 수 있도록 권한을 설정합니다.
                 </ContentDescription>
 
                 <InstructionBox>
@@ -972,7 +972,7 @@ function GithubConnectModal({ companyId, onClose, onConnected }) {
                 <Badge $type="github">◆ GitHub에서 할 일</Badge>
                 <ContentHeading>레포지토리에 설치</ContentHeading>
                 <ContentDescription>
-                  SAI가 사용할 레포지토리에 GitHub App을 설치합니다.
+                  SAi가 사용할 레포지토리에 GitHub App을 설치합니다.
                 </ContentDescription>
 
                 <InstructionBox>
@@ -1014,9 +1014,9 @@ function GithubConnectModal({ companyId, onClose, onConnected }) {
 
             {step === 4 && (
               <>
-                <Badge $type="sai">● SAI에서 입력할 일</Badge>
+                <Badge $type="sai">● SAi에서 입력할 일</Badge>
                 <ContentHeading>연결 정보 붙여넣기</ContentHeading>
-                <ContentDescription>GitHub App의 연결 정보를 SAI에 입력합니다.</ContentDescription>
+                <ContentDescription>GitHub App의 연결 정보를 SAi에 입력합니다.</ContentDescription>
 
                 <InstructionBox>
                   <Instruction
@@ -1110,7 +1110,7 @@ function GithubConnectModal({ companyId, onClose, onConnected }) {
                 <Badge $type="github">◆ GitHub에서 할 일</Badge>
                 <ContentHeading>실시간 수신 설정</ContentHeading>
                 <ContentDescription>
-                  GitHub의 변경 사항을 SAI가 실시간으로 받을 수 있도록 설정합니다.
+                  GitHub의 변경 사항을 SAi가 실시간으로 받을 수 있도록 설정합니다.
                 </ContentDescription>
 
                 <InstructionBox>

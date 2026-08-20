@@ -340,7 +340,7 @@ export default function ReviewPanel({
 
       <KrHeader>
         <KrLabel>KOREAN · 김대표 SEES THIS</KrLabel>
-        <KrByline>written by SAI</KrByline>
+        <KrByline>written by SAi</KrByline>
       </KrHeader>
       <KrText>{krText}</KrText>
 
@@ -348,7 +348,7 @@ export default function ReviewPanel({
         <AddedNote key={i}>
           <AddedNoteDot />
           <AddedNoteText>
-            Your added line goes out as its own Korean sentence — SAI writes it when you send.
+            Your added line goes out as its own Korean sentence — SAi writes it when you send.
           </AddedNoteText>
         </AddedNote>
       ))}

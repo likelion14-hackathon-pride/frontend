@@ -57,7 +57,7 @@ export default function MemberNav() {
         {({ isActive }) => (
           <>
             <IconImg src={chatIcon} alt="" width={15} height={15} $active={isActive} />
-            <span>Ask SAI</span>
+            <span>Ask SAi</span>
           </>
         )}
       </NavItem>

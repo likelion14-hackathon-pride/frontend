@@ -171,7 +171,7 @@ export default function MemberAskPage() {
   const activeScopeLabel = scopes.find((scope) => scope.id === scopeId)?.label ?? 'Company-wide';
 
   return (
-    <MemberShell screenTitle="Ask SAI">
+    <MemberShell screenTitle="Ask SAi">
       <Layout>
         <ScrollArea ref={listRef}>
           <CenteredContent>
@@ -187,7 +187,7 @@ export default function MemberAskPage() {
                     onEscalated={() => {}}
                   />
                 ))}
-                {sending && <LoadingState compact label="SAI is checking the handbook..." />}
+                {sending && <LoadingState compact label="SAi is checking the handbook..." />}
               </MessageList>
             )}
           </CenteredContent>

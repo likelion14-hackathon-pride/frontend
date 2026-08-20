@@ -109,7 +109,7 @@ export default function TasksGreeting({ taskCount = 0, userName, onAskClick }) {
         <AskIconBadge>
           <img src={chatBubbleIcon} alt="" width={12} height={12} />
         </AskIconBadge>
-        <AskLabel>Ask SAI about any of these</AskLabel>
+        <AskLabel>Ask SAi about any of these</AskLabel>
         <EnterChip>Enter ↵</EnterChip>
       </AskButton>
     </Wrap>
