@@ -26,13 +26,24 @@ const MEMBER_AREA_DESCRIPTION = {
   SECURITY: 'Security standards · operations',
 };
 
+// 이 세 타입은 실제 출처 문서가 없어서 source.label 이 항상 한글 고정값으로 온다.
+// 영어로 보여주려면 source.label 보다 이 값을 우선한다.
+const SOURCE_LABEL_EN = {
+  DIRECT_ENTRY: 'Written by Owner',
+  ONBOARDING: 'Day 0 default rule',
+  ESCALATION: 'Owner-confirmed answer',
+};
+
 function toRuleItem(entry, index) {
   const source = entry.source;
   return {
     id: entry.id,
     title: entry.ruleEn || entry.title,
     // 접힌 줄에도 출처가 보인다. 근거가 없으면 어디서 만들어졌는지라도 보여 준다.
-    sourceTag: source?.label ?? lookup(ENTRY_ORIGIN_LABEL, entry.sourceType),
+    sourceTag:
+      SOURCE_LABEL_EN[entry.sourceType] ??
+      source?.label ??
+      lookup(ENTRY_ORIGIN_LABEL, entry.sourceType),
     desc: entry.ruleEn && entry.ruleEn !== entry.title ? entry.title : null,
     quote: entry.originalKo,
     showSourceBox: !['ONBOARDING', 'DIRECT_ENTRY', 'ESCALATION'].includes(entry.sourceType),
@@ -42,7 +53,7 @@ function toRuleItem(entry, index) {
           source.label,
           source.speakerName,
           source.occurredAt ? formatDateTime(source.occurredAt, { fallback: '' }) : null,
-          source.count > 1 ? `외 ${source.count - 1}건` : null,
+          source.count > 1 ? `and ${source.count - 1} more` : null,
         ]
           .filter(Boolean)
           .join(' · ')

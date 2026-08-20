@@ -100,7 +100,7 @@ export default function MemberTasksPage() {
         />
 
         <InlineError error={cardsError} onRetry={reloadCards} />
-        <InlineError error={moveError} onRetry={clearMoveError} retryLabel="닫기" />
+        <InlineError error={moveError} onRetry={clearMoveError} retryLabel="Dismiss" />
 
         {projects.length > 0 && (
           <ProjectFilterChips
@@ -111,7 +111,7 @@ export default function MemberTasksPage() {
         )}
 
         {cardsLoading && columns.every((col) => col.cards.length === 0) ? (
-          <LoadingState label="지시 카드를 불러오는 중…" />
+          <LoadingState label="Loading task cards…" />
         ) : (
           <TaskBoard
             columns={filteredColumns}
