@@ -34,3 +34,26 @@ export function displayStatusOf(entry) {
 export function countByStatus(entries, status) {
   return entries.filter((entry) => displayStatusOf(entry) === status).length;
 }
+
+// 트리와 같은 순서(회사 규칙은 COMPANY_GROUPS 순, 프로젝트는 projects 순)로 훑어
+// 확인된 항목 중 맨 위 항목을 고른다. 'all' 은 회사 규칙 쪽을 먼저 본다(트리에서 위에 오므로).
+export function firstConfirmedItemForTier(items, tier, projects = []) {
+  const confirmed = items.filter((item) => item.status === 'confirmed');
+  const companyItems = confirmed.filter((item) => item.tier === 'company');
+  const projectItems = confirmed.filter((item) => item.tier === 'project');
+
+  const firstInOrder = (orderedKeys, pool) => {
+    for (const key of orderedKeys) {
+      const found = pool.find((item) => item.groupKey === key);
+      if (found) return found;
+    }
+    return null;
+  };
+
+  const firstCompany = () => firstInOrder(COMPANY_GROUPS.map((group) => group.key), companyItems);
+  const firstProject = () => firstInOrder(projects.map((project) => project.key), projectItems);
+
+  if (tier === 'company') return firstCompany();
+  if (tier === 'project') return firstProject();
+  return firstCompany() ?? firstProject();
+}

@@ -32,19 +32,20 @@ const TagRow = styled.div`
 `;
 
 const TierPill = styled.span`
-  display: flex;
+  display: inline-flex;
   height: 21.333px;
-  padding: 4px 11.781px 4.333px 9px;
+  padding: 0 10px;
   justify-content: center;
   align-items: center;
+  text-align: center;
   border-radius: 7px;
-  background: #17171b;
+  background: ${({ $tone }) => ($tone === 'project' ? '#2563EB' : '#17171b')};
   color: #fff;
   font-family: 'Plus Jakarta Sans';
   font-size: 10px;
   font-style: normal;
   font-weight: 700;
-  line-height: 127%;
+  line-height: 1;
   letter-spacing: 0.2px;
   white-space: nowrap;
 `;
@@ -254,7 +255,9 @@ function HandbookDetailPanel({ item, pending = false, onSave, onDelete }) {
   return (
     <Panel>
       <TagRow>
-        <TierPill>{item.tier === 'company' ? '회사 규칙' : '프로젝트 지식'}</TierPill>
+        <TierPill $tone={item.tier}>
+          {item.tier === 'company' ? '회사 규칙' : '프로젝트 지식'}
+        </TierPill>
         <GroupText>{item.groupLabel || getGroupLabel(item.groupKey)}</GroupText>
         {item.day0 && <Day0Text>Day 0 기본 규칙</Day0Text>}
       </TagRow>

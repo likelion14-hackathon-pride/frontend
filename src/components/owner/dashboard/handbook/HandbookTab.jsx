@@ -17,7 +17,7 @@ import AddItemPanel from './AddItemPanel';
 import HandbookTierTree from './HandbookTierTree';
 import HandbookDetailPanel from './HandbookDetailPanel';
 import ScrollArea from '../../../common/ScrollArea';
-import { displayStatusOf } from './handbookTabData';
+import { displayStatusOf, firstConfirmedItemForTier } from './handbookTabData';
 
 const TabContent = styled.div`
   display: flex;
@@ -178,9 +178,14 @@ function HandbookTab({ companyId }) {
     [reviewInboxQuery.data]
   );
   // 오른쪽 상세 박스는 왼쪽 핸드북 트리(확정 항목)에 있는 것만 보여준다. 보관함의 초안은 대상이 아니다.
-  const confirmedItems = items.filter((item) => item.status === 'confirmed');
+  // 선택한 항목이 현재 분류 필터 밖으로 나가면(또는 아직 선택한 적이 없으면) 그 필터의 맨 위
+  // 항목(트리와 같은 순서)으로 대체한다.
+  const tierFilteredConfirmedItems = items.filter(
+    (item) => item.status === 'confirmed' && (activeTier === 'all' || item.tier === activeTier)
+  );
   const selectedItem =
-    confirmedItems.find((item) => item.id === selectedItemId) ?? confirmedItems[0] ?? null;
+    tierFilteredConfirmedItems.find((item) => item.id === selectedItemId) ??
+    firstConfirmedItemForTier(items, activeTier, projects);
 
   const reload = () => {
     entriesQuery.reload();
