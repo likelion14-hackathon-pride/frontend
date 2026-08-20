@@ -235,16 +235,6 @@ const SubMenu = styled.div`
 
 const SubItem = styled(NavLink)`
   ${subItemStyles}
-
-  ${(props) =>
-    props.$active &&
-    css`
-      background: linear-gradient(135deg, rgba(255, 96, 0, 0.08), rgba(255, 138, 61, 0.03));
-
-      &:hover {
-        box-shadow: none;
-      }
-    `}
 `;
 
 const SubToggle = styled.button`
@@ -307,16 +297,6 @@ const ProjectItem = styled(NavLink)`
   &:hover {
     box-shadow: inset 0 0 0 999px rgba(23, 23, 27, 0.045);
   }
-
-  ${(props) =>
-    props.$active &&
-    css`
-      background: linear-gradient(135deg, rgba(255, 96, 0, 0.08), rgba(255, 138, 61, 0.03));
-
-      &:hover {
-        box-shadow: none;
-      }
-    `}
 `;
 
 const Dot = styled.span`
@@ -324,7 +304,7 @@ const Dot = styled.span`
   height: 7px;
   flex: none;
   border-radius: 2px;
-  background: ${(props) => (props.$active ? '#8A94A3' : '#D8D8DE')};
+  background: ${(props) => (props.$active ? '#FF6000' : '#D8D8DE')};
 `;
 
 const ProjectLabel = styled.span`

@@ -10,13 +10,23 @@ const Card = styled.div`
   gap: 14px;
   flex: 1 1 320px;
   min-width: 280px;
-  border: 0.1px dotted #ff8a3d;
+  border: 1px solid #ffb27e;
   border-radius: 18px;
   box-shadow:
-    0 14px 34px -14px rgba(23, 44, 90, 0.22),
-    0 3px 8px -2px rgba(23, 44, 90, 0.08);
+    0 1px 20px rgba(255, 138, 61, 0.34),
+    0 14px 34px rgba(255, 138, 61, 0.16);
   padding: 18px 20px;
   background-color: #ff8a3d33;
+  cursor: pointer;
+  transition: 0.18s;
+
+  &:hover {
+    box-shadow:
+      0 2px 24px rgba(255, 138, 61, 0.44),
+      0 20px 44px rgba(255, 138, 61, 0.22);
+    background-color: #ff8a3d45;
+    transform: translateY(-1px);
+  }
 `;
 
 const MainButton = styled.button`
