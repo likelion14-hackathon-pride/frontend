@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 
 import * as authApi from '../../../apis/auth';
@@ -38,6 +38,13 @@ const Modal = styled.div`
   display: flex;
   flex-direction: column;
   gap: 20px;
+
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 const Header = styled.div`
@@ -220,7 +227,15 @@ export default function ProfileSettingModal({ onClose }) {
     onClose?.();
   };
 
-  const locations = optionsQuery.data?.locations ?? [];
+  // 서버는 HANOI/DA_NANG 을 여전히 따로 준다. 화면에서는 "Ho Chi Minh" 하나로 합쳐 보여준다.
+  const rawLocations = optionsQuery.data?.locations ?? [];
+  const locations = useMemo(
+    () =>
+      rawLocations
+        .filter((item) => item.value !== 'DA_NANG')
+        .map((item) => (item.value === 'HANOI' ? { ...item, label: 'Ho Chi Minh' } : item)),
+    [rawLocations]
+  );
   const roles = optionsQuery.data?.roles ?? [];
   const selectedLocation = locations.find((item) => item.value === location);
 
