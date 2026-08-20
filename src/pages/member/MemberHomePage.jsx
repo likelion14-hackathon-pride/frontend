@@ -129,7 +129,7 @@ export default function MemberHomePage() {
         <InlineError error={homeError} onRetry={reloadHome} />
 
         {homeLoading && !home ? (
-          <LoadingState label="홈 화면을 불러오는 중…" />
+          <LoadingState label="Loading home…" />
         ) : (
           <>
             <TopRow>
@@ -147,7 +147,7 @@ export default function MemberHomePage() {
                   count={unread?.count ?? 0}
                   from={null}
                   time=""
-                  message="아직 읽지 않은 지시가 없습니다."
+                  message="No unread instructions yet."
                   onClick={goToTasks}
                 />
               )}
