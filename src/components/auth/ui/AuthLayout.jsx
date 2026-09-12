@@ -184,7 +184,7 @@ const ListWrapper = styled.div`
   padding-top: 4px;
   align-items: flex-start;
   align-self: stretch;
-  gap: 10px;
+  gap: 15px;
 `;
 
 const LanguageRow = styled.div`
