@@ -17,11 +17,11 @@ const SectionLabel = styled.p`
 
 const Grid = styled.div`
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
 
   @media (max-width: 480px) {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 `;
 
@@ -30,18 +30,21 @@ const Tag = styled.button`
   align-items: center;
   justify-content: center;
   gap: 10px;
+  min-width: 0;
   padding: 12px 14px 13px;
   border-radius: 999px;
   cursor: pointer;
-  white-space: nowrap;
 
   background: ${({ $active }) => ($active ? '#FFF3E6' : '#FAFAFB')};
   border: 1px solid ${({ $active }) => ($active ? '#FF8A3D' : '#EFEFF1')};
 `;
 
 const TagLabel = styled.span`
+  min-width: 0;
   font-size: 13px;
   font-weight: 700;
+  text-align: center;
+  word-break: keep-all;
   color: ${({ $active }) => ($active ? colors.primary : colors.textPrimary)};
 `;
 

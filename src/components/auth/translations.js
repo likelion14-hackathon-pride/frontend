@@ -65,8 +65,8 @@ export const translations = {
       { text: 'what to do next.', highlight: true },
     ],
     checklist: [
-      'Reads how your team works and builds the handbook.',
-      'Answers teammate’s questions from that handbook.',
+      'Reads team rules and builds the handbook.',
+      'Answers teammates’ questions using it.',
       'Teammates get clarity. Owners get their time back.',
     ],
     signupLabel: 'Sign up',
