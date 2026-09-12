@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { ESCALATION_STATUS, lookup } from '../../../../apis/constants';
 import { formatShortKo } from '../../../../utils/time';
 import { ErrorState, LoadingState } from '../../../common/AsyncStates';
+import { shouldShowApprovalForStatus } from './questionData';
 
 const Panel = styled.div`
   box-sizing: border-box;
@@ -413,6 +414,7 @@ function QuestionApprovalPanel({
   const meta = lookup(STATUS_META, question.status);
   const proposal = detail?.proposal ?? null;
   const needsReanswer = question.serverStatus === ESCALATION_STATUS.SENT && question.declined;
+  const showApproval = shouldShowApprovalForStatus(question.serverStatus);
 
   const startEdit = () => {
     setDraftTitle(proposal?.title ?? '');
@@ -431,7 +433,7 @@ function QuestionApprovalPanel({
     });
 
   return (
-    <Panel $tall={question.status === 'pending_approval'}>
+    <Panel $tall={showApproval}>
       <HeaderRow>
         <HeaderLeft>
           <StatusBadge
@@ -502,7 +504,7 @@ function QuestionApprovalPanel({
         <StatusBanner>
           <StatusBannerTitle>핸드북에 저장되었습니다.</StatusBannerTitle>
           <StatusBannerHint>
-            초안으로 들어갔습니다. 핸드북 탭의 확인 보관함에서 확정하면 SAi가 바로 답합니다.
+            확정된 규칙으로 반영되어 추가 승인이 필요하지 않습니다.
           </StatusBannerHint>
         </StatusBanner>
       )}
@@ -514,7 +516,7 @@ function QuestionApprovalPanel({
         </StatusBanner>
       )}
 
-      {question.status === 'pending_approval' && (
+      {showApproval && (
         <>
           {detailLoading && !proposal && <LoadingState compact label="저장 제안을 만드는 중…" />}
           {detailError && !proposal && (

@@ -1,5 +1,14 @@
 import styled from 'styled-components';
 
+import { PROMOTION_FILTERS } from './handbookPromotion';
+
+const HeaderStack = styled.div`
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 14px;
+`;
+
 const HeaderRow = styled.div`
   display: flex;
   width: 100%;
@@ -46,6 +55,8 @@ const ControlsGroup = styled.div`
   align-items: center;
   gap: 10px;
   flex-shrink: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 `;
 
 const TierTrack = styled.div`
@@ -81,6 +92,11 @@ const TierTab = styled.button`
   background: ${({ $active }) => ($active ? '#2563EB' : '#FFF')};
   color: ${({ $active }) => ($active ? '#FFF' : '#3C3C44')};
   box-shadow: ${({ $active }) => ($active ? '0 10px 20px -8px #2563EB' : '0 1px 4px 0 rgba(23, 44, 90, 0.10)')};
+
+  &:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+  }
 `;
 
 const ArchiveButton = styled.button`
@@ -97,6 +113,11 @@ const ArchiveButton = styled.button`
     ${({ $open, $hasItems }) => ($open ? '#9A6212' : $hasItems ? '#F0E0C0' : '#F0E0C0')};
   background: ${({ $open }) => ($open ? '#9A6212' : '#FFF')};
   opacity: ${({ $open, $hasItems }) => ($open || $hasItems ? 1 : 0.55)};
+
+  &:focus-visible {
+    outline: 2px solid #9a6212;
+    outline-offset: 2px;
+  }
 `;
 
 const ArchiveLabel = styled.span`
@@ -144,6 +165,11 @@ const AddButton = styled.button`
   &:hover {
     background: #2e2e36;
   }
+
+  &:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+  }
 `;
 
 const AddLabel = styled.span`
@@ -156,6 +182,52 @@ const AddLabel = styled.span`
   line-height: 123%;
   letter-spacing: -0.2px;
   white-space: nowrap;
+`;
+
+const PromotionFilterRow = styled.div`
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+`;
+
+const FilterLabel = styled.span`
+  color: #6b6b73;
+  font-family: 'Plus Jakarta Sans';
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+`;
+
+const FilterTrack = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+`;
+
+const FilterButton = styled.button`
+  min-height: 30px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid ${({ $active }) => ($active ? '#BFD0F8' : '#E6E6EB')};
+  background: ${({ $active }) => ($active ? '#EEF3FF' : '#FFFFFF')};
+  color: ${({ $active }) => ($active ? '#1D4ED8' : '#6B6B73')};
+  font-family: 'Plus Jakarta Sans';
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    background: ${({ $active }) => ($active ? '#E5EDFF' : '#FAFAFB')};
+  }
+
+  &:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+  }
 `;
 
 function ArchiveIcon({ color }) {
@@ -189,62 +261,83 @@ function PlusIcon() {
 function HandbookHeaderControls({
   activeTier,
   onTierChange,
+  activePromotion,
+  onPromotionChange,
   waitingCount,
   archiveOpen,
   onToggleArchive,
   onOpenAddPanel,
 }) {
   return (
-    <HeaderRow>
-      <TextGroup>
-        <Heading>핸드북</Heading>
-        <Subheading>
-          확인된 항목만 표시됩니다. 확인 전 항목은 보관함에서 한 번에 확인하세요
-        </Subheading>
-      </TextGroup>
+    <HeaderStack>
+      <HeaderRow>
+        <TextGroup>
+          <Heading>핸드북</Heading>
+          <Subheading>
+            승인된 항목만 표시됩니다. 승인 전 항목은 검토 보관함에서 확인하세요
+          </Subheading>
+        </TextGroup>
 
-      <ControlsGroup>
-        <TierTrack>
-          <TierTab
-            type="button"
-            $active={!archiveOpen && activeTier === 'all'}
-            onClick={() => onTierChange('all')}
-          >
-            전체
-          </TierTab>
-          <TierTab
-            type="button"
-            $active={!archiveOpen && activeTier === 'company'}
-            onClick={() => onTierChange('company')}
-          >
-            회사 규칙
-          </TierTab>
-          <TierTab
-            type="button"
-            $active={!archiveOpen && activeTier === 'project'}
-            onClick={() => onTierChange('project')}
-          >
-            프로젝트
-          </TierTab>
-        </TierTrack>
+        <ControlsGroup>
+          <TierTrack>
+            <TierTab
+              type="button"
+              $active={!archiveOpen && activeTier === 'all'}
+              onClick={() => onTierChange('all')}
+            >
+              전체
+            </TierTab>
+            <TierTab
+              type="button"
+              $active={!archiveOpen && activeTier === 'company'}
+              onClick={() => onTierChange('company')}
+            >
+              회사 규칙
+            </TierTab>
+            <TierTab
+              type="button"
+              $active={!archiveOpen && activeTier === 'project'}
+              onClick={() => onTierChange('project')}
+            >
+              프로젝트
+            </TierTab>
+          </TierTrack>
 
-        <ArchiveButton
-          type="button"
-          $open={archiveOpen}
-          $hasItems={waitingCount > 0}
-          onClick={onToggleArchive}
-        >
-          <ArchiveIcon color={archiveOpen ? '#FFFFFF' : '#9A6212'} />
-          <ArchiveLabel $open={archiveOpen}>확인 보관함</ArchiveLabel>
-          <ArchiveCount $open={archiveOpen}>{waitingCount}</ArchiveCount>
-        </ArchiveButton>
+          <ArchiveButton
+            type="button"
+            $open={archiveOpen}
+            $hasItems={waitingCount > 0}
+            onClick={onToggleArchive}
+          >
+            <ArchiveIcon color={archiveOpen ? '#FFFFFF' : '#9A6212'} />
+            <ArchiveLabel $open={archiveOpen}>검토 보관함</ArchiveLabel>
+            <ArchiveCount $open={archiveOpen}>{waitingCount}</ArchiveCount>
+          </ArchiveButton>
 
-        <AddButton type="button" onClick={onOpenAddPanel}>
-          <PlusIcon />
-          <AddLabel>항목 직접 추가</AddLabel>
-        </AddButton>
-      </ControlsGroup>
-    </HeaderRow>
+          <AddButton type="button" onClick={onOpenAddPanel}>
+            <PlusIcon />
+            <AddLabel>항목 직접 추가</AddLabel>
+          </AddButton>
+        </ControlsGroup>
+      </HeaderRow>
+
+      <PromotionFilterRow role="group" aria-label="자동화 분류 필터">
+        <FilterLabel>자동화 분류</FilterLabel>
+        <FilterTrack>
+          {PROMOTION_FILTERS.map((filter) => (
+            <FilterButton
+              key={filter.value}
+              type="button"
+              $active={!archiveOpen && activePromotion === filter.value}
+              aria-pressed={!archiveOpen && activePromotion === filter.value}
+              onClick={() => onPromotionChange(filter.value)}
+            >
+              {filter.label}
+            </FilterButton>
+          ))}
+        </FilterTrack>
+      </PromotionFilterRow>
+    </HeaderStack>
   );
 }
 

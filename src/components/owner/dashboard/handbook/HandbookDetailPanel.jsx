@@ -1,8 +1,12 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
+import { REVIEW_DECISION } from '../../../../apis/constants';
 import { formatShortKo } from '../../../../utils/time';
 import { getGroupLabel } from './handbookTabData';
+import { canIndividuallyReview, isApprovedEntry } from './handbookPromotion';
+import PromotionBadge, { ApprovalStatusBadge } from './PromotionBadge';
+import PromotionDetails from './PromotionDetails';
 
 const Panel = styled.div`
   box-sizing: border-box;
@@ -138,6 +142,7 @@ const ButtonRow = styled.div`
   gap: 8px;
   flex-shrink: 0;
   margin-top: auto;
+  flex-wrap: wrap;
 `;
 
 const OpenSourceButton = styled.button`
@@ -158,6 +163,11 @@ const OpenSourceButton = styled.button`
   font-weight: 700;
   line-height: 123%;
   white-space: nowrap;
+
+  &:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+  }
 `;
 
 const EditButton = styled.button`
@@ -178,6 +188,11 @@ const EditButton = styled.button`
   font-weight: 700;
   line-height: 123%;
   white-space: nowrap;
+
+  &:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+  }
 `;
 
 const DeleteButton = styled.button`
@@ -200,6 +215,39 @@ const DeleteButton = styled.button`
   font-weight: 700;
   line-height: 123%;
   white-space: nowrap;
+
+  &:focus-visible {
+    outline: 2px solid #b4232d;
+    outline-offset: 2px;
+  }
+`;
+
+const ReviewButton = styled.button`
+  display: flex;
+  min-width: 62px;
+  height: 36.667px;
+  padding: 10px 16px;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  border-radius: 11px;
+  background: ${({ $reject }) => ($reject ? '#FEF2F2' : '#17171B')};
+  color: ${({ $reject }) => ($reject ? '#B4232D' : '#FFFFFF')};
+  cursor: pointer;
+  font-family: 'Plus Jakarta Sans';
+  font-size: 12.5px;
+  font-weight: 700;
+  white-space: nowrap;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${({ $reject }) => ($reject ? '#B4232D' : '#2563EB')};
+    outline-offset: 2px;
+  }
 `;
 
 const TimestampText = styled.span`
@@ -225,7 +273,7 @@ const EmptyPanel = styled.div`
   width: 100%;
 `;
 
-function HandbookDetailPanel({ item, pending = false, onSave, onDelete }) {
+function HandbookDetailPanel({ item, pending = false, onSave, onDelete, onReview, onOpenSimilar }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState('');
 
@@ -252,6 +300,9 @@ function HandbookDetailPanel({ item, pending = false, onSave, onDelete }) {
     setEditing(false);
   };
 
+  const reviewable = canIndividuallyReview(item.raw);
+  const approved = isApprovedEntry(item.raw);
+
   return (
     <Panel>
       <TagRow>
@@ -260,6 +311,8 @@ function HandbookDetailPanel({ item, pending = false, onSave, onDelete }) {
         </TierPill>
         <GroupText>{item.groupLabel || getGroupLabel(item.groupKey)}</GroupText>
         {item.day0 && <Day0Text>Day 0 기본 규칙</Day0Text>}
+        <PromotionBadge entry={item.raw} />
+        <ApprovalStatusBadge entry={item.raw} />
       </TagRow>
 
       {editing ? (
@@ -282,6 +335,8 @@ function HandbookDetailPanel({ item, pending = false, onSave, onDelete }) {
         </Box>
       )}
 
+      <PromotionDetails entry={item.raw} onOpenSimilar={onOpenSimilar} />
+
       <ButtonRow>
         {/* 원문 링크는 근거가 있을 때만 있다. 없으면 눌러도 갈 곳이 없으므로 감춘다. */}
         {item.sourceHref && (
@@ -294,13 +349,35 @@ function HandbookDetailPanel({ item, pending = false, onSave, onDelete }) {
             {pending ? '저장 중…' : '수정 후 저장'}
           </EditButton>
         ) : (
-          <EditButton type="button" onClick={startEdit}>
+          <EditButton type="button" onClick={startEdit} disabled={pending}>
             수정
           </EditButton>
         )}
-        <DeleteButton type="button" onClick={() => onDelete(item.id)} disabled={pending}>
-          {item.status === 'confirmed' ? '삭제' : '거절'}
-        </DeleteButton>
+        {reviewable ? (
+          <>
+            <ReviewButton
+              type="button"
+              onClick={() => onReview(item.id, REVIEW_DECISION.REJECT)}
+              disabled={pending}
+              $reject
+            >
+              거절
+            </ReviewButton>
+            <ReviewButton
+              type="button"
+              onClick={() => onReview(item.id, REVIEW_DECISION.APPROVE)}
+              disabled={pending || item.status === 'empty'}
+            >
+              승인
+            </ReviewButton>
+          </>
+        ) : (
+          approved && (
+            <DeleteButton type="button" onClick={() => onDelete(item.id)} disabled={pending}>
+              삭제
+            </DeleteButton>
+          )
+        )}
         <TimestampText>
           {item.lastConfirmed ? `최근 확인 ${formatShortKo(item.lastConfirmed)}` : '확인 이력 없음'}
         </TimestampText>

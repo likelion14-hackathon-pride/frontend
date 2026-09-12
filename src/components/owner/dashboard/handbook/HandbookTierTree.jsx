@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import styled from 'styled-components';
 import { COMPANY_GROUPS } from './handbookTabData';
+import PromotionBadge, { ApprovalStatusBadge } from './PromotionBadge';
 import fileTransWhite from '../../../../assets/owner/file_trans_white.svg';
 import treeIcon from '../../../../assets/owner/tree.svg';
 
@@ -115,6 +116,12 @@ const Header = styled.button`
   font: inherit;
   text-align: left;
   cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
 `;
 
 const CornerCurve = styled.span`
@@ -202,6 +209,11 @@ const ItemButton = styled.button`
   &:hover {
     background: ${({ $active }) => ($active ? '#F5F8FF' : '#FAFAFB')};
   }
+
+  &:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+  }
 `;
 
 const ItemText = styled.span`
@@ -219,14 +231,18 @@ const ItemText = styled.span`
   letter-spacing: -0.3px;
 `;
 
-const Chevron = styled.span`
+const ItemMeta = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+`;
+
+const Chevron = styled.svg`
+  width: 12px;
+  height: 12px;
   flex-shrink: 0;
   color: #a0a0a8;
-  font-family: 'Plus Jakarta Sans';
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 14px;
 `;
 
 const EmptyGroupHint = styled.span`
@@ -239,8 +255,14 @@ const EmptyGroupHint = styled.span`
 function ItemRowView({ item, active, onSelect }) {
   return (
     <ItemButton type="button" $active={active} onClick={() => onSelect(item.id)}>
-      <ItemText>{item.text}</ItemText>
-      <Chevron>›</Chevron>
+      <ItemText>{item.text || '(내용 없음)'}</ItemText>
+      <ItemMeta>
+        <PromotionBadge entry={item.raw} />
+        <ApprovalStatusBadge entry={item.raw} />
+        <Chevron viewBox="0 0 12 12" fill="none" aria-hidden="true">
+          <path d="M4.5 2.5L8 6L4.5 9.5" stroke="currentColor" strokeWidth="1.4" />
+        </Chevron>
+      </ItemMeta>
     </ItemButton>
   );
 }
@@ -260,9 +282,8 @@ function HandbookTierTree({ activeTier, items, selectedItemId, onSelect, project
     });
   };
 
-  const confirmedItems = items.filter((item) => item.status === 'confirmed');
-  const companyItems = confirmedItems.filter((item) => item.tier === 'company');
-  const projectItems = confirmedItems.filter((item) => item.tier === 'project');
+  const companyItems = items.filter((item) => item.tier === 'company');
+  const projectItems = items.filter((item) => item.tier === 'project');
 
   const showCompany = activeTier === 'all' || activeTier === 'company';
   const showProject = activeTier === 'all' || activeTier === 'project';
@@ -303,7 +324,7 @@ function HandbookTierTree({ activeTier, items, selectedItemId, onSelect, project
                   {!collapsed && (
                     <ItemList>
                       {groupItems.length === 0 ? (
-                        <EmptyGroupHint>확인된 항목이 없습니다</EmptyGroupHint>
+                        <EmptyGroupHint>표시할 항목이 없습니다</EmptyGroupHint>
                       ) : (
                         groupItems.map((item) => (
                           <ItemRowView
@@ -358,7 +379,7 @@ function HandbookTierTree({ activeTier, items, selectedItemId, onSelect, project
                   {!collapsed && (
                     <ItemList>
                       {groupItems.length === 0 ? (
-                        <EmptyGroupHint>확인된 항목이 없습니다</EmptyGroupHint>
+                        <EmptyGroupHint>표시할 항목이 없습니다</EmptyGroupHint>
                       ) : (
                         groupItems.map((item) => (
                           <ItemRowView

@@ -36,11 +36,10 @@ export function countByStatus(entries, status) {
 }
 
 // 트리와 같은 순서(회사 규칙은 COMPANY_GROUPS 순, 프로젝트는 projects 순)로 훑어
-// 확인된 항목 중 맨 위 항목을 고른다. 'all' 은 회사 규칙 쪽을 먼저 본다(트리에서 위에 오므로).
-export function firstConfirmedItemForTier(items, tier, projects = []) {
-  const confirmed = items.filter((item) => item.status === 'confirmed');
-  const companyItems = confirmed.filter((item) => item.tier === 'company');
-  const projectItems = confirmed.filter((item) => item.tier === 'project');
+// 현재 표시 중인 맨 위 항목을 고른다. 'all' 은 회사 규칙 쪽을 먼저 본다(트리에서 위에 오므로).
+export function firstItemForTier(items, tier, projects = []) {
+  const companyItems = items.filter((item) => item.tier === 'company');
+  const projectItems = items.filter((item) => item.tier === 'project');
 
   const firstInOrder = (orderedKeys, pool) => {
     for (const key of orderedKeys) {
@@ -65,3 +64,6 @@ export function firstConfirmedItemForTier(items, tier, projects = []) {
   if (tier === 'project') return firstProject();
   return firstCompany() ?? firstProject();
 }
+
+// 이전 이름을 쓰는 호출부와의 하위 호환성을 유지한다.
+export const firstConfirmedItemForTier = firstItemForTier;

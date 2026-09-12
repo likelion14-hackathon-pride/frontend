@@ -1,5 +1,8 @@
 import { api } from './axiosInstance';
 import { ENDPOINTS } from './endpoints';
+import { buildBulkReviewPayload } from './handbookPayloads';
+
+export { buildBulkReviewPayload } from './handbookPayloads';
 
 // entryCount 는 확정(CONFIRMED) 규칙 수다. 초안과 빈 항목은 세지 않는다.
 export function fetchScopes(companyId, { kind } = {}) {
@@ -17,10 +20,10 @@ export function createProjectScope(companyId, { name, description }) {
 
 export function fetchEntries(
   companyId,
-  { scopeId, scopeKind, status, reviewStatus, origin, cursor, limit } = {}
+  { scopeId, scopeKind, status, reviewStatus, origin, promotionType, cursor, limit } = {}
 ) {
   return api.get(ENDPOINTS.handbook.entries(companyId), {
-    params: { scopeId, scopeKind, status, reviewStatus, origin, cursor, limit },
+    params: { scopeId, scopeKind, status, reviewStatus, origin, promotionType, cursor, limit },
   });
 }
 
@@ -68,6 +71,9 @@ export function reviewEntry(companyId, entryId, decision) {
 }
 
 // 승인할 수 없는 항목은 건너뛰고 skipped 에 사유와 함께 돌아온다.
-export function reviewAllEntries(companyId, entryIds) {
-  return api.post(ENDPOINTS.handbook.reviewAll(companyId), { entryIds });
+export function reviewAllEntries(companyId, entryIds, decision = 'APPROVE') {
+  return api.post(
+    ENDPOINTS.handbook.reviewAll(companyId),
+    buildBulkReviewPayload(entryIds, decision)
+  );
 }
