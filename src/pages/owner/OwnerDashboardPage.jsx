@@ -26,6 +26,7 @@ function readStoredTab() {
 function OwnerDashboardPage() {
   const { companyId, user, logout } = useAuth();
   const [activeTab, setActiveTabState] = useState(readStoredTab);
+  const [handbookRevision, setHandbookRevision] = useState(0);
 
   const setActiveTab = (tab) => {
     setActiveTabState(tab);
@@ -64,8 +65,15 @@ function OwnerDashboardPage() {
           onNavigateToQuestions={() => setActiveTab('question')}
         />
       )}
-      {activeTab === 'handbook' && <HandbookTab companyId={companyId} />}
-      {activeTab === 'question' && <QuestionTab companyId={companyId} />}
+      {activeTab === 'handbook' && (
+        <HandbookTab companyId={companyId} refreshKey={handbookRevision} />
+      )}
+      {activeTab === 'question' && (
+        <QuestionTab
+          companyId={companyId}
+          onHandbookChanged={() => setHandbookRevision((revision) => revision + 1)}
+        />
+      )}
       {activeTab === 'source' && <SourceTab companyId={companyId} />}
       {activeTab === 'settings' && <SettingsTab companyId={companyId} />}
     </DashboardLayout>

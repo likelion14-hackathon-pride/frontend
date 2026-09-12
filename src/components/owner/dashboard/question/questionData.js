@@ -5,8 +5,8 @@
 //   APPROVED  핸드북 규칙으로 승격됨            → 저장됨
 //   DISMISSED 대표가 물린 질문                  → 저장 안 함
 
-import { ESCALATION_STATUS } from '../../../../apis/constants';
-import { formatRelativeKo, formatShortKo } from '../../../../utils/time';
+import { ESCALATION_STATUS } from '../../../../apis/constants.js';
+import { formatRelativeKo, formatShortKo } from '../../../../utils/time.js';
 
 export const UI_STATUS = {
   WAITING: 'waiting',
@@ -26,6 +26,10 @@ const STATUS_MAP = {
 
 export function uiStatusOf(status) {
   return STATUS_MAP[status] ?? STATUS_MAP.DEFAULT;
+}
+
+export function shouldShowApprovalForStatus(status) {
+  return status === ESCALATION_STATUS.ANSWERED;
 }
 
 export function toQuestionRow(escalation) {
