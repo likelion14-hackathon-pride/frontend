@@ -17,7 +17,16 @@ import AddItemPanel from './AddItemPanel';
 import HandbookTierTree from './HandbookTierTree';
 import HandbookDetailPanel from './HandbookDetailPanel';
 import ScrollArea from '../../../common/ScrollArea';
-import { displayStatusOf, firstConfirmedItemForTier } from './handbookTabData';
+import { displayStatusOf, firstItemForTier } from './handbookTabData';
+import {
+  canIndividuallyReview,
+  isApprovedEntry,
+  isBulkDecision,
+  matchesPromotionFilter,
+  PROMOTION_FILTER_ALL,
+  reviewStateOf,
+  safeBulkEntryIds,
+} from './handbookPromotion';
 
 const TabContent = styled.div`
   display: flex;
@@ -88,16 +97,20 @@ function toItem(entry) {
     sourceHref: entry.source?.permalink ?? null,
     status: displayStatusOf(entry),
     day0: entry.sourceType === 'ONBOARDING',
-    lastConfirmed: entry.reviewedAt ?? entry.updatedAt,
+    lastConfirmed: entry.autoPromotedAt ?? entry.reviewedAt ?? entry.updatedAt,
     raw: entry,
   };
 }
 
-function HandbookTab({ companyId }) {
+function HandbookTab({ companyId, refreshKey = 0 }) {
   const [activeTier, setActiveTier] = useState('all');
+  const [activePromotion, setActivePromotion] = useState(PROMOTION_FILTER_ALL);
   const [selectedItemId, setSelectedItemId] = useState(null);
+  const [externalSelectedItem, setExternalSelectedItem] = useState(null);
   const [addPanelOpen, setAddPanelOpen] = useState(false);
   const [archiveOpen, setArchiveOpen] = useState(false);
+  const [bulkResult, setBulkResult] = useState(null);
+  const bulkSubmittingRef = useRef(false);
 
   // 트리·보관함 카드의 남는 높이를 실측해서 고정한다. flex 만으로는 여러 단계 아래까지
   // "확정된 높이"가 안 내려가서 내부 스크롤이 안 걸리는 경우가 있어 직접 잰다.
@@ -124,17 +137,24 @@ function HandbookTab({ companyId }) {
     };
   }, [addPanelOpen, archiveOpen]);
 
-  // 대표는 확정·초안·빈칸을 모두 본다. 보관(ARCHIVED)은 거절한 것이라 목록에서 뺀다.
-  const entriesQuery = useAsync(() => handbookApi.fetchAllEntries(companyId), [companyId], {
-    enabled: Boolean(companyId),
-  });
+  // 일반 핸드북에는 실제 승인된 항목만 표시한다. 승인 전 후보는 검토 보관함에서만 다룬다.
+  // promotionType은 자동화 분류일 뿐이므로 승인 여부의 기준으로 사용하지 않는다.
+  const entriesQuery = useAsync(
+    () =>
+      handbookApi.fetchAllEntries(companyId, {
+        reviewStatus: REVIEW_STATUS.APPROVED,
+        ...(activePromotion === PROMOTION_FILTER_ALL ? {} : { promotionType: activePromotion }),
+      }),
+    [companyId, activePromotion, refreshKey],
+    { enabled: Boolean(companyId) }
+  );
   const reviewInboxQuery = useAsync(
     () =>
       handbookApi.fetchAllEntries(companyId, {
         reviewStatus: REVIEW_STATUS.PENDING,
         origin: [ENTRY_ORIGIN.SLACK, ENTRY_ORIGIN.GITHUB, ENTRY_ORIGIN.FILE].join(','),
       }),
-    [companyId],
+    [companyId, refreshKey],
     { enabled: Boolean(companyId) }
   );
   const scopesQuery = useAsync(() => handbookApi.fetchScopes(companyId), [companyId], {
@@ -144,23 +164,28 @@ function HandbookTab({ companyId }) {
   const review = useMutation(({ entryId, decision }) =>
     handbookApi.reviewEntry(companyId, entryId, decision)
   );
-  const reviewAll = useMutation((entryIds) => handbookApi.reviewAllEntries(companyId, entryIds));
+  const reviewAll = useMutation(({ entryIds, decision }) =>
+    handbookApi.reviewAllEntries(companyId, entryIds, decision)
+  );
   const createEntry = useMutation((payload) => handbookApi.createEntry(companyId, payload));
   const updateEntry = useMutation(({ entryId, patch }) =>
     handbookApi.updateEntry(companyId, entryId, patch)
   );
   const deleteEntry = useMutation((entryId) => handbookApi.deleteEntry(companyId, entryId));
   const createScope = useMutation((name) => handbookApi.createProjectScope(companyId, { name }));
+  const fetchSimilarEntry = useMutation((entryId) => handbookApi.fetchEntry(companyId, entryId));
 
   const items = useMemo(
     () =>
       (entriesQuery.data ?? [])
-        .filter((entry) => entry.status !== ENTRY_STATUS.ARCHIVED)
+        // 구버전 서버나 캐시 응답에도 승인 전 항목이 섞이지 않도록 한 번 더 방어한다.
+        .filter(isApprovedEntry)
+        .filter((entry) => matchesPromotionFilter(entry, activePromotion))
         .map(toItem),
-    [entriesQuery.data]
+    [activePromotion, entriesQuery.data]
   );
 
-  const scopes = scopesQuery.data?.items ?? [];
+  const scopes = useMemo(() => scopesQuery.data?.items ?? [], [scopesQuery.data]);
   const projects = useMemo(
     () =>
       scopes
@@ -174,18 +199,17 @@ function HandbookTab({ companyId }) {
       (reviewInboxQuery.data ?? [])
         .filter((entry) => entry.status !== ENTRY_STATUS.ARCHIVED)
         .map(toItem)
-        .filter((item) => item.status !== 'confirmed'),
+        .filter((item) => reviewStateOf(item.raw) === 'pending'),
     [reviewInboxQuery.data]
   );
-  // 오른쪽 상세 박스는 왼쪽 핸드북 트리(확정 항목)에 있는 것만 보여준다. 보관함의 초안은 대상이 아니다.
-  // 선택한 항목이 현재 분류 필터 밖으로 나가면(또는 아직 선택한 적이 없으면) 그 필터의 맨 위
-  // 항목(트리와 같은 순서)으로 대체한다.
-  const tierFilteredConfirmedItems = items.filter(
-    (item) => item.status === 'confirmed' && (activeTier === 'all' || item.tier === activeTier)
+  // 선택한 항목이 현재 필터 밖으로 나가면 그 필터의 맨 위 항목으로 대체한다.
+  const tierFilteredItems = items.filter(
+    (item) => activeTier === 'all' || item.tier === activeTier
   );
   const selectedItem =
-    tierFilteredConfirmedItems.find((item) => item.id === selectedItemId) ??
-    firstConfirmedItemForTier(items, activeTier, projects);
+    tierFilteredItems.find((item) => item.id === selectedItemId) ??
+    (externalSelectedItem?.id === selectedItemId ? externalSelectedItem : null) ??
+    firstItemForTier(items, activeTier, projects);
 
   const reload = () => {
     entriesQuery.reload();
@@ -193,15 +217,39 @@ function HandbookTab({ companyId }) {
     scopesQuery.reload();
   };
 
-  const handleConfirm = async (id) => {
-    const result = await review.mutate({ entryId: id, decision: REVIEW_DECISION.APPROVE });
-    if (result.ok) reload();
+  const handleReview = async (id, decision) => {
+    const source =
+      items.find((item) => item.id === id) ??
+      waitingItems.find((item) => item.id === id) ??
+      (externalSelectedItem?.id === id ? externalSelectedItem : null);
+    if (!canIndividuallyReview(source?.raw) || !isBulkDecision(decision)) {
+      return { ok: false };
+    }
+    const result = await review.mutate({ entryId: id, decision });
+    if (result.ok) {
+      setExternalSelectedItem(null);
+      reload();
+    }
+    return result;
   };
 
-  const handleConfirmAll = async () => {
-    // 내용이 없는 BLANK 항목은 서버가 건너뛰고 skipped 로 알려 준다.
-    const result = await reviewAll.mutate(waitingItems.map((item) => item.id));
-    if (result.ok) reload();
+  const handleBulkReview = async (selectedIds, decision) => {
+    if (bulkSubmittingRef.current || !isBulkDecision(decision)) return { ok: false };
+    // UI에서 체크박스를 숨기는 것과 별개로 요청 직전에도 개별 검토 항목을 제거한다.
+    const entryIds = safeBulkEntryIds(waitingItems, selectedIds);
+    if (entryIds.length === 0) return { ok: false };
+
+    bulkSubmittingRef.current = true;
+    try {
+      const result = await reviewAll.mutate({ entryIds, decision });
+      if (result.ok) {
+        setBulkResult(result.data);
+        reload();
+      }
+      return result;
+    } finally {
+      bulkSubmittingRef.current = false;
+    }
   };
 
   const handleAddProject = async (_key, label) => {
@@ -237,15 +285,37 @@ function HandbookTab({ companyId }) {
   };
 
   const handleDeleteItem = async (id) => {
-    const item = items.find((entry) => entry.id === id);
+    const item =
+      items.find((entry) => entry.id === id) ??
+      waitingItems.find((entry) => entry.id === id) ??
+      (externalSelectedItem?.id === id ? externalSelectedItem : null);
     // 확정 전 초안은 삭제가 아니라 거절(REJECT)로 내린다(handbook/views.py).
-    const result =
-      item?.status === 'confirmed'
-        ? await deleteEntry.mutate(id)
-        : await review.mutate({ entryId: id, decision: REVIEW_DECISION.REJECT });
+    const result = isApprovedEntry(item?.raw)
+      ? await deleteEntry.mutate(id)
+      : await review.mutate({ entryId: id, decision: REVIEW_DECISION.REJECT });
     if (result.ok) {
       setSelectedItemId(null);
+      setExternalSelectedItem(null);
       reload();
+    }
+    return result;
+  };
+
+  const handleOpenSimilar = async (id) => {
+    const localItem = items.find((item) => item.id === id);
+    if (localItem) {
+      setExternalSelectedItem(null);
+      setSelectedItemId(id);
+      setArchiveOpen(false);
+      return;
+    }
+
+    const result = await fetchSimilarEntry.mutate(id);
+    if (result.ok) {
+      setExternalSelectedItem(toItem(result.data));
+      setSelectedItemId(id);
+      setArchiveOpen(false);
+      setAddPanelOpen(false);
     }
   };
 
@@ -269,7 +339,20 @@ function HandbookTab({ companyId }) {
     <TabContent>
       <HandbookHeaderControls
         activeTier={activeTier}
-        onTierChange={setActiveTier}
+        onTierChange={(tier) => {
+          setActiveTier(tier);
+          setArchiveOpen(false);
+          setSelectedItemId(null);
+          setExternalSelectedItem(null);
+        }}
+        activePromotion={activePromotion}
+        onPromotionChange={(promotion) => {
+          setActivePromotion(promotion);
+          setArchiveOpen(false);
+          setAddPanelOpen(false);
+          setSelectedItemId(null);
+          setExternalSelectedItem(null);
+        }}
         waitingCount={waitingItems.length}
         archiveOpen={archiveOpen}
         onToggleArchive={() => {
@@ -290,7 +373,8 @@ function HandbookTab({ companyId }) {
           createEntry.error ||
           updateEntry.error ||
           deleteEntry.error ||
-          createScope.error
+          createScope.error ||
+          fetchSimilarEntry.error
         }
       />
 
@@ -299,9 +383,10 @@ function HandbookTab({ companyId }) {
           <ConfirmInboxPanel
             items={waitingItems}
             pending={review.pending || reviewAll.pending || deleteEntry.pending}
-            onConfirm={handleConfirm}
-            onConfirmAll={handleConfirmAll}
-            onDelete={handleDeleteItem}
+            bulkResult={bulkResult}
+            onReview={handleReview}
+            onBulkReview={handleBulkReview}
+            onOpenSimilar={handleOpenSimilar}
             onClose={() => setArchiveOpen(false)}
           />
         ) : (
@@ -312,7 +397,10 @@ function HandbookTab({ companyId }) {
                   activeTier={activeTier}
                   items={items}
                   selectedItemId={selectedItem?.id ?? null}
-                  onSelect={setSelectedItemId}
+                  onSelect={(id) => {
+                    setExternalSelectedItem(null);
+                    setSelectedItemId(id);
+                  }}
                   projects={projects}
                 />
               </ScrollArea>
@@ -331,9 +419,11 @@ function HandbookTab({ companyId }) {
               ) : (
                 <HandbookDetailPanel
                   item={selectedItem}
-                  pending={updateEntry.pending || deleteEntry.pending}
+                  pending={review.pending || updateEntry.pending || deleteEntry.pending}
                   onSave={handleUpdateItemText}
                   onDelete={handleDeleteItem}
+                  onReview={handleReview}
+                  onOpenSimilar={handleOpenSimilar}
                 />
               )}
             </RightColumn>

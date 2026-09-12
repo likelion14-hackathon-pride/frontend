@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import * as handbookApi from '../../../../apis/handbook';
 import * as qnaApi from '../../../../apis/qna';
 import * as sourcesApi from '../../../../apis/sources';
-import { CONNECTION_KIND, SCOPE_KIND } from '../../../../apis/constants';
+import { CONNECTION_KIND, ESCALATION_STATUS, SCOPE_KIND } from '../../../../apis/constants';
 import { ErrorState, InlineError, LoadingState } from '../../../common/AsyncStates';
 import { useAsync, useMutation } from '../../../../hooks/useAsync';
 import { slackThreadUrl } from '../../../../utils/slack';
@@ -61,8 +61,23 @@ const SplitRow = styled.div`
   gap: 16px;
 `;
 
-function QuestionTab({ companyId }) {
+const CompletionBanner = styled.div`
+  display: flex;
+  width: 100%;
+  align-items: center;
+  padding: 11px 14px;
+  border-radius: 12px;
+  background: #eaf6ef;
+  color: #1f6f42;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12.5px;
+  font-weight: 700;
+  line-height: 1.5;
+`;
+
+function QuestionTab({ companyId, onHandbookChanged }) {
   const [selectedId, setSelectedId] = useState(null);
+  const [completionNotice, setCompletionNotice] = useState(null);
 
   const listQuery = useAsync(() => qnaApi.fetchAllEscalations(companyId), [companyId], {
     enabled: Boolean(companyId),
@@ -109,7 +124,15 @@ function QuestionTab({ companyId }) {
     if (!id) return;
     pendingCheckRef.current = null;
     const result = await checkAnswer.mutate(id);
-    if (result.ok) reload();
+    if (result.ok) {
+      if (result.data?.status === ESCALATION_STATUS.APPROVED) {
+        setCompletionNotice('Owner 답변이 핸드북 규칙으로 자동 승격되었습니다.');
+        onHandbookChanged?.();
+      } else if (result.data?.status === ESCALATION_STATUS.ANSWERED) {
+        setCompletionNotice(null);
+      }
+      reload();
+    }
   };
 
   useEffect(() => {
@@ -161,6 +184,12 @@ function QuestionTab({ companyId }) {
 
       <InlineError error={checkAnswer.error || approve.error || dismiss.error} />
 
+      {completionNotice && (
+        <CompletionBanner role="status" aria-live="polite">
+          {completionNotice}
+        </CompletionBanner>
+      )}
+
       <QuestionStatCards
         waitingCount={waitingCount}
         waitingFootnote={
@@ -188,7 +217,10 @@ function QuestionTab({ companyId }) {
           }}
           onApprove={async (edits) => {
             const result = await approve.mutate({ id: activeId, edits });
-            if (result.ok) reload();
+            if (result.ok) {
+              onHandbookChanged?.();
+              reload();
+            }
           }}
           onDismiss={async () => {
             const result = await dismiss.mutate(activeId);

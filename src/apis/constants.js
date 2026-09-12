@@ -232,6 +232,19 @@ export const REVIEW_DECISION = {
   HOLD: 'HOLD',
 };
 
+// HandbookEntry.PromotionType — 자동화 판단의 분류다.
+// 실제 승인 여부는 ENTRY_STATUS / REVIEW_STATUS 로 별도 판정한다.
+export const PROMOTION_TYPE = {
+  AUTO_PROMOTED: 'AUTO_PROMOTED',
+  PENDING_REVIEW: 'PENDING_REVIEW',
+  MANUAL_REQUIRED: 'MANUAL_REQUIRED',
+};
+
+export const AUTO_PROMOTION_METHOD = {
+  OWNER_DECISION: 'OWNER_DECISION',
+  REPEATED_EVIDENCE: 'REPEATED_EVIDENCE',
+};
+
 // HandbookEntry.Origin — handbook/models.py:49
 export const ENTRY_ORIGIN = {
   SLACK: 'SLACK',
