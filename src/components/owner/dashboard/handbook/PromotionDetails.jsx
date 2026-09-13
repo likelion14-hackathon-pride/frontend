@@ -196,10 +196,6 @@ function PromotionDetails({ entry, onOpenSimilar }) {
           <MetricLabel>유사도</MetricLabel>
           <MetricValue>{similarityLabel(entry.similarityScore)}</MetricValue>
         </Metric>
-        <Metric>
-          <MetricLabel>정책 버전</MetricLabel>
-          <MetricValue>{metricValue(entry.promotionPolicyVersion)}</MetricValue>
-        </Metric>
       </Metrics>
 
       {risks.length > 0 && (
