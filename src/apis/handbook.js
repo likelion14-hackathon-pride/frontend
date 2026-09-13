@@ -18,6 +18,7 @@ export function createProjectScope(companyId, { name, description }) {
   });
 }
 
+/** @returns {Promise<import('./handbookTypes.js').HandbookEntryListResponse>} */
 export function fetchEntries(
   companyId,
   { scopeId, scopeKind, status, reviewStatus, origin, promotionType, cursor, limit } = {}
@@ -28,6 +29,7 @@ export function fetchEntries(
 }
 
 // 핸드북 화면은 계층 트리를 그려야 해서 한 페이지만으로는 만들 수 없다.
+/** @returns {Promise<import('./handbookTypes.js').HandbookEntry[]>} */
 export async function fetchAllEntries(companyId, params = {}, { maxPages = 20 } = {}) {
   const items = [];
   let cursor;
@@ -48,6 +50,7 @@ export function createEntry(companyId, { title, originalKo, ruleEn, scopeId }) {
   return api.post(ENDPOINTS.handbook.entries(companyId), body);
 }
 
+/** @returns {Promise<import('./handbookTypes.js').HandbookEntry>} */
 export function fetchEntry(companyId, entryId) {
   return api.get(ENDPOINTS.handbook.entry(companyId, entryId));
 }

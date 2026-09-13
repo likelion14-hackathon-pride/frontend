@@ -4,7 +4,12 @@ import styled from 'styled-components';
 import { REVIEW_DECISION } from '../../../../apis/constants';
 import ScrollArea from '../../../common/ScrollArea';
 import { getGroupLabel } from './handbookTabData';
-import { bulkSkipReasonLabel, canIndividuallyReview, isBulkSelectable } from './handbookPromotion';
+import {
+  bulkReviewSummary,
+  bulkSkipReasonLabel,
+  canIndividuallyReview,
+  isBulkSelectable,
+} from './handbookPromotion';
 import PromotionBadge, { ApprovalStatusBadge } from './PromotionBadge';
 import PromotionDetails from './PromotionDetails';
 
@@ -414,7 +419,8 @@ function ConfirmInboxPanel({
     }
   };
 
-  const skipped = Array.isArray(bulkResult?.skipped) ? bulkResult.skipped : [];
+  const summary = bulkReviewSummary(bulkResult);
+  const skipped = summary.skipped;
   const itemById = new Map(items.map((item) => [item.id, item]));
 
   return (
@@ -462,10 +468,8 @@ function ConfirmInboxPanel({
       {bulkResult && (
         <ResultBanner role="status" aria-live="polite">
           <ResultTitle>
-            {bulkResult.decision === REVIEW_DECISION.REJECT
-              ? `거절 완료 · 거절 ${bulkResult.rejectedCount ?? bulkResult.processedCount ?? 0}개`
-              : `승인 완료 · 승인 ${bulkResult.approvedCount ?? bulkResult.processedCount ?? 0}개`}{' '}
-            · 제외 {skipped.length}개
+            요청 {summary.requestCount}개 · 처리 {summary.processedCount}개 · 승인{' '}
+            {summary.approvedCount}개 · 거절 {summary.rejectedCount}개 · 제외 {skipped.length}개
           </ResultTitle>
           {skipped.length > 0 && (
             <SkipList>
