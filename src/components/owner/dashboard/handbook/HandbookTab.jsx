@@ -407,14 +407,16 @@ function HandbookTab({ companyId, refreshKey = 0 }) {
                   />
                 </ScrollArea>
               ) : (
-                <HandbookDetailPanel
-                  item={selectedItem}
-                  pending={review.pending || updateEntry.pending || deleteEntry.pending}
-                  onSave={handleUpdateItemText}
-                  onDelete={handleDeleteItem}
-                  onReview={handleReview}
-                  onOpenSimilar={handleOpenSimilar}
-                />
+                <ScrollArea key={selectedItem?.id ?? 'empty-detail'}>
+                  <HandbookDetailPanel
+                    item={selectedItem}
+                    pending={review.pending || updateEntry.pending || deleteEntry.pending}
+                    onSave={handleUpdateItemText}
+                    onDelete={handleDeleteItem}
+                    onReview={handleReview}
+                    onOpenSimilar={handleOpenSimilar}
+                  />
+                </ScrollArea>
               )}
             </RightColumn>
           </Body>
