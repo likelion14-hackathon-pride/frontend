@@ -5,7 +5,7 @@ import { REVIEW_DECISION } from '../../../../apis/constants';
 import { formatShortKo } from '../../../../utils/time';
 import { getGroupLabel } from './handbookTabData';
 import { canIndividuallyReview, isApprovedEntry } from './handbookPromotion';
-import PromotionBadge, { ApprovalStatusBadge } from './PromotionBadge';
+import PromotionBadge from './PromotionBadge';
 import PromotionDetails from './PromotionDetails';
 
 const Panel = styled.div`
@@ -312,7 +312,6 @@ function HandbookDetailPanel({ item, pending = false, onSave, onDelete, onReview
         <GroupText>{item.groupLabel || getGroupLabel(item.groupKey)}</GroupText>
         {item.day0 && <Day0Text>Day 0 기본 규칙</Day0Text>}
         <PromotionBadge entry={item.raw} />
-        <ApprovalStatusBadge entry={item.raw} />
       </TagRow>
 
       {editing ? (
