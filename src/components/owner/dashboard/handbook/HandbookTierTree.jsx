@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import styled from 'styled-components';
 import { COMPANY_GROUPS } from './handbookTabData';
-import PromotionBadge, { ApprovalStatusBadge } from './PromotionBadge';
+import PromotionBadge from './PromotionBadge';
 import fileTransWhite from '../../../../assets/owner/file_trans_white.svg';
 import treeIcon from '../../../../assets/owner/tree.svg';
 
@@ -258,7 +258,6 @@ function ItemRowView({ item, active, onSelect }) {
       <ItemText>{item.text || '(내용 없음)'}</ItemText>
       <ItemMeta>
         <PromotionBadge entry={item.raw} />
-        <ApprovalStatusBadge entry={item.raw} />
         <Chevron viewBox="0 0 12 12" fill="none" aria-hidden="true">
           <path d="M4.5 2.5L8 6L4.5 9.5" stroke="currentColor" strokeWidth="1.4" />
         </Chevron>

@@ -79,10 +79,14 @@ const LeftColumn = styled.div`
 `;
 
 const RightColumn = styled.div`
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   flex: 1 1 320px;
   min-width: 0;
+  min-height: 0;
+  max-height: 100%;
+  overflow: hidden;
 `;
 
 function toItem(entry) {
