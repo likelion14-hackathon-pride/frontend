@@ -11,29 +11,21 @@ export const PROMOTION_FILTER_ALL = 'ALL';
 export const PROMOTION_FILTERS = [
   { value: PROMOTION_FILTER_ALL, label: '전체' },
   { value: PROMOTION_TYPE.AUTO_PROMOTED, label: '자동 승격' },
-  { value: PROMOTION_TYPE.PENDING_REVIEW, label: '검토 대기' },
-  { value: PROMOTION_TYPE.MANUAL_REQUIRED, label: '개별 검토 필요' },
+  { value: PROMOTION_TYPE.PENDING_REVIEW, label: '일괄 검토 경로' },
+  { value: PROMOTION_TYPE.MANUAL_REQUIRED, label: '개별 검토 경로' },
 ];
 
-const PROMOTION_META = {
-  [PROMOTION_TYPE.AUTO_PROMOTED]: {
-    label: '자동 승격',
-    color: '#1F7A45',
-    bg: '#EAF6EF',
-    border: '#CBE8D6',
-  },
-  [PROMOTION_TYPE.PENDING_REVIEW]: {
-    label: '검토 대기',
-    color: '#1D4ED8',
-    bg: '#EEF3FF',
-    border: '#D5E1FC',
-  },
-  [PROMOTION_TYPE.MANUAL_REQUIRED]: {
-    label: '개별 검토 필요',
-    color: '#9A6212',
-    bg: '#FFF6E8',
-    border: '#F0DFC0',
-  },
+const GREEN_META = { color: '#1F7A45', bg: '#EAF6EF', border: '#CBE8D6' };
+const BLUE_META = { color: '#1D4ED8', bg: '#EEF3FF', border: '#D5E1FC' };
+const AMBER_META = { color: '#9A6212', bg: '#FFF6E8', border: '#F0DFC0' };
+const NEUTRAL_META = { color: '#6B6B73', bg: '#F4F4F6', border: '#E2E2E7' };
+
+const REVIEW_META = {
+  approved: { label: '승인됨', color: '#1F7A45', bg: '#F3FAF6' },
+  rejected: { label: '거절됨', color: '#B4232D', bg: '#FEF2F3' },
+  pending: { label: '검토 대기', color: '#6B6B73', bg: '#F4F4F6' },
+  held: { label: '보류됨', color: '#6B6B73', bg: '#F4F4F6' },
+  unknown: { label: '승인 상태 미확인', color: '#6B6B73', bg: '#F4F4F6' },
 };
 
 const REASON_LABELS = {
@@ -67,21 +59,33 @@ const SKIP_REASON_LABELS = {
 
 export function reviewStateOf(entry) {
   if (!entry) return 'unknown';
-  if (entry.status === ENTRY_STATUS.CONFIRMED || entry.reviewStatus === REVIEW_STATUS.APPROVED) {
-    return 'approved';
+
+  // reviewStatus가 현재 승인 상태의 기준이다. status는 구형 응답의 호환용 fallback이다.
+  switch (entry.reviewStatus) {
+    case REVIEW_STATUS.APPROVED:
+      return 'approved';
+    case REVIEW_STATUS.REJECTED:
+      return 'rejected';
+    case REVIEW_STATUS.HELD:
+      return 'held';
+    case REVIEW_STATUS.PENDING:
+      return 'pending';
+    default:
+      break;
   }
-  if (entry.status === ENTRY_STATUS.ARCHIVED || entry.reviewStatus === REVIEW_STATUS.REJECTED) {
-    return 'rejected';
-  }
-  if (entry.reviewStatus === REVIEW_STATUS.HELD) return 'held';
-  if (
-    entry.reviewStatus === REVIEW_STATUS.PENDING ||
-    entry.status === ENTRY_STATUS.DRAFT ||
-    entry.status === ENTRY_STATUS.BLANK
-  ) {
-    return 'pending';
-  }
+
+  if (entry.status === ENTRY_STATUS.CONFIRMED) return 'approved';
+  if (entry.status === ENTRY_STATUS.ARCHIVED) return 'rejected';
+  if (entry.status === ENTRY_STATUS.DRAFT || entry.status === ENTRY_STATUS.BLANK) return 'pending';
   return 'unknown';
+}
+
+export function reviewStatusMetaOf(entry) {
+  return REVIEW_META[reviewStateOf(entry)] ?? REVIEW_META.unknown;
+}
+
+export function isPendingReviewEntry(entry) {
+  return reviewStateOf(entry) === 'pending';
 }
 
 export function isApprovedEntry(entry) {
@@ -95,9 +99,9 @@ export function canIndividuallyReview(entry) {
 }
 
 export function isBulkSelectable(entry) {
-  if (!canIndividuallyReview(entry)) return false;
-  // 신규 필드가 없는 기존 초안은 예전처럼 일괄 검토할 수 있게 둔다.
-  return entry?.promotionType == null || entry.promotionType === PROMOTION_TYPE.PENDING_REVIEW;
+  return (
+    isPendingReviewEntry(entry) && entry?.promotionType === PROMOTION_TYPE.PENDING_REVIEW
+  );
 }
 
 export function safeBulkEntryIds(items, selectedIds) {
@@ -116,25 +120,44 @@ export function matchesPromotionFilter(entry, filter) {
 }
 
 export function promotionMetaOf(entry) {
-  const known = PROMOTION_META[entry?.promotionType];
-  if (known) return known;
+  const pending = isPendingReviewEntry(entry);
+  if (entry?.promotionType === PROMOTION_TYPE.AUTO_PROMOTED) {
+    return entry.isAutoPromoted === true
+      ? { label: '자동 승격', ...GREEN_META }
+      : { label: '자동 승격 분류', ...NEUTRAL_META };
+  }
+  if (entry?.promotionType === PROMOTION_TYPE.PENDING_REVIEW) {
+    return { label: pending ? '일괄 검토 대상' : '일괄 검토 경유', ...BLUE_META };
+  }
+  if (entry?.promotionType === PROMOTION_TYPE.MANUAL_REQUIRED) {
+    return { label: pending ? '개별 검토 필요' : '개별 검토 경유', ...AMBER_META };
+  }
 
   const state = reviewStateOf(entry);
   if (state === 'approved') {
-    return { label: '확인됨', color: '#1F7A45', bg: '#EAF6EF', border: '#CBE8D6' };
+    return { label: '확인됨', ...GREEN_META };
   }
   if (state === 'rejected') {
     return { label: '거절됨', color: '#B4232D', bg: '#FEF2F3', border: '#F6CACD' };
   }
   if (state === 'pending' || state === 'held') {
-    return {
-      label: state === 'held' ? '보류' : '확인 대기',
-      color: '#6B6B73',
-      bg: '#F4F4F6',
-      border: '#E2E2E7',
-    };
+    return { label: state === 'held' ? '보류됨' : '확인 대기', ...NEUTRAL_META };
   }
-  return { label: '상태 미확인', color: '#6B6B73', bg: '#F4F4F6', border: '#E2E2E7' };
+  return { label: '상태 미확인', ...NEUTRAL_META };
+}
+
+export function bulkReviewSummary(result) {
+  const results = Array.isArray(result?.results) ? result.results : [];
+  const skipped = Array.isArray(result?.skipped) ? result.skipped : [];
+  const processedCount = Number.isFinite(result?.processedCount) ? result.processedCount : 0;
+  return {
+    results,
+    skipped,
+    requestCount: results.length || processedCount + skipped.length,
+    processedCount,
+    approvedCount: Number.isFinite(result?.approvedCount) ? result.approvedCount : 0,
+    rejectedCount: Number.isFinite(result?.rejectedCount) ? result.rejectedCount : 0,
+  };
 }
 
 export function autoPromotionMethodLabel(method) {

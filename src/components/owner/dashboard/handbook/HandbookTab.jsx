@@ -3,10 +3,7 @@ import styled from 'styled-components';
 
 import * as handbookApi from '../../../../apis/handbook';
 import {
-  ENTRY_ORIGIN,
-  ENTRY_STATUS,
   REVIEW_DECISION,
-  REVIEW_STATUS,
   SCOPE_KIND,
 } from '../../../../apis/constants';
 import { ErrorState, InlineError, LoadingState } from '../../../common/AsyncStates';
@@ -27,6 +24,11 @@ import {
   reviewStateOf,
   safeBulkEntryIds,
 } from './handbookPromotion';
+import {
+  approvedEntriesParams,
+  refetchHandbookData,
+  reviewInboxParams,
+} from './handbookQueries';
 
 const TabContent = styled.div`
   display: flex;
@@ -141,19 +143,12 @@ function HandbookTab({ companyId, refreshKey = 0 }) {
   // promotionType은 자동화 분류일 뿐이므로 승인 여부의 기준으로 사용하지 않는다.
   const entriesQuery = useAsync(
     () =>
-      handbookApi.fetchAllEntries(companyId, {
-        reviewStatus: REVIEW_STATUS.APPROVED,
-        ...(activePromotion === PROMOTION_FILTER_ALL ? {} : { promotionType: activePromotion }),
-      }),
+      handbookApi.fetchAllEntries(companyId, approvedEntriesParams(activePromotion)),
     [companyId, activePromotion, refreshKey],
     { enabled: Boolean(companyId) }
   );
   const reviewInboxQuery = useAsync(
-    () =>
-      handbookApi.fetchAllEntries(companyId, {
-        reviewStatus: REVIEW_STATUS.PENDING,
-        origin: [ENTRY_ORIGIN.SLACK, ENTRY_ORIGIN.GITHUB, ENTRY_ORIGIN.FILE].join(','),
-      }),
+    () => handbookApi.fetchAllEntries(companyId, reviewInboxParams()),
     [companyId, refreshKey],
     { enabled: Boolean(companyId) }
   );
@@ -197,7 +192,6 @@ function HandbookTab({ companyId, refreshKey = 0 }) {
   const waitingItems = useMemo(
     () =>
       (reviewInboxQuery.data ?? [])
-        .filter((entry) => entry.status !== ENTRY_STATUS.ARCHIVED)
         .map(toItem)
         .filter((item) => reviewStateOf(item.raw) === 'pending'),
     [reviewInboxQuery.data]
@@ -211,11 +205,7 @@ function HandbookTab({ companyId, refreshKey = 0 }) {
     (externalSelectedItem?.id === selectedItemId ? externalSelectedItem : null) ??
     firstItemForTier(items, activeTier, projects);
 
-  const reload = () => {
-    entriesQuery.reload();
-    reviewInboxQuery.reload();
-    scopesQuery.reload();
-  };
+  const reload = () => refetchHandbookData(entriesQuery, reviewInboxQuery, scopesQuery);
 
   const handleReview = async (id, decision) => {
     const source =
@@ -228,7 +218,7 @@ function HandbookTab({ companyId, refreshKey = 0 }) {
     const result = await review.mutate({ entryId: id, decision });
     if (result.ok) {
       setExternalSelectedItem(null);
-      reload();
+      await reload();
     }
     return result;
   };
@@ -244,7 +234,7 @@ function HandbookTab({ companyId, refreshKey = 0 }) {
       const result = await reviewAll.mutate({ entryIds, decision });
       if (result.ok) {
         setBulkResult(result.data);
-        reload();
+        await reload();
       }
       return result;
     } finally {

@@ -147,7 +147,7 @@ function metricValue(value, fallback = '확인되지 않음') {
 function PromotionDetails({ entry, onOpenSimilar }) {
   if (!entry) return null;
 
-  if (entry.promotionType === PROMOTION_TYPE.AUTO_PROMOTED) {
+  if (entry.promotionType === PROMOTION_TYPE.AUTO_PROMOTED && entry.isAutoPromoted === true) {
     return (
       <Section aria-label="자동 승격 정보">
         <AutoSummary>
@@ -159,6 +159,8 @@ function PromotionDetails({ entry, onOpenSimilar }) {
       </Section>
     );
   }
+
+  if (entry.promotionType === PROMOTION_TYPE.AUTO_PROMOTED) return null;
 
   if (entry.promotionType !== PROMOTION_TYPE.MANUAL_REQUIRED) return null;
 
@@ -193,6 +195,10 @@ function PromotionDetails({ entry, onOpenSimilar }) {
         <Metric>
           <MetricLabel>유사도</MetricLabel>
           <MetricValue>{similarityLabel(entry.similarityScore)}</MetricValue>
+        </Metric>
+        <Metric>
+          <MetricLabel>정책 버전</MetricLabel>
+          <MetricValue>{metricValue(entry.promotionPolicyVersion)}</MetricValue>
         </Metric>
       </Metrics>
 

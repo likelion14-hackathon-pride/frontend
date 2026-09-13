@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import { promotionMetaOf, reviewStateOf } from './handbookPromotion';
+import { promotionMetaOf, reviewStatusMetaOf } from './handbookPromotion';
 
 const Badge = styled.span`
   display: inline-flex;
@@ -27,14 +27,6 @@ const Dot = styled.span`
   border-radius: 50%;
   background: currentColor;
 `;
-
-const REVIEW_META = {
-  approved: { label: '승인됨', color: '#1F7A45', bg: '#F3FAF6' },
-  rejected: { label: '거절됨', color: '#B4232D', bg: '#FEF2F3' },
-  pending: { label: '승인 대기', color: '#6B6B73', bg: '#F4F4F6' },
-  held: { label: '보류', color: '#6B6B73', bg: '#F4F4F6' },
-  unknown: { label: '승인 상태 미확인', color: '#6B6B73', bg: '#F4F4F6' },
-};
 
 const ReviewBadge = styled.span`
   display: inline-flex;
@@ -63,7 +55,7 @@ function PromotionBadge({ entry }) {
 }
 
 export function ApprovalStatusBadge({ entry }) {
-  const meta = REVIEW_META[reviewStateOf(entry)] ?? REVIEW_META.unknown;
+  const meta = reviewStatusMetaOf(entry);
   return (
     <ReviewBadge $bg={meta.bg} $color={meta.color}>
       {meta.label}
