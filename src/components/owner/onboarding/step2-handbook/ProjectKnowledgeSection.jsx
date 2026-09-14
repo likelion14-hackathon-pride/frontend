@@ -139,6 +139,14 @@ const CreateButton = styled.button`
   cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   background: ${({ disabled }) => (disabled ? '#E6E6EB' : '#2563EB')};
   color: ${({ disabled }) => (disabled ? '#B4B4BC' : '#FFFFFF')};
+  transition:
+    background 0.15s ease,
+    box-shadow 0.15s ease;
+
+  &:not(:disabled):hover {
+    background: #1d4ed8;
+    box-shadow: 0 8px 18px -8px rgba(37, 99, 235, 0.55);
+  }
 `;
 
 const CancelButton = styled.button`

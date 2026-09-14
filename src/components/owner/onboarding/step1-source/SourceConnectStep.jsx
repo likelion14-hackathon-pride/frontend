@@ -159,6 +159,16 @@ const CtaButton = styled.button`
   border-radius: 999px;
   cursor: pointer;
   background: #fff;
+  transition:
+    background 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+
+  &:hover {
+    background: #f3f4f6;
+    box-shadow: 0 10px 24px -12px rgba(0, 0, 0, 0.35);
+    transform: translateY(-1px);
+  }
 `;
 
 const CtaButtonLabel = styled.span`

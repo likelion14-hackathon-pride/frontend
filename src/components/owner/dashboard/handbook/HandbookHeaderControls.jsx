@@ -92,6 +92,11 @@ const TierTab = styled.button`
   background: ${({ $active }) => ($active ? '#2563EB' : '#FFF')};
   color: ${({ $active }) => ($active ? '#FFF' : '#3C3C44')};
   box-shadow: ${({ $active }) => ($active ? '0 10px 20px -8px #2563EB' : '0 1px 4px 0 rgba(23, 44, 90, 0.10)')};
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: ${({ $active }) => ($active ? '#1D4ED8' : '#F5F5F7')};
+  }
 
   &:focus-visible {
     outline: 2px solid #2563eb;

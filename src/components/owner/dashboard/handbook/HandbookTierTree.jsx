@@ -108,14 +108,20 @@ const Header = styled.button`
   width: 100%;
   align-items: center;
   gap: 10px;
-  height: 18.667px;
-  margin-bottom: 12px;
+  min-height: 18.667px;
+  padding: 6px 10px;
+  margin: -6px -10px 6px -10px;
   border: none;
+  border-radius: 10px;
   background: none;
-  padding: 0;
   font: inherit;
   text-align: left;
   cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: #f5f5f7;
+  }
 
   &:focus-visible {
     outline: 2px solid #2563eb;
