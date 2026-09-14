@@ -280,7 +280,15 @@ const CopyButton = styled.button`
   border: none;
   border-radius: 15px;
   background: #fff;
-  cursor: pointer;
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
+  transition:
+    background 0.15s ease,
+    box-shadow 0.15s ease;
+
+  &:not(:disabled):hover {
+    background: #f3f4f6;
+    box-shadow: 0 8px 18px -10px rgba(0, 0, 0, 0.35);
+  }
 `;
 
 const CopyButtonLabelWrap = styled.span`
@@ -350,6 +358,14 @@ const GhostButton = styled.button`
   font-weight: 700;
   line-height: normal;
   cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+
+  &:hover {
+    background: #e6e6eb;
+    color: #17171b;
+  }
 `;
 
 const PrimaryButton = styled.button`
@@ -362,6 +378,16 @@ const PrimaryButton = styled.button`
   background: #000;
   box-shadow: 0 12px 26px -12px rgba(37, 99, 235, 0.6);
   cursor: pointer;
+  transition:
+    background 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+
+  &:hover {
+    background: #17171b;
+    box-shadow: 0 16px 32px -12px rgba(37, 99, 235, 0.7);
+    transform: translateY(-1px);
+  }
 `;
 
 const PrimaryButtonLabel = styled.span`

@@ -229,6 +229,11 @@ const AddButton = styled.button`
   font-weight: 700;
   line-height: 128%;
   white-space: nowrap;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: ${({ $primary }) => ($primary ? '#1D4ED8' : '#E6E6EB')};
+  }
 
   &:disabled {
     opacity: 0.45;
@@ -280,6 +285,11 @@ const SmallButton = styled.button`
   font-weight: 700;
   background: ${({ $primary }) => ($primary ? '#2563eb' : '#f0f0f2')};
   color: ${({ $primary }) => ($primary ? '#ffffff' : '#6b6b73')};
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: ${({ $primary }) => ($primary ? '#1d4ed8' : '#e6e6eb')};
+  }
 `;
 
 function SourceBoxCard({

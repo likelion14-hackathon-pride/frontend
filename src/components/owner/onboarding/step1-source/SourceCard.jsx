@@ -109,6 +109,7 @@ const ConnectButton = styled.button`
   font-style: normal;
   font-weight: 700;
   letter-spacing: -0.2px;
+  transition: background 0.15s ease;
 
   ${({ $status }) =>
     $status === 'connecting'
@@ -122,6 +123,13 @@ const ConnectButton = styled.button`
     font-family: Pretendard;
     line-height: normal;
   `}
+
+  ${({ $status }) =>
+    $status === 'connecting'
+      ? ''
+      : $status === 'connected'
+        ? `&:hover { background: #1E40AF; }`
+        : `&:hover { background: #E6E6EB; }`}
 `;
 
 function SourceCard({
