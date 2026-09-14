@@ -9,6 +9,7 @@ import RoleSelect from '../../components/auth/ui/RoleSelect';
 import BackButton from '../../components/auth/ui/BackButton';
 import Input from '../../components/auth/ui/Input';
 import { StartButton } from '../../components/auth/ui/Button';
+import DemoAccessRow from '../../components/auth/ui/DemoAccessRow';
 import OwnerSignupForm from '../../components/auth/OwnerSignupForm';
 import MemberSignupForm from '../../components/auth/MemberSignupForm';
 import MemberSetupForm from '../../components/auth/MemberSetupForm';
@@ -32,6 +33,20 @@ const Notice = styled.div`
     $tone === 'error' ? '#FEF2F3' : $tone === 'info' ? '#F7F8FA' : '#FFF8E3'};
   color: ${({ $tone }) => ($tone === 'error' ? '#96131C' : $tone === 'info' ? '#525A66' : '#7A5A05')};
 `;
+
+// 로그인 없이 둘러보기: 백엔드에 미리 만들어 둔 테스트 계정으로 즉시 로그인한다.
+// 계정 정보는 커밋하지 않고 .env(.local)의 VITE_DEMO_* 값으로 채운다 - 안 채워지면 버튼은
+// "아직 준비되지 않았다"는 안내만 띄운다.
+const DEMO_ACCOUNTS = {
+  owner: {
+    email: import.meta.env.VITE_DEMO_OWNER_EMAIL,
+    password: import.meta.env.VITE_DEMO_OWNER_PASSWORD,
+  },
+  member: {
+    email: import.meta.env.VITE_DEMO_MEMBER_EMAIL,
+    password: import.meta.env.VITE_DEMO_MEMBER_PASSWORD,
+  },
+};
 
 const FieldError = styled.p`
   margin: -2px 0 0;
@@ -181,6 +196,25 @@ export default function LoginPage() {
     }
   };
 
+  const handleDemoLogin = async (roleKey) => {
+    if (submitting) return;
+    const creds = DEMO_ACCOUNTS[roleKey];
+    if (!creds.email || !creds.password) {
+      localError(t.demoNotReady);
+      return;
+    }
+    setFormError(null);
+    clearSessionNotice();
+    setSubmitting(true);
+    try {
+      await login(creds);
+    } catch (caught) {
+      showError(caught);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const submitLabel = (() => {
     if (submitting) return '처리 중…';
     if (mode === 'login') return t.submitLogin;
@@ -295,6 +329,17 @@ export default function LoginPage() {
       <StartButton onClick={handleSubmit} disabled={submitting}>
         {submitLabel}
       </StartButton>
+
+      {mode === 'login' && (
+        <DemoAccessRow
+          label={t.demoDividerLabel}
+          ownerLabel={t.demoOwnerLabel}
+          memberLabel={t.demoMemberLabel}
+          onSelectOwner={() => handleDemoLogin('owner')}
+          onSelectMember={() => handleDemoLogin('member')}
+          disabled={submitting}
+        />
+      )}
     </AuthLayout>
   );
 }
