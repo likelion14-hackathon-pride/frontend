@@ -55,6 +55,10 @@ export const translations = {
     errorRequired: '모든 항목을 입력해주세요.',
     errorSetupRequired: '근무 위치와 담당 역할을 선택해주세요.',
     errorLoginRequired: '이메일과 비밀번호를 모두 입력해주세요.',
+    demoDividerLabel: '테스트 계정으로 둘러보기',
+    demoOwnerLabel: '관리자 화면',
+    demoMemberLabel: '팀원 화면',
+    demoNotReady: '테스트 계정이 아직 준비되지 않았어요.',
   },
   en: {
     brandWelcome: 'Welcome to SAi',
@@ -109,5 +113,9 @@ export const translations = {
     errorRequired: 'Please fill in all fields.',
     errorSetupRequired: 'Please select a work location and a role.',
     errorLoginRequired: 'Please enter both email and password.',
+    demoDividerLabel: 'Browse without logging in',
+    demoOwnerLabel: 'Owner view',
+    demoMemberLabel: 'Member view',
+    demoNotReady: 'Test accounts are not ready yet.',
   },
 };
