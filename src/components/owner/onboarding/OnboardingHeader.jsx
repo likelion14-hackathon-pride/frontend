@@ -58,6 +58,14 @@ const LogoutButton = styled.button`
   border: 0.667px solid #eaeaee;
   background: #fff;
   cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+
+  &:hover {
+    background: #f5f5f7;
+    border-color: #d8d8de;
+  }
 `;
 
 const LogoutIcon = styled.img`

@@ -110,6 +110,11 @@ const Chip = styled.button`
   border: 0.667px solid ${({ $active }) => ($active ? '#2563EB' : '#E6E6EB')};
   background: ${({ $active }) => ($active ? '#2563EB' : '#FFFFFF')};
   color: ${({ $active }) => ($active ? '#FFFFFF' : '#6B6B73')};
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: ${({ $active }) => ($active ? '#1D4ED8' : '#F5F5F7')};
+  }
 `;
 
 const EmptyProjectText = styled.span`
@@ -135,6 +140,11 @@ const GhostButton = styled.button`
   font-family: 'Plus Jakarta Sans';
   font-size: 12.5px;
   font-weight: 700;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: #e6e6eb;
+  }
 `;
 
 const ConfirmButton = styled.button`
@@ -148,6 +158,11 @@ const ConfirmButton = styled.button`
   font-family: 'Plus Jakarta Sans';
   font-size: 12.5px;
   font-weight: 700;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: ${({ disabled }) => (disabled ? '#DBE4FC' : '#1D4ED8')};
+  }
 `;
 
 const COMPANY_OPTION = '__company__';

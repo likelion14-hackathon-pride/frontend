@@ -132,7 +132,7 @@ const CopyButton = styled.button`
   border-radius: 14px;
   border: ${({ $copied }) => ($copied ? '0.5px solid #1F7A45' : '0.667px solid transparent')};
   background: ${({ $copied }) => ($copied ? 'rgba(31, 122, 69, 0.50)' : '#2563EB')};
-  cursor: pointer;
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   color: #fff;
   text-align: center;
   font-family: 'Plus Jakarta Sans';
@@ -141,6 +141,11 @@ const CopyButton = styled.button`
   font-weight: 700;
   line-height: 123%;
   white-space: nowrap;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: ${({ $copied }) => ($copied ? 'rgba(31, 122, 69, 0.50)' : '#1D4ED8')};
+  }
 `;
 
 const COPIED_RESET_MS = 2000;
