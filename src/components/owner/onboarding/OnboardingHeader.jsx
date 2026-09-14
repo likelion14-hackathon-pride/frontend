@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import OnboardingStepper from './OnboardingStepper';
 import symbol from '../../../assets/owner/symbol.svg';
 import wordmark from '../../../assets/owner/wordmark.svg';
+import logoutIcon from '../../../assets/owner/logout.svg';
 
 const Bar = styled.header`
   display: grid;
@@ -42,7 +43,27 @@ const AvatarContainer = styled.div`
   display: flex;
   justify-content: flex-end;
   align-items: center;
+  gap: 12px;
   justify-self: end;
+`;
+
+const LogoutButton = styled.button`
+  display: flex;
+  width: 44px;
+  height: 44px;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  border-radius: 50px;
+  border: 0.667px solid #eaeaee;
+  background: #fff;
+  cursor: pointer;
+`;
+
+const LogoutIcon = styled.img`
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
 `;
 
 const Avatar = styled.div`
@@ -60,7 +81,7 @@ const Avatar = styled.div`
   flex-shrink: 0;
 `;
 
-function OnboardingHeader({ currentStep, userInitial = '김', onStepClick }) {
+function OnboardingHeader({ currentStep, userInitial = '김', onStepClick, onLogout }) {
   return (
     <Bar>
       <Logo>
@@ -71,6 +92,9 @@ function OnboardingHeader({ currentStep, userInitial = '김', onStepClick }) {
         <OnboardingStepper currentStep={currentStep} onStepClick={onStepClick} />
       </StepperWrapper>
       <AvatarContainer>
+        <LogoutButton type="button" onClick={onLogout} aria-label="로그아웃" title="로그아웃">
+          <LogoutIcon src={logoutIcon} alt="" />
+        </LogoutButton>
         <Avatar>{userInitial}</Avatar>
       </AvatarContainer>
     </Bar>

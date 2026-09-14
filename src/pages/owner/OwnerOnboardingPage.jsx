@@ -19,7 +19,7 @@ import { useAsync, useMutation } from '../../hooks/useAsync';
 function OwnerOnboardingPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { companyId, company, refreshMe } = useAuth();
+  const { companyId, company, user, refreshMe, logout } = useAuth();
 
   // 가입 응답에만 담겨 오는 회사 코드. 없으면 회사 조회로 채운다.
   const [companyCode, setCompanyCode] = useState(
@@ -119,7 +119,12 @@ function OwnerOnboardingPage() {
 
   return (
     <OnboardingLayout>
-      <OnboardingHeader currentStep={currentStep} onStepClick={handleStepClick} />
+      <OnboardingHeader
+        currentStep={currentStep}
+        onStepClick={handleStepClick}
+        userInitial={user?.name?.trim()?.charAt(0)?.toUpperCase() ?? '?'}
+        onLogout={logout}
+      />
 
       <InlineError error={stepError} />
 
