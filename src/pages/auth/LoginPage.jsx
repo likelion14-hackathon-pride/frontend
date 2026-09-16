@@ -34,9 +34,7 @@ const Notice = styled.div`
   color: ${({ $tone }) => ($tone === 'error' ? '#96131C' : $tone === 'info' ? '#525A66' : '#7A5A05')};
 `;
 
-// 로그인 없이 둘러보기: 백엔드에 미리 만들어 둔 테스트 계정으로 즉시 로그인한다.
-// 계정 정보는 커밋하지 않고 .env(.local)의 VITE_DEMO_* 값으로 채운다 - 안 채워지면 버튼은
-// "아직 준비되지 않았다"는 안내만 띄운다.
+// 로그인 없이 둘러보기
 const DEMO_ACCOUNTS = {
   owner: {
     email: import.meta.env.VITE_DEMO_OWNER_EMAIL,
@@ -182,8 +180,6 @@ export default function LoginPage() {
     try {
       await authApi.updateMe({ location: workLocation, role: jobRole });
     } catch (caught) {
-      // 계정은 이미 만들어졌다. 설정만 실패했으므로 알리고 그대로 진행한다.
-      // 홈의 설정 모달에서 다시 고칠 수 있다.
       showError(caught);
     }
 

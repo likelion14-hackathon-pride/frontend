@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 import * as cardsApi from '../../../apis/cards';
 import * as qnaApi from '../../../apis/qna';
-import { CARD_COLUMN, URGENCY_LABEL, lookup } from '../../../apis/constants';
+import { CARD_COLUMN, CARD_STATUS, URGENCY_LABEL, lookup } from '../../../apis/constants';
 import { useAsync, useMutation } from '../../../hooks/useAsync';
 import { formatDateTime } from '../../../utils/time';
 import { ErrorState, InlineError, LoadingState } from '../../common/AsyncStates';
@@ -11,17 +11,22 @@ import { useMemberNavigation } from '../../../context/member/MemberContext';
 import chatBubbleIcon from '../../../assets/icons/chat-org.svg';
 import bookIcon from '../../../assets/icons/book-org.svg';
 
-// Ready/In progress/Answered 에서만 쓰는 CTA. Waiting 은 버튼이 없고, Done 은 별도 DoneRow 로 그린다.
-const CTA_LABEL = {
-  [CARD_COLUMN.READY]: "I'll take this on",
-  [CARD_COLUMN.IN_PROGRESS]: 'Mark as done',
-  [CARD_COLUMN.ANSWERED]: 'Mark as done',
-  DEFAULT: null,
-};
-
-const MOVE_HINT = {
-  [CARD_COLUMN.READY]: 'Starting this will move it to In progress.',
-  DEFAULT: null,
+// 상태별 전환 버튼. Waiting 은 버튼이 없다. Done 카드는 보드에서 이미 걸러지고
+// Finished tasks 모달에서만 보이므로 이 패널까지 오지 않는다.
+// Answered 를 In progress로 되돌리는 건 이 버튼이 아니라 답변 카드의 "Noted"
+// (qnaApi.acknowledgeEscalation) 몫이다 - 그게 카드를 Answered 열에서 실제로 빼내는
+// 유일한 경로라서, 여기 별도 버튼을 두면 상태 PATCH 만 하고 열은 안 바뀌는 혼란을 만든다.
+const CTA_ACTIONS = {
+  [CARD_COLUMN.READY]: [
+    {
+      label: 'Take on',
+      target: CARD_STATUS.IN_PROGRESS,
+      hint: 'Starting this will move it to In progress.',
+    },
+  ],
+  [CARD_COLUMN.IN_PROGRESS]: [{ label: 'Mark as done', target: CARD_STATUS.DONE }],
+  [CARD_COLUMN.ANSWERED]: [{ label: 'Mark as done', target: CARD_STATUS.DONE }],
+  DEFAULT: [],
 };
 
 const Overlay = styled.div`
@@ -465,55 +470,6 @@ const AnswerMeta = styled.div`
   margin-top: 6px;
 `;
 
-// Done: 초록 체크 + 같은 줄 우측에 Reopen
-const DoneCard = styled.div`
-  background: #fff;
-  border-radius: 18px;
-  box-shadow: 0px 1px 20px 0px #0000002e;
-  padding: 16px 18px;
-`;
-
-const DoneRow = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 9px;
-`;
-
-const DoneCheck = styled.span`
-  width: 22px;
-  height: 22px;
-  flex: none;
-  border-radius: 7px;
-  background: #3ba55c;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const DoneLabel = styled.span`
-  flex: 1;
-  min-width: 0;
-  font-size: 14.5px;
-  font-weight: 800;
-`;
-
-const DoneButton = styled.button`
-  flex: none;
-  white-space: nowrap;
-  font-size: 13px;
-  font-weight: 700;
-  color: #6b6b73;
-  border: 1px solid #eaeaee;
-  padding: 8px 13px;
-  border-radius: 10px;
-  background: none;
-  cursor: pointer;
-
-  &:hover {
-    box-shadow: inset 0 0 0 999px rgba(23, 23, 27, 0.045);
-  }
-`;
-
 export default function TaskDetailPanel({ card, isWide, onToggleWide, onClose, onMoveAction }) {
   const { companyId, goToAskWithQuestion, reloadCards } = useMemberNavigation();
   const [askDraft, setAskDraft] = useState('');
@@ -532,18 +488,12 @@ export default function TaskDetailPanel({ card, isWide, onToggleWide, onClose, o
 
   const detail = detailQuery.data;
   const columnId = card.columnId ?? card.column;
-  const ctaLabel = lookup(CTA_LABEL, columnId);
-  const moveHint = lookup(MOVE_HINT, columnId);
+  const ctaActions = lookup(CTA_ACTIONS, columnId) ?? [];
 
   const isReady = columnId === CARD_COLUMN.READY;
   const isInProgress = columnId === CARD_COLUMN.IN_PROGRESS;
   const isWaiting = columnId === CARD_COLUMN.WAITING;
   const isAnswered = columnId === CARD_COLUMN.ANSWERED;
-  const isDone = columnId === CARD_COLUMN.DONE;
-
-  // Done 카드가 어디서 왔는지는 서버가 previousColumn 으로 알려준다(추측 아님).
-  const previousColumn = card.previousColumn ?? detail?.previousColumn;
-  const doneFromAnswered = isDone && previousColumn === CARD_COLUMN.ANSWERED;
 
   function handleAskSend() {
     if (!askDraft.trim()) return;
@@ -565,10 +515,10 @@ export default function TaskDetailPanel({ card, isWide, onToggleWide, onClose, o
   const sentQuestions = questions.filter((q) => !(q.answerEn || q.answerKo));
   const answeredQuestions = questions.filter((q) => q.answerEn || q.answerKo);
 
-  const showMainCard = isReady || isInProgress || isWaiting || (isDone && !doneFromAnswered);
+  const showMainCard = isReady || isInProgress || isWaiting;
   const showHandbookAndAsk = isInProgress; // Handbook rules / Ask SAI 는 In progress 에서만
   const showSentQuestions = isWaiting;
-  const showAnsweredQuestions = isAnswered || (isDone && doneFromAnswered);
+  const showAnsweredQuestions = isAnswered;
 
   return (
     <Overlay $wide={isWide}>
@@ -714,33 +664,16 @@ export default function TaskDetailPanel({ card, isWide, onToggleWide, onClose, o
           </Card>
         )}
 
-        {isDone ? (
-          <DoneCard>
-            <DoneRow>
-              <DoneCheck>
-                <svg
-                  width="11"
-                  height="11"
-                  viewBox="0 0 10 10"
-                  fill="none"
-                  stroke="#fff"
-                  strokeWidth="1.9"
-                >
-                  <path d="M2 5.2l2 2L8 3" />
-                </svg>
-              </DoneCheck>
-              <DoneLabel>Done</DoneLabel>
-              <DoneButton onClick={onMoveAction}>Reopen</DoneButton>
-            </DoneRow>
-          </DoneCard>
-        ) : (
-          ctaLabel && (
-            <StatusCard>
-              <StatusLabel>TASK STATUS</StatusLabel>
-              <StatusButton onClick={onMoveAction}>{ctaLabel}</StatusButton>
-              {moveHint && <StatusHint>{moveHint}</StatusHint>}
-            </StatusCard>
-          )
+        {ctaActions.length > 0 && (
+          <StatusCard>
+            <StatusLabel>TASK STATUS</StatusLabel>
+            {ctaActions.map((action) => (
+              <StatusButton key={action.target} onClick={() => onMoveAction(action.target)}>
+                {action.label}
+              </StatusButton>
+            ))}
+            {ctaActions[0]?.hint && <StatusHint>{ctaActions[0].hint}</StatusHint>}
+          </StatusCard>
         )}
       </Body>
     </Overlay>

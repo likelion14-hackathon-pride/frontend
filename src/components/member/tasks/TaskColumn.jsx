@@ -14,19 +14,13 @@ const COLUMN_THEME = {
     countBg: 'rgba(255, 255, 255, 0.62)',
     shadow: '0 14px 34px -14px rgba(23, 44, 90, 0.22), 0 3px 8px -2px rgba(23, 44, 90, 0.08)',
   },
-  WAITING: {
+  QUESTION: {
     bg: '#FAF0E4',
     color: '#A85B14',
     countBg: 'rgba(255, 255, 255, 0.62)',
     shadow: '0 14px 34px -14px rgba(23, 44, 90, 0.22), 0 3px 8px -2px rgba(23, 44, 90, 0.08)',
   },
-  ANSWERED: {
-    bg: '#FDF7F2',
-    color: '#B4600D',
-    countBg: 'rgba(255, 255, 255, 0.62)',
-    shadow: '0 14px 34px -14px rgba(23, 44, 90, 0.22), 0 3px 8px -2px rgba(23, 44, 90, 0.08)',
-  },
-  DONE: {
+  DEFAULT: {
     bg: '#fff',
     color: '#6B6B73',
     countBg: '#F2F2F4',
@@ -79,7 +73,7 @@ const CountBadge = styled.span`
 `;
 
 export default function TaskColumn({ id, name, cards = [], onCardClick, onCtaClick }) {
-  const theme = COLUMN_THEME[id] ?? COLUMN_THEME.DONE;
+  const theme = COLUMN_THEME[id] ?? COLUMN_THEME.DEFAULT;
 
   return (
     <Column>

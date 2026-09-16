@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import arrowIcon from '../../../assets/icons/arrow.svg';
+import { AVATAR_COLORS, TAG_THEME } from './TaskCard';
 
 const Card = styled.div`
   background: #fff;
@@ -8,27 +9,6 @@ const Card = styled.div`
     0 14px 34px -14px rgba(23, 44, 90, 0.22),
     0 3px 8px -2px rgba(23, 44, 90, 0.08);
   padding: 16px 17px;
-  transition:
-    transform 0.15s,
-    box-shadow 0.15s;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px -10px rgba(0, 0, 0, 0.16);
-  }
-`;
-
-const MainButton = styled.button`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 11px;
-  text-align: left;
-  padding: 0;
-  border: none;
-  background: none;
-  cursor: pointer;
 `;
 
 const TitleRow = styled.div`
@@ -52,39 +32,33 @@ const Title = styled.span`
   overflow: hidden;
 `;
 
-const MoreDots = styled.span`
+const ReopenButton = styled.button`
   flex: none;
-  font-size: 15px;
-  color: #c4c4cc;
-  line-height: 1;
-`;
-
-const StatusBadge = styled.span`
-  flex: none;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 11px;
-  font-weight: 700;
-  color: ${(props) => props.$theme.color};
-  background: ${(props) => props.$theme.bg};
-  padding: 4px 9px 4px 7px;
-  border-radius: 6px;
   white-space: nowrap;
-`;
+  font-size: 12px;
+  font-weight: 700;
+  color: #6b6b73;
+  border: 1px solid #eaeaee;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #fff;
+  cursor: pointer;
 
-const StatusDot = styled.span`
-  width: 5px;
-  height: 5px;
-  flex: none;
-  border-radius: 50%;
-  background: currentColor;
+  &:hover {
+    box-shadow: inset 0 0 0 999px rgba(23, 23, 27, 0.045);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
 `;
 
 const TagRow = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+  margin-top: 11px;
 `;
 
 const Tag = styled.span`
@@ -100,6 +74,7 @@ const BottomRow = styled.div`
   display: flex;
   align-items: center;
   gap: 10px;
+  margin-top: 11px;
 `;
 
 const People = styled.div`
@@ -150,64 +125,45 @@ const SourceText = styled.span`
   text-overflow: ellipsis;
 `;
 
-export const TAG_THEME = {
-  neutral: { bg: '#FDF1E4', color: '#C97A22' },
-  warn: { bg: '#FBEAEA', color: '#B03A3A' },
-  positive: { bg: '#E8F3EC', color: '#2C7A4B' },
-  meta: { bg: '#EEEEFC', color: '#5B5BD6' },
-};
-
-export const AVATAR_COLORS = {
-  M: '#3BA55C',
-  김: '#17171B',
-  지: '#7B5BD6',
-};
-
-export default function TaskCard({
+export default function FinishedTaskCard({
   title,
   tags = [],
   people = [],
   source,
   slackHref,
-  statusBadge,
-  onClick,
+  reopening,
+  onReopen,
 }) {
   return (
     <Card>
-      <MainButton onClick={onClick}>
-        <TitleRow>
-          <Title>{title}</Title>
-          {statusBadge && (
-            <StatusBadge $theme={TAG_THEME[statusBadge.type] ?? TAG_THEME.neutral}>
-              <StatusDot />
-              {statusBadge.label}
-            </StatusBadge>
-          )}
-          <MoreDots>···</MoreDots>
-        </TitleRow>
+      <TitleRow>
+        <Title>{title}</Title>
+        <ReopenButton type="button" disabled={reopening} onClick={onReopen}>
+          Reopen
+        </ReopenButton>
+      </TitleRow>
 
-        {tags.length > 0 && (
-          <TagRow>
-            {tags.map((t) => (
-              <Tag key={t.label} $theme={TAG_THEME[t.type] ?? TAG_THEME.neutral}>
-                {t.label}
-              </Tag>
+      {tags.length > 0 && (
+        <TagRow>
+          {tags.map((t) => (
+            <Tag key={t.label} $theme={TAG_THEME[t.type] ?? TAG_THEME.neutral}>
+              {t.label}
+            </Tag>
+          ))}
+        </TagRow>
+      )}
+
+      {people.length > 0 && (
+        <BottomRow>
+          <People>
+            {people.map((p, i) => (
+              <Avatar key={i} $bg={AVATAR_COLORS[p] ?? '#E4E4E8'}>
+                {p}
+              </Avatar>
             ))}
-          </TagRow>
-        )}
-
-        {people.length > 0 && (
-          <BottomRow>
-            <People>
-              {people.map((p, i) => (
-                <Avatar key={i} $bg={AVATAR_COLORS[p] ?? '#E4E4E8'}>
-                  {p}
-                </Avatar>
-              ))}
-            </People>
-          </BottomRow>
-        )}
-      </MainButton>
+          </People>
+        </BottomRow>
+      )}
 
       {source && slackHref && (
         <SourceLink href={slackHref} target="_blank" rel="noreferrer">
