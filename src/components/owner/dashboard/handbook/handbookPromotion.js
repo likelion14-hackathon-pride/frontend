@@ -11,8 +11,8 @@ export const PROMOTION_FILTER_ALL = 'ALL';
 export const PROMOTION_FILTERS = [
   { value: PROMOTION_FILTER_ALL, label: '전체' },
   { value: PROMOTION_TYPE.AUTO_PROMOTED, label: '자동 승격' },
-  { value: PROMOTION_TYPE.PENDING_REVIEW, label: '일괄 검토 경로' },
-  { value: PROMOTION_TYPE.MANUAL_REQUIRED, label: '개별 검토 경로' },
+  { value: PROMOTION_TYPE.PENDING_REVIEW, label: '일괄 검토' },
+  { value: PROMOTION_TYPE.MANUAL_REQUIRED, label: '개별 검토' },
 ];
 
 const GREEN_META = { color: '#1F7A45', bg: '#EAF6EF', border: '#CBE8D6' };
@@ -127,10 +127,10 @@ export function promotionMetaOf(entry) {
       : { label: '자동 승격 분류', ...NEUTRAL_META };
   }
   if (entry?.promotionType === PROMOTION_TYPE.PENDING_REVIEW) {
-    return { label: pending ? '일괄 검토 대상' : '일괄 검토 경유', ...BLUE_META };
+    return { label: pending ? '일괄 검토 대상' : '일괄 검토', ...BLUE_META };
   }
   if (entry?.promotionType === PROMOTION_TYPE.MANUAL_REQUIRED) {
-    return { label: pending ? '개별 검토 필요' : '개별 검토 경유', ...AMBER_META };
+    return { label: pending ? '개별 검토 필요' : '개별 검토', ...AMBER_META };
   }
 
   const state = reviewStateOf(entry);
