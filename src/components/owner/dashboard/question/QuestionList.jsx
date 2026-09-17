@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 
 import { ESCALATION_STATUS, lookup } from '../../../../apis/constants';
+import ScrollArea from '../../../common/ScrollArea';
 
 const STATUS_META = {
   waiting: { label: '답변 대기', bg: '#FFF6E8', color: '#9A6212' },
@@ -24,7 +25,7 @@ const Panel = styled.div`
   box-shadow:
     0 14px 34px -14px rgba(23, 44, 90, 0.22),
     0 3px 8px -2px rgba(23, 44, 90, 0.08);
-  overflow-y: auto;
+  overflow: hidden;
 `;
 
 const Row = styled.button`
@@ -146,35 +147,37 @@ function QuestionList({ questions, selectedId, onSelect }) {
 
   return (
     <Panel>
-      {questions.map((q) => {
-        const meta = lookup(STATUS_META, q.status);
-        const needsReanswer = q.serverStatus === ESCALATION_STATUS.SENT && q.declined;
-        return (
-          <Row
-            key={q.id}
-            type="button"
-            $active={q.id === selectedId}
-            onClick={() => onSelect(q.id)}
-          >
-            <AvatarPill>
-              <AvatarLabel>{q.employee}</AvatarLabel>
-            </AvatarPill>
-            <TextGroup>
-              <QuestionText>{q.text}</QuestionText>
-              <SourceText>
-                {q.project} · {q.time}
-                {q.declined ? ' · 응답 거부' : ''}
-              </SourceText>
-            </TextGroup>
-            <Badge
-              $bg={needsReanswer ? '#FEF2F2' : meta.bg}
-              $color={needsReanswer ? '#DC2626' : meta.color}
+      <ScrollArea>
+        {questions.map((q) => {
+          const meta = lookup(STATUS_META, q.status);
+          const needsReanswer = q.serverStatus === ESCALATION_STATUS.SENT && q.declined;
+          return (
+            <Row
+              key={q.id}
+              type="button"
+              $active={q.id === selectedId}
+              onClick={() => onSelect(q.id)}
             >
-              {meta.label}
-            </Badge>
-          </Row>
-        );
-      })}
+              <AvatarPill>
+                <AvatarLabel>{q.employee}</AvatarLabel>
+              </AvatarPill>
+              <TextGroup>
+                <QuestionText>{q.text}</QuestionText>
+                <SourceText>
+                  {q.project} · {q.time}
+                  {q.declined ? ' · 응답 거부' : ''}
+                </SourceText>
+              </TextGroup>
+              <Badge
+                $bg={needsReanswer ? '#FEF2F2' : meta.bg}
+                $color={needsReanswer ? '#DC2626' : meta.color}
+              >
+                {meta.label}
+              </Badge>
+            </Row>
+          );
+        })}
+      </ScrollArea>
     </Panel>
   );
 }
