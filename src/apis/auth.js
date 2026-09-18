@@ -28,6 +28,14 @@ export async function login({ email, password }) {
   return data;
 }
 
+// 랜딩 페이지에서 이메일/비밀번호 없이 역할만 골라 들어가는 체험 로그인.
+// 응답의 next 로 대표/팀원이 각자 다른 화면으로 바로 들어간다.
+export async function demoLogin({ role }) {
+  const data = await api.post(ENDPOINTS.auth.demoLogin, { role }, { skipAuth: true });
+  tokenStore.set(data.accessToken, data.refreshToken);
+  return data;
+}
+
 // 서버는 발급된 토큰을 무효화하지 않는다. 실패해도 화면은 로그아웃으로 진행한다.
 export async function logout() {
   try {

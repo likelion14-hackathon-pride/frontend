@@ -160,6 +160,25 @@ export function AuthProvider({ children }) {
     [finishAuth]
   );
 
+  // 체험 로그인은 routeForRole(가입 상태 기반 분기)이 아니라 서버가 준 next 를 그대로 따라간다 -
+  // 대표 체험은 온보딩을 건너뛰고 바로 /owner 로, 팀원 체험은 /member/tasks 로 간다.
+  //
+  // next 로 먼저 이동한 다음에 세션을 채운다 - 순서를 반대로 하면(세션부터 채우면),
+  // 아직 랜딩(RedirectIfAuthenticated)에 머물러 있는 동안 isAuthenticated 가 true 로 바뀌면서
+  // 그쪽이 routeForRole() 의 기본 경로로 먼저 이동해 버리고, 우리가 원하는 next 이동과 경합한다.
+  // status 를 LOADING 으로 먼저 두면 RequireAuth 가 로그인으로 튕기지 않고 로딩 화면을 보여준다.
+  const demoLogin = useCallback(
+    async (role) => {
+      const result = await authApi.demoLogin({ role });
+      setSessionNotice(null);
+      setStatus(STATUS.LOADING);
+      if (result?.next) navigateRef.current(`/${result.next}`, { replace: true });
+      const me = await loadMe();
+      return me ? result : null;
+    },
+    [loadMe]
+  );
+
   const signupOwner = useCallback(
     async (payload) => {
       const result = await authApi.signupOwner(payload);
@@ -215,6 +234,7 @@ export function AuthProvider({ children }) {
       bootstrapError,
       retryBootstrap: loadMe,
       login,
+      demoLogin,
       signupOwner,
       signupMemberAccount,
       completeAuth,
@@ -230,6 +250,7 @@ export function AuthProvider({ children }) {
       bootstrapError,
       loadMe,
       login,
+      demoLogin,
       signupOwner,
       signupMemberAccount,
       completeAuth,
