@@ -37,8 +37,8 @@ const EmptyButton = styled.button`
 
 const Grid = styled.div`
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
   align-items: start;
 
   scrollbar-width: none;
