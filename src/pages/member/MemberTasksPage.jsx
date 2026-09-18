@@ -6,6 +6,9 @@ import TasksGreeting from '../../components/member/tasks/TasksGreeting';
 import ProjectFilterChips from '../../components/member/tasks/ProjectFilterChips';
 import TaskBoard from '../../components/member/tasks/TaskBoard';
 import TaskDetailPanel from '../../components/member/tasks/TaskDetailPanel';
+import FinishedTasksButton from '../../components/member/tasks/FinishedTasksButton';
+import FinishedTasksModal from '../../components/member/tasks/FinishedTasksModal';
+import BoardInfoModal from '../../components/member/tasks/BoardInfoModal';
 import { InlineError, LoadingState } from '../../components/common/AsyncStates';
 import { useMemberNavigation } from '../../context/member/MemberContext';
 
@@ -20,11 +23,14 @@ export default function MemberTasksPage() {
     goToAsk,
     profile,
     columns,
+    finishedCards,
     cardsLoading,
     cardsError,
     reloadCards,
     handleCtaClick,
     handleReopen,
+    moveCard,
+    movingCardId,
     projectScopes,
     moveError,
     clearMoveError,
@@ -39,6 +45,8 @@ export default function MemberTasksPage() {
   const [activeProject, setActiveProject] = useState('all');
   const [selectedCard, setSelectedCard] = useState(null);
   const [isPanelWide, setIsPanelWide] = useState(false);
+  const [isFinishedOpen, setIsFinishedOpen] = useState(false);
+  const [isInfoOpen, setIsInfoOpen] = useState(false);
 
   // Slack 답변이 반영되면 card.column 이 바뀐다. 이 화면에 머무는 동안엔
   // 12초마다, 그리고 다른 탭/창 갔다가 이 화면으로 돌아왔을 때(focus) 다시 불러온다.
@@ -73,17 +81,22 @@ export default function MemberTasksPage() {
   const activeProjectLabel =
     projects.find((project) => project.id === activeProject)?.label ?? activeProject;
 
-  function handleCardClick(card, columnId) {
-    setSelectedCard({ ...card, columnId });
+  // 카드가 어느 보드 그룹(Ready/In progress/Question)에 있었는지가 아니라, 카드 자신의
+  // 실제 상태(card.column: READY/IN_PROGRESS/WAITING/ANSWERED)를 기준으로 상세 패널을 그린다.
+  function handleCardClick(card) {
+    setSelectedCard({ ...card, columnId: card.column });
   }
 
-  async function handleMoveFromPanel() {
+  // TaskDetailPanel 이 어떤 상태로 옮길지(target) 직접 골라서 넘긴다 — Answered 는
+  // In progress/Done 둘 다 될 수 있어서 컬럼 하나에 상태 하나로는 정할 수 없기 때문이다.
+  async function handleMoveFromPanel(targetStatus) {
     if (!selectedCard) return;
-    const result =
-      selectedCard.column === 'DONE'
-        ? await handleReopen(selectedCard)
-        : await handleCtaClick(selectedCard, selectedCard.columnId ?? selectedCard.column);
+    const result = await moveCard(selectedCard, targetStatus);
     if (result?.ok) setSelectedCard(null);
+  }
+
+  async function handleReopenFinished(card) {
+    await handleReopen(card);
   }
 
   return (
@@ -107,6 +120,7 @@ export default function MemberTasksPage() {
             projects={projects}
             activeId={activeProject}
             onSelect={setActiveProject}
+            onInfoClick={() => setIsInfoOpen(true)}
           />
         )}
 
@@ -131,6 +145,19 @@ export default function MemberTasksPage() {
         onClose={() => setSelectedCard(null)}
         onMoveAction={handleMoveFromPanel}
       />
+
+      <FinishedTasksButton onClick={() => setIsFinishedOpen(true)} />
+
+      {isFinishedOpen && (
+        <FinishedTasksModal
+          cards={finishedCards}
+          reopeningId={movingCardId}
+          onReopen={handleReopenFinished}
+          onClose={() => setIsFinishedOpen(false)}
+        />
+      )}
+
+      {isInfoOpen && <BoardInfoModal onClose={() => setIsInfoOpen(false)} />}
     </MemberShell>
   );
 }

@@ -26,10 +26,9 @@ export default function MemberNav() {
     pathname.startsWith('/member/handbook/project')
   );
 
-  // 배지는 아직 안 끝낸 카드 수다. Done 열은 세지 않는다.
-  const taskCount = columns
-    .filter((column) => column.id !== 'DONE')
-    .reduce((sum, column) => sum + column.cards.length, 0);
+  // 배지는 아직 안 끝낸 카드 수다. columns 는 Ready/In progress/Question만 담고,
+  // 끝난(DONE) 카드는 애초에 여기 들어오지 않는다.
+  const taskCount = columns.reduce((sum, column) => sum + column.cards.length, 0);
 
   // 규칙 수는 지식공간의 entryCount(확정 규칙만) 합계다.
   const sumEntries = (scopes) => scopes.reduce((sum, scope) => sum + (scope.entryCount ?? 0), 0);

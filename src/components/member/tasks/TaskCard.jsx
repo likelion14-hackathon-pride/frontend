@@ -31,6 +31,14 @@ const MainButton = styled.button`
   cursor: pointer;
 `;
 
+const TitleBlock = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  width: 100%;
+`;
+
 const TitleRow = styled.div`
   display: flex;
   align-items: flex-start;
@@ -58,6 +66,50 @@ const MoreDots = styled.span`
   color: #c4c4cc;
   line-height: 1;
 `;
+
+const StatusBadge = styled.span`
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  color: ${(props) => props.$theme.color};
+  background: none;
+  padding: 0;
+  border-radius: 0;
+  white-space: nowrap;
+`;
+
+const StatusDot = styled.span`
+  width: 5px;
+  height: 5px;
+  flex: none;
+  border-radius: 50%;
+  background: currentColor;
+`;
+
+const StatusCheck = styled.svg`
+  flex: none;
+`;
+
+function StatusMark({ type }) {
+  if (type === 'positive') {
+    return (
+      <StatusCheck width="9" height="9" viewBox="0 0 10 10" fill="none">
+        <path
+          d="M2 5.2l2 2L8 3"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </StatusCheck>
+    );
+  }
+  return <StatusDot />;
+}
 
 const TagRow = styled.div`
   display: flex;
@@ -128,27 +180,47 @@ const SourceText = styled.span`
   text-overflow: ellipsis;
 `;
 
-const TAG_THEME = {
+export const TAG_THEME = {
   neutral: { bg: '#FDF1E4', color: '#C97A22' },
   warn: { bg: '#FBEAEA', color: '#B03A3A' },
   positive: { bg: '#E8F3EC', color: '#2C7A4B' },
   meta: { bg: '#EEEEFC', color: '#5B5BD6' },
 };
 
-const AVATAR_COLORS = {
+export const AVATAR_COLORS = {
   M: '#3BA55C',
   김: '#17171B',
   지: '#7B5BD6',
 };
 
-export default function TaskCard({ title, tags = [], people = [], source, slackHref, onClick }) {
+export default function TaskCard({
+  title,
+  tags = [],
+  people = [],
+  source,
+  slackHref,
+  statusBadge,
+  onClick,
+}) {
   return (
     <Card>
       <MainButton onClick={onClick}>
-        <TitleRow>
-          <Title>{title}</Title>
-          <MoreDots>···</MoreDots>
-        </TitleRow>
+        <TitleBlock>
+          {statusBadge && (
+            <TitleRow>
+              <StatusBadge $theme={TAG_THEME[statusBadge.type] ?? TAG_THEME.neutral}>
+                <StatusMark type={statusBadge.type} />
+                {statusBadge.label}
+              </StatusBadge>
+              <MoreDots>···</MoreDots>
+            </TitleRow>
+          )}
+
+          <TitleRow>
+            <Title>{title}</Title>
+            {!statusBadge && <MoreDots>···</MoreDots>}
+          </TitleRow>
+        </TitleBlock>
 
         {tags.length > 0 && (
           <TagRow>
@@ -160,7 +232,7 @@ export default function TaskCard({ title, tags = [], people = [], source, slackH
           </TagRow>
         )}
 
-        {people.length > 0 && (
+        {people.length > 0 && !statusBadge && (
           <BottomRow>
             <People>
               {people.map((p, i) => (
