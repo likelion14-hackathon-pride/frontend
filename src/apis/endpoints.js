@@ -11,6 +11,7 @@ export const ENDPOINTS = {
     signupOwner: '/api/auth/signup/owner',
     signupMember: '/api/auth/signup/member',
     login: '/api/auth/login',
+    demoLogin: '/api/auth/demo-login',
     logout: '/api/auth/logout',
     tokenRefresh: '/api/auth/token/refresh/',
     tokenVerify: '/api/auth/token/verify/',
