@@ -9,7 +9,7 @@ const COLUMN_THEME = {
     shadow: '0 14px 34px -14px rgba(23, 44, 90, 0.22), 0 3px 8px -2px rgba(23, 44, 90, 0.08)',
   },
   IN_PROGRESS: {
-    bg: '#F7E5D3',
+    bg: '#FFDEC5',
     color: '#8A4708',
     countBg: 'rgba(255, 255, 255, 0.62)',
     shadow: '0 14px 34px -14px rgba(23, 44, 90, 0.22), 0 3px 8px -2px rgba(23, 44, 90, 0.08)',

@@ -31,6 +31,14 @@ const MainButton = styled.button`
   cursor: pointer;
 `;
 
+const TitleBlock = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  width: 100%;
+`;
+
 const TitleRow = styled.div`
   display: flex;
   align-items: flex-start;
@@ -60,16 +68,17 @@ const MoreDots = styled.span`
 `;
 
 const StatusBadge = styled.span`
-  flex: none;
+  flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: 5px;
   font-size: 11px;
   font-weight: 700;
   color: ${(props) => props.$theme.color};
-  background: ${(props) => props.$theme.bg};
-  padding: 4px 9px 4px 7px;
-  border-radius: 6px;
+  background: none;
+  padding: 0;
+  border-radius: 0;
   white-space: nowrap;
 `;
 
@@ -80,6 +89,27 @@ const StatusDot = styled.span`
   border-radius: 50%;
   background: currentColor;
 `;
+
+const StatusCheck = styled.svg`
+  flex: none;
+`;
+
+function StatusMark({ type }) {
+  if (type === 'positive') {
+    return (
+      <StatusCheck width="9" height="9" viewBox="0 0 10 10" fill="none">
+        <path
+          d="M2 5.2l2 2L8 3"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </StatusCheck>
+    );
+  }
+  return <StatusDot />;
+}
 
 const TagRow = styled.div`
   display: flex;
@@ -175,16 +205,22 @@ export default function TaskCard({
   return (
     <Card>
       <MainButton onClick={onClick}>
-        <TitleRow>
-          <Title>{title}</Title>
+        <TitleBlock>
           {statusBadge && (
-            <StatusBadge $theme={TAG_THEME[statusBadge.type] ?? TAG_THEME.neutral}>
-              <StatusDot />
-              {statusBadge.label}
-            </StatusBadge>
+            <TitleRow>
+              <StatusBadge $theme={TAG_THEME[statusBadge.type] ?? TAG_THEME.neutral}>
+                <StatusMark type={statusBadge.type} />
+                {statusBadge.label}
+              </StatusBadge>
+              <MoreDots>···</MoreDots>
+            </TitleRow>
           )}
-          <MoreDots>···</MoreDots>
-        </TitleRow>
+
+          <TitleRow>
+            <Title>{title}</Title>
+            {!statusBadge && <MoreDots>···</MoreDots>}
+          </TitleRow>
+        </TitleBlock>
 
         {tags.length > 0 && (
           <TagRow>
@@ -196,7 +232,7 @@ export default function TaskCard({
           </TagRow>
         )}
 
-        {people.length > 0 && (
+        {people.length > 0 && !statusBadge && (
           <BottomRow>
             <People>
               {people.map((p, i) => (

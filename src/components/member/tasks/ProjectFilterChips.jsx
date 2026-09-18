@@ -29,7 +29,36 @@ const Chip = styled.button`
   cursor: pointer;
 `;
 
-export default function ProjectFilterChips({ projects = [], activeId = 'all', onSelect }) {
+const InfoButton = styled.button`
+  flex: none;
+  margin-left: auto;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: none;
+  background: none;
+  color: #b4b4bc;
+  cursor: pointer;
+
+  &:hover {
+    color: #6b6b73;
+  }
+`;
+
+function InfoIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <circle cx="9" cy="9" r="7.5" stroke="currentColor" strokeWidth="1.4" />
+      <path d="M9 8.2V13" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+      <circle cx="9" cy="5.6" r="0.95" fill="currentColor" />
+    </svg>
+  );
+}
+
+export default function ProjectFilterChips({ projects = [], activeId = 'all', onSelect, onInfoClick }) {
   return (
     <Row>
       <Label>PROJECT</Label>
@@ -41,6 +70,11 @@ export default function ProjectFilterChips({ projects = [], activeId = 'all', on
           #{p.label}
         </Chip>
       ))}
+      {onInfoClick && (
+        <InfoButton type="button" onClick={onInfoClick} aria-label="Board info">
+          <InfoIcon />
+        </InfoButton>
+      )}
     </Row>
   );
 }

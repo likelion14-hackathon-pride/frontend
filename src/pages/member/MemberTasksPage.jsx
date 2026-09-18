@@ -8,6 +8,7 @@ import TaskBoard from '../../components/member/tasks/TaskBoard';
 import TaskDetailPanel from '../../components/member/tasks/TaskDetailPanel';
 import FinishedTasksButton from '../../components/member/tasks/FinishedTasksButton';
 import FinishedTasksModal from '../../components/member/tasks/FinishedTasksModal';
+import BoardInfoModal from '../../components/member/tasks/BoardInfoModal';
 import { InlineError, LoadingState } from '../../components/common/AsyncStates';
 import { useMemberNavigation } from '../../context/member/MemberContext';
 
@@ -45,6 +46,7 @@ export default function MemberTasksPage() {
   const [selectedCard, setSelectedCard] = useState(null);
   const [isPanelWide, setIsPanelWide] = useState(false);
   const [isFinishedOpen, setIsFinishedOpen] = useState(false);
+  const [isInfoOpen, setIsInfoOpen] = useState(false);
 
   // Slack 답변이 반영되면 card.column 이 바뀐다. 이 화면에 머무는 동안엔
   // 12초마다, 그리고 다른 탭/창 갔다가 이 화면으로 돌아왔을 때(focus) 다시 불러온다.
@@ -118,6 +120,7 @@ export default function MemberTasksPage() {
             projects={projects}
             activeId={activeProject}
             onSelect={setActiveProject}
+            onInfoClick={() => setIsInfoOpen(true)}
           />
         )}
 
@@ -153,6 +156,8 @@ export default function MemberTasksPage() {
           onClose={() => setIsFinishedOpen(false)}
         />
       )}
+
+      {isInfoOpen && <BoardInfoModal onClose={() => setIsInfoOpen(false)} />}
     </MemberShell>
   );
 }
