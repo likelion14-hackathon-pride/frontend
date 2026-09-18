@@ -7,7 +7,6 @@ import { MemberProvider } from './context/member/MemberContext';
 import { RedirectIfAuthenticated, RequireAuth, RequireRole } from './routes/guards';
 
 import LoginPage from './pages/auth/LoginPage';
-import LandingPage from './pages/auth/LandingPage';
 import LoadingScreen from './pages/common/LoadingScreen';
 import MemberHomePage from './pages/member/MemberHomePage';
 import MemberTasksPage from './pages/member/MemberTasksPage';
@@ -23,15 +22,6 @@ const SPLASH_DURATION = 1800; // ms, 필요하면 조절
 function AppRoutes() {
   return (
     <Routes>
-      <Route
-        path="/"
-        element={
-          <RedirectIfAuthenticated>
-            <LandingPage />
-          </RedirectIfAuthenticated>
-        }
-      />
-
       <Route
         path="/login"
         element={

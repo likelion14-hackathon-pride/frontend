@@ -3,6 +3,7 @@ import styled from 'styled-components';
 
 import * as authApi from '../../apis/auth';
 import { toApiError } from '../../apis/errors';
+import { ROLE } from '../../apis/constants';
 import AuthLayout from '../../components/auth/ui/AuthLayout';
 import ModeToggle from '../../components/auth/ui/ModeToggle';
 import RoleSelect from '../../components/auth/ui/RoleSelect';
@@ -34,18 +35,6 @@ const Notice = styled.div`
   color: ${({ $tone }) => ($tone === 'error' ? '#96131C' : $tone === 'info' ? '#525A66' : '#7A5A05')};
 `;
 
-// 로그인 없이 둘러보기
-const DEMO_ACCOUNTS = {
-  owner: {
-    email: import.meta.env.VITE_DEMO_OWNER_EMAIL,
-    password: import.meta.env.VITE_DEMO_OWNER_PASSWORD,
-  },
-  member: {
-    email: import.meta.env.VITE_DEMO_MEMBER_EMAIL,
-    password: import.meta.env.VITE_DEMO_MEMBER_PASSWORD,
-  },
-};
-
 const FieldError = styled.p`
   margin: -2px 0 0;
   font-family: Pretendard, 'Plus Jakarta Sans', sans-serif;
@@ -57,6 +46,7 @@ const FieldError = styled.p`
 export default function LoginPage() {
   const {
     login,
+    demoLogin,
     signupOwner,
     signupMemberAccount,
     completeAuth,
@@ -192,18 +182,14 @@ export default function LoginPage() {
     }
   };
 
+  // 이메일/비밀번호 없이 역할만으로 접속하는 체험 로그인(POST /api/auth/demo-login).
   const handleDemoLogin = async (roleKey) => {
     if (submitting) return;
-    const creds = DEMO_ACCOUNTS[roleKey];
-    if (!creds.email || !creds.password) {
-      localError(t.demoNotReady);
-      return;
-    }
     setFormError(null);
     clearSessionNotice();
     setSubmitting(true);
     try {
-      await login(creds);
+      await demoLogin(roleKey === 'owner' ? ROLE.OWNER : ROLE.MEMBER);
     } catch (caught) {
       showError(caught);
     } finally {
