@@ -1,0 +1,60 @@
+/* Figma-materialized background bitmap classes, referenced by the ported
+   onboarding/owner mock components. Values copied from the original
+   sai-landing-slim export (1-head-styles.html). */
+.fig-asset-82e07f64d0e31f96-4c9b9fa6 {
+  background: url('../../../assets/landing/figmocks/bg-cea47e8a-333x500.png') 64.649% 78.895% / 459.13% 920.93%
+    no-repeat;
+}
+.fig-asset-82e07f64d0e31f96-8bb8482c {
+  background: url('../../../assets/landing/figmocks/bg-cea47e8a-333x500.png') 51.923% 18.611% / 586.667% 851.613%
+    no-repeat;
+}
+.fig-asset-82e07f64d0e31f96-afbfe546 {
+  background: url('../../../assets/landing/figmocks/bg-cea47e8a-333x500.png') 1.774% 50.699% / 435.745% 867.796%
+    no-repeat;
+}
+.fig-asset-82e07f64d0e31f96-d6402eee {
+  background: url('../../../assets/landing/figmocks/bg-cea47e8a-333x500.png') 25.962% 33.973% / 471.429% 688.696%
+    no-repeat;
+}
+.fig-asset-b02ec39023a28b66 {
+  background: url('../../../assets/landing/figmocks/bg-90823088-192x192.png') center / cover no-repeat;
+}
+.fig-asset-beec4bcbb56ff354 {
+  background: url('../../../assets/landing/figmocks/bg-c42594c1-162x148.png') center / cover no-repeat;
+}
+.fig-asset-72b90c52d2235a10 {
+  background: url('../../../assets/landing/figmocks/bg-da5addc7-433x181.png') center / cover no-repeat;
+}
+.fig-asset-76236997e5208589-02d762ad {
+  background: url('../../../assets/landing/figmocks/bg-e1f1459e-1311x45.png') top left / 1311px 45px repeat;
+}
+
+/* components-div.js (Project mock) fig-asset classes */
+.fig-asset-1d56af742747464c {
+  background: url('../../../assets/landing/figmocks/bg-e316496d-1372x956.png') center / cover no-repeat;
+}
+.fig-asset-446c2181b9ae438d-d9061b87 {
+  background: url('../../../assets/landing/figmocks/bg-1a5af7bd-360x156.png') center / contain no-repeat;
+}
+.fig-asset-6565e336d3d40fab-870b0ffc {
+  background: url('../../../assets/landing/figmocks/bg-a0b0fec1-260x956.png') top left / 260px 956px repeat;
+}
+.fig-asset-85c94a1c43f8652c-de8adcd4 {
+  background: url('../../../assets/landing/figmocks/bg-74fbb375-227x124.png') top left / 227px 124px repeat;
+}
+.fig-asset-95addb661582b9d9-93d2cea7 {
+  background: url('../../../assets/landing/figmocks/bg-e7f64cfd-300x300.png') center / contain no-repeat;
+}
+.fig-asset-a19e6de2b7f67ebd-8fe0c407 {
+  background: url('../../../assets/landing/figmocks/bg-574f3f2a-177x34.png') top left / 177px 34px repeat;
+}
+.fig-asset-bcfe24dfb2c11817-134d1309 {
+  background: url('../../../assets/landing/figmocks/bg-7bbb2a8e-227x44.png') top left / 227px 44px repeat;
+}
+.fig-asset-de727597385139be-765d36ef {
+  background: url('../../../assets/landing/figmocks/bg-bae06fb3-19x17.png') top left / 19px 17px repeat;
+}
+.fig-asset-decc1e66cad1ab71-573e013b {
+  background: url('../../../assets/landing/figmocks/bg-886fe637-1112x956.png') top left / 1112px 956px repeat;
+}
