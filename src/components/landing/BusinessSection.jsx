@@ -307,8 +307,7 @@ export default function BusinessSection({ reveal }) {
         </TableWrap>
 
         <PriceNote>
-          * 일정 규모의 기업은 각 회사의 보안 규정과 데이터양에 맞춘 '맞춤형 공사'가 들어가야 하므로
-          별도 견적으로 진행하는 것이 SaaS 업계의 표준
+          * 일정 규모의 기업은 각 회사의 보안 규정과 데이터양에 맞춘 별도 견적으로 진행됩니다.
         </PriceNote>
       </PricingBlock>
     </SectionShell>
